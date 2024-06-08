@@ -25,7 +25,7 @@ namespace vulkancraft
 		{
 			extent = game_window_.getExtent();
 
-			// HACK: 这里没有了 glfwWaitEvents();
+			// HACK: 这里去掉了 glfwWaitEvents();
 		}
 
 		vkDeviceWaitIdle(game_device_.get_vulkan_device());
@@ -48,7 +48,7 @@ namespace vulkancraft
 
 	void GameRenderer::create_command_buffers()
 	{
-		command_buffer_vector_.resize(GameSwapChain::MAX_FRAMES_IN_FLIGHT);
+		command_buffer_vector_.resize(GameSwapChain::kMaxFramesInFlight);
 
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -127,7 +127,7 @@ namespace vulkancraft
 		}
 
 		is_frame_started_ = false;
-		current_frame_index_ = (current_frame_index_ + 1) % GameSwapChain::MAX_FRAMES_IN_FLIGHT;
+		current_frame_index_ = (current_frame_index_ + 1) % GameSwapChain::kMaxFramesInFlight;
 	}
 
 	void GameRenderer::begin_swap_chain_render_pass(VkCommandBuffer commandBuffer)

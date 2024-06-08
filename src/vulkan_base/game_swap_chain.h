@@ -17,7 +17,7 @@ namespace vulkancraft
 	{
 	public:
 
-		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+		static constexpr int kMaxFramesInFlight = 2;
 
 		GameSwapChain(GameDevice& game_device_ref, VkExtent2D window_extent);
 		GameSwapChain(GameDevice& game_device_ref, VkExtent2D window_extent, std::shared_ptr<GameSwapChain> previous);

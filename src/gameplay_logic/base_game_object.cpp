@@ -74,7 +74,7 @@ namespace vulkancraft
 		gameObj.color_ = color;
 		gameObj.transform_.scale.x = radius;
 		gameObj.point_light_ = std::make_unique<PointLightComponent>();
-		gameObj.point_light_->light_intensity = intensity;
+		gameObj.point_light_ -> light_intensity = intensity;
 
 		return gameObj;
 	}

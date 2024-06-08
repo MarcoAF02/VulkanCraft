@@ -63,7 +63,7 @@ namespace vulkancraft
 		vkDestroyRenderPass(game_device_.get_vulkan_device(), render_pass_, nullptr);
 
 		// cleanup synchronization objects
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		for (size_t i = 0; i < kMaxFramesInFlight; i++)
 		{
 			vkDestroySemaphore(game_device_.get_vulkan_device(), render_finished_semaphore_vector_[i], nullptr);
 			vkDestroySemaphore(game_device_.get_vulkan_device(), image_available_semaphore_vector_[i], nullptr);
@@ -138,7 +138,7 @@ namespace vulkancraft
 
 		auto result = vkQueuePresentKHR(game_device_.present_queue(), &presentInfo);
 
-		current_frame_ = (current_frame_ + 1) % MAX_FRAMES_IN_FLIGHT;
+		current_frame_ = (current_frame_ + 1) % kMaxFramesInFlight;
 
 		return result;
 	}
@@ -381,9 +381,9 @@ namespace vulkancraft
 
 	void GameSwapChain::create_sync_objects()
 	{
-		image_available_semaphore_vector_.resize(MAX_FRAMES_IN_FLIGHT);
-		render_finished_semaphore_vector_.resize(MAX_FRAMES_IN_FLIGHT);
-		in_flight_fence_vector_.resize(MAX_FRAMES_IN_FLIGHT);
+		image_available_semaphore_vector_.resize(kMaxFramesInFlight);
+		render_finished_semaphore_vector_.resize(kMaxFramesInFlight);
+		in_flight_fence_vector_.resize(kMaxFramesInFlight);
 		images_in_flight_vector_.resize(image_count(), VK_NULL_HANDLE);
 
 		VkSemaphoreCreateInfo semaphoreInfo = {};
@@ -393,7 +393,7 @@ namespace vulkancraft
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		for (size_t i = 0; i < kMaxFramesInFlight; i++)
 		{
 			if (vkCreateSemaphore(game_device_.get_vulkan_device(), &semaphoreInfo, nullptr, &image_available_semaphore_vector_[i]) != VK_SUCCESS ||
 				vkCreateSemaphore(game_device_.get_vulkan_device(), &semaphoreInfo, nullptr, &render_finished_semaphore_vector_[i]) != VK_SUCCESS ||
