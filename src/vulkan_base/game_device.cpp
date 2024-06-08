@@ -10,7 +10,7 @@
 namespace vulkancraft
 {
 	// local callback functions
-	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback
+	static VKAPI_ATTR VkBool32 VKAPI_CALL debug_call_back
 	(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -18,11 +18,11 @@ namespace vulkancraft
 		void* pUserData
 	)
 	{
-		std::cerr << "验证层发来的错误信息: " << pCallbackData->pMessage << std::endl;
+		std::cerr << "验证层发来的错误信息: " << pCallbackData -> pMessage << std::endl;
 		return VK_FALSE;
 	}
 
-	VkResult CreateDebugUtilsMessengerEXT
+	VkResult create_debug_utils_messenger_Ext
 	(
 		VkInstance instance,
 		const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
@@ -46,7 +46,7 @@ namespace vulkancraft
 		}
 	}
 
-	void DestroyDebugUtilsMessengerEXT
+	void destroy_debug_utils_messenger_Ext
 	(
 		VkInstance instance,
 		VkDebugUtilsMessengerEXT debugMessenger,
@@ -66,16 +66,16 @@ namespace vulkancraft
 	}
 
 	// class member functions
-	GameDevice::GameDevice(GameWindow& window) : window{ window }
+	GameDevice::GameDevice(GameWindow& window) : game_window_{ window }
 	{
 		try
 		{
-			createInstance();
-			setupDebugMessenger();
-			createSurface();
-			pickPhysicalDevice();
-			createLogicalDevice();
-			createCommandPool();
+			create_vulkan_instance();
+			setup_debug_messenger();
+			create_surface();
+			pick_physical_device();
+			create_logical_device();
+			create_command_pool();
 
 			std::cout << "========================================" << std::endl;
 			std::cout << "GameDevice 类初始化成功" << std::endl;
@@ -89,21 +89,21 @@ namespace vulkancraft
 
 	GameDevice::~GameDevice()
 	{
-		vkDestroyCommandPool(device_, commandPool, nullptr);
-		vkDestroyDevice(device_, nullptr);
+		vkDestroyCommandPool(vulkan_device_, command_pool_, nullptr);
+		vkDestroyDevice(vulkan_device_, nullptr);
 
-		if (enableValidationLayers)
+		if (enable_validation_layers_)
 		{
-			DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+			destroy_debug_utils_messenger_Ext(instance_, debug_messenger_, nullptr);
 		}
 
-		vkDestroySurfaceKHR(instance, surface_, nullptr);
-		vkDestroyInstance(instance, nullptr);
+		vkDestroySurfaceKHR(instance_, surface_, nullptr);
+		vkDestroyInstance(instance_, nullptr);
 	}
 
-	void GameDevice::createInstance()
+	void GameDevice::create_vulkan_instance()
 	{
-		if (enableValidationLayers && !checkValidationLayerSupport())
+		if (enable_validation_layers_ && !check_validation_layer_support())
 		{
 			throw std::runtime_error("已请求验证层，但验证层不可用");
 		}
@@ -120,18 +120,18 @@ namespace vulkancraft
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		createInfo.pApplicationInfo = &appInfo;
 
-		auto extensions = getRequiredExtensions();
+		auto extensions = get_required_extension_vector();
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 		createInfo.ppEnabledExtensionNames = extensions.data();
 
 		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
 
-		if (enableValidationLayers)
+		if (enable_validation_layers_)
 		{
-			createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-			createInfo.ppEnabledLayerNames = validationLayers.data();
+			createInfo.enabledLayerCount = static_cast<uint32_t>(validation_layer_vector_.size());
+			createInfo.ppEnabledLayerNames = validation_layer_vector_.data();
 
-			populateDebugMessengerCreateInfo(debugCreateInfo);
+			populate_debug_messenger_create_info(debugCreateInfo);
 			createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
 		}
 		else
@@ -140,18 +140,18 @@ namespace vulkancraft
 			createInfo.pNext = nullptr;
 		}
 
-		if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
+		if (vkCreateInstance(&createInfo, nullptr, &instance_) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Vulkan Instance 创建失败");
 		}
 
-		hasRequiredInstanceExtensions();
+		has_required_instance_extensions();
 	}
 
-	void GameDevice::pickPhysicalDevice()
+	void GameDevice::pick_physical_device()
 	{
 		uint32_t deviceCount = 0;
-		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+		vkEnumeratePhysicalDevices(instance_, &deviceCount, nullptr);
 
 		if (deviceCount == 0)
 		{
@@ -160,32 +160,32 @@ namespace vulkancraft
 
 		std::cout << "找到的显卡数量: " << deviceCount << std::endl;
 		std::vector<VkPhysicalDevice> devices(deviceCount);
-		vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+		vkEnumeratePhysicalDevices(instance_, &deviceCount, devices.data());
 
 		for (const auto& device : devices)
 		{
-			if (isDeviceSuitable(device))
+			if (is_device_suitable(device))
 			{
-				physicalDevice = device;
+				physical_device_ = device;
 				break;
 			}
 		}
 
-		if (physicalDevice == VK_NULL_HANDLE)
+		if (physical_device_ == VK_NULL_HANDLE)
 		{
 			throw std::runtime_error("没有找到合适的显卡");
 		}
 
-		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-		std::cout << "显卡的名称为: " << properties.deviceName << std::endl;
+		vkGetPhysicalDeviceProperties(physical_device_, &properties_);
+		std::cout << "显卡的名称为: " << properties_.deviceName << std::endl;
 	}
 
-	void GameDevice::createLogicalDevice()
+	void GameDevice::create_logical_device()
 	{
-		QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+		QueueFamilyIndices indices = find_queue_families(physical_device_);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-		std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
+		std::set<uint32_t> uniqueQueueFamilies = { indices.graphics_family, indices.present_family };
 
 		float queuePriority = 1.0f;
 
@@ -209,59 +209,59 @@ namespace vulkancraft
 		createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
 		createInfo.pEnabledFeatures = &deviceFeatures;
-		createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
-		createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+		createInfo.enabledExtensionCount = static_cast<uint32_t>(device_extension_vector_.size());
+		createInfo.ppEnabledExtensionNames = device_extension_vector_.data();
 
 		// might not really be necessary anymore because device specific validation layers
 		// have been deprecated
-		if (enableValidationLayers)
+		if (enable_validation_layers_)
 		{
-			createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-			createInfo.ppEnabledLayerNames = validationLayers.data();
+			createInfo.enabledLayerCount = static_cast<uint32_t>(validation_layer_vector_.size());
+			createInfo.ppEnabledLayerNames = validation_layer_vector_.data();
 		}
 		else
 		{
 			createInfo.enabledLayerCount = 0;
 		}
 
-		if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device_) != VK_SUCCESS)
+		if (vkCreateDevice(physical_device_, &createInfo, nullptr, &vulkan_device_) != VK_SUCCESS)
 		{
 			throw std::runtime_error("逻辑设备创建失败");
 		}
 
-		vkGetDeviceQueue(device_, indices.graphicsFamily, 0, &graphicsQueue_);
-		vkGetDeviceQueue(device_, indices.presentFamily, 0, &presentQueue_);
+		vkGetDeviceQueue(vulkan_device_, indices.graphics_family, 0, &graphics_queue_);
+		vkGetDeviceQueue(vulkan_device_, indices.present_family, 0, &present_queue_);
 	}
 
-	void GameDevice::createCommandPool()
+	void GameDevice::create_command_pool()
 	{
-		QueueFamilyIndices queueFamilyIndices = findPhysicalQueueFamilies();
+		QueueFamilyIndices queueFamilyIndices = find_physical_queue_families();
 
 		VkCommandPoolCreateInfo poolInfo = {};
 		poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;
+		poolInfo.queueFamilyIndex = queueFamilyIndices.graphics_family;
 		poolInfo.flags =
 			VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
-		if (vkCreateCommandPool(device_, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
+		if (vkCreateCommandPool(vulkan_device_, &poolInfo, nullptr, &command_pool_) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Command Pool 创建失败");
 		}
 	}
 
-	void GameDevice::createSurface() { window.create_vulkan_window(instance, &surface_); }
+	void GameDevice::create_surface() { game_window_.create_vulkan_window(instance_, &surface_); }
 
-	bool GameDevice::isDeviceSuitable(VkPhysicalDevice device)
+	bool GameDevice::is_device_suitable(VkPhysicalDevice device)
 	{
-		QueueFamilyIndices indices = findQueueFamilies(device);
+		QueueFamilyIndices indices = find_queue_families(device);
 
-		bool extensionsSupported = checkDeviceExtensionSupport(device);
+		bool extensionsSupported = check_device_extension_support(device);
 		bool swapChainAdequate = false;
 
 		if (extensionsSupported)
 		{
-			SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
-			swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+			SwapChainSupportDetails swapChainSupport = query_swap_chain_support(device);
+			swapChainAdequate = !swapChainSupport.formats_vector.empty() && !swapChainSupport.present_mode_vector.empty();
 		}
 
 		VkPhysicalDeviceFeatures supportedFeatures;
@@ -270,32 +270,29 @@ namespace vulkancraft
 		return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 	}
 
-	void GameDevice::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+	void GameDevice::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
 	{
 		createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-		createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-			VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-		createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-			VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-			VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-		createInfo.pfnUserCallback = debugCallback;
+		createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+		createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+		createInfo.pfnUserCallback = debug_call_back;
 		createInfo.pUserData = nullptr;  // Optional
 	}
 
-	void GameDevice::setupDebugMessenger()
+	void GameDevice::setup_debug_messenger()
 	{
-		if (!enableValidationLayers) return;
+		if (!enable_validation_layers_) return;
 		VkDebugUtilsMessengerCreateInfoEXT createInfo;
-		populateDebugMessengerCreateInfo(createInfo);
+		populate_debug_messenger_create_info(createInfo);
 
-		if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
+		if (create_debug_utils_messenger_Ext(instance_, &createInfo, nullptr, &debug_messenger_) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Debug Messenger 创建失败");
 		}
 	}
 
-	bool GameDevice::checkValidationLayerSupport()
+	bool GameDevice::check_validation_layer_support()
 	{
 		uint32_t layerCount;
 		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -303,7 +300,7 @@ namespace vulkancraft
 		std::vector<VkLayerProperties> availableLayers(layerCount);
 		vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
-		for (const char* layerName : validationLayers)
+		for (const char* layerName : validation_layer_vector_)
 		{
 			bool layerFound = false;
 
@@ -325,12 +322,12 @@ namespace vulkancraft
 		return true;
 	}
 
-	std::vector<const char*> GameDevice::getRequiredExtensions()
+	std::vector<const char*> GameDevice::get_required_extension_vector()
 	{
 		uint32_t extensionCount = 0;
 
 		// 先确定扩展的数量，知道 Vector 要开多大
-		if (!SDL_Vulkan_GetInstanceExtensions(window.sdl_window_, &extensionCount, nullptr))
+		if (!SDL_Vulkan_GetInstanceExtensions(game_window_.sdl_window_, &extensionCount, nullptr))
 		{
 			throw std::runtime_error("尝试获取 Vulkan 扩展数量失败");
 		}
@@ -338,13 +335,13 @@ namespace vulkancraft
 		std::vector<const char*> extensions(extensionCount);
 
 		// 然后确定扩展的实际内容
-		if (!SDL_Vulkan_GetInstanceExtensions(window.sdl_window_, &extensionCount, extensions.data()))
+		if (!SDL_Vulkan_GetInstanceExtensions(game_window_.sdl_window_, &extensionCount, extensions.data()))
 		{
 			throw std::runtime_error("尝试获取 Vulkan 扩展内容失败");
 		}
 
 		// 然后把验证层塞进去
-		if (enableValidationLayers)
+		if (enable_validation_layers_)
 		{
 			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		}
@@ -352,7 +349,7 @@ namespace vulkancraft
 		return extensions;
 	}
 
-	void GameDevice::hasRequiredInstanceExtensions()
+	void GameDevice::has_required_instance_extensions()
 	{
 		uint32_t extensionCount = 0;
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -369,7 +366,7 @@ namespace vulkancraft
 		}
 
 		std::cout << "必需的扩展为:" << std::endl;
-		auto requiredExtensions = getRequiredExtensions();
+		auto requiredExtensions = get_required_extension_vector();
 
 		for (const auto& required : requiredExtensions)
 		{
@@ -382,7 +379,7 @@ namespace vulkancraft
 		}
 	}
 
-	bool GameDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)
+	bool GameDevice::check_device_extension_support(VkPhysicalDevice device)
 	{
 		uint32_t extensionCount;
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -396,7 +393,7 @@ namespace vulkancraft
 			availableExtensions.data()
 		);
 
-		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+		std::set<std::string> requiredExtensions(device_extension_vector_.begin(), device_extension_vector_.end());
 
 		for (const auto& extension : availableExtensions)
 		{
@@ -406,7 +403,7 @@ namespace vulkancraft
 		return requiredExtensions.empty();
 	}
 
-	QueueFamilyIndices GameDevice::findQueueFamilies(VkPhysicalDevice device)
+	QueueFamilyIndices GameDevice::find_queue_families(VkPhysicalDevice device)
 	{
 		QueueFamilyIndices indices;
 
@@ -422,8 +419,8 @@ namespace vulkancraft
 		{
 			if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 			{
-				indices.graphicsFamily = i;
-				indices.graphicsFamilyHasValue = true;
+				indices.graphics_family = i;
+				indices.graphics_family_has_value = true;
 			}
 
 			VkBool32 presentSupport = false;
@@ -431,8 +428,8 @@ namespace vulkancraft
 
 			if (queueFamily.queueCount > 0 && presentSupport)
 			{
-				indices.presentFamily = i;
-				indices.presentFamilyHasValue = true;
+				indices.present_family = i;
+				indices.present_family_has_value = true;
 			}
 
 			if (indices.isComplete())
@@ -446,7 +443,7 @@ namespace vulkancraft
 		return indices;
 	}
 
-	SwapChainSupportDetails GameDevice::querySwapChainSupport(VkPhysicalDevice device)
+	SwapChainSupportDetails GameDevice::query_swap_chain_support(VkPhysicalDevice device)
 	{
 		SwapChainSupportDetails details;
 		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface_, &details.capabilities);
@@ -456,8 +453,8 @@ namespace vulkancraft
 
 		if (formatCount != 0)
 		{
-			details.formats.resize(formatCount);
-			vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface_, &formatCount, details.formats.data());
+			details.formats_vector.resize(formatCount);
+			vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface_, &formatCount, details.formats_vector.data());
 		}
 
 		uint32_t presentModeCount;
@@ -465,20 +462,20 @@ namespace vulkancraft
 
 		if (presentModeCount != 0)
 		{
-			details.presentModes.resize(presentModeCount);
+			details.present_mode_vector.resize(presentModeCount);
 			vkGetPhysicalDeviceSurfacePresentModesKHR
 			(
 				device,
 				surface_,
 				&presentModeCount,
-				details.presentModes.data()
+				details.present_mode_vector.data()
 			);
 		}
 
 		return details;
 	}
 
-	VkFormat GameDevice::findSupportedFormat
+	VkFormat GameDevice::find_supported_format
 	(
 		const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features
 	)
@@ -486,7 +483,7 @@ namespace vulkancraft
 		for (VkFormat format : candidates)
 		{
 			VkFormatProperties props;
-			vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+			vkGetPhysicalDeviceFormatProperties(physical_device_, format, &props);
 
 			if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) 
 			{
@@ -504,7 +501,7 @@ namespace vulkancraft
 	uint32_t GameDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 	{
 		VkPhysicalDeviceMemoryProperties memProperties;
-		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+		vkGetPhysicalDeviceMemoryProperties(physical_device_, &memProperties);
 
 		for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
 		{
@@ -517,7 +514,7 @@ namespace vulkancraft
 		throw std::runtime_error("找不到支持的内存类型");
 	}
 
-	void GameDevice::createBuffer
+	void GameDevice::create_buffer
 	(
 		VkDeviceSize size,
 		VkBufferUsageFlags usage,
@@ -532,37 +529,37 @@ namespace vulkancraft
 		bufferInfo.usage = usage;
 		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		if (vkCreateBuffer(device_, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+		if (vkCreateBuffer(vulkan_device_, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Vertex Buffer 创建失败");
 		}
 
 		VkMemoryRequirements memRequirements;
-		vkGetBufferMemoryRequirements(device_, buffer, &memRequirements);
+		vkGetBufferMemoryRequirements(vulkan_device_, buffer, &memRequirements);
 
 		VkMemoryAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.allocationSize = memRequirements.size;
 		allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
-		if (vkAllocateMemory(device_, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
+		if (vkAllocateMemory(vulkan_device_, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Vertex Buffer 内存分配失败");
 		}
 
-		vkBindBufferMemory(device_, buffer, bufferMemory, 0);
+		vkBindBufferMemory(vulkan_device_, buffer, bufferMemory, 0);
 	}
 
-	VkCommandBuffer GameDevice::beginSingleTimeCommands()
+	VkCommandBuffer GameDevice::begin_single_time_commands()
 	{
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocInfo.commandPool = commandPool;
+		allocInfo.commandPool = command_pool_;
 		allocInfo.commandBufferCount = 1;
 
 		VkCommandBuffer commandBuffer;
-		vkAllocateCommandBuffers(device_, &allocInfo, &commandBuffer);
+		vkAllocateCommandBuffers(vulkan_device_, &allocInfo, &commandBuffer);
 
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -572,7 +569,7 @@ namespace vulkancraft
 		return commandBuffer;
 	}
 
-	void GameDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer)
+	void GameDevice::end_single_time_commands(VkCommandBuffer commandBuffer)
 	{
 		vkEndCommandBuffer(commandBuffer);
 
@@ -581,15 +578,15 @@ namespace vulkancraft
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &commandBuffer;
 
-		vkQueueSubmit(graphicsQueue_, 1, &submitInfo, VK_NULL_HANDLE);
-		vkQueueWaitIdle(graphicsQueue_);
+		vkQueueSubmit(graphics_queue_, 1, &submitInfo, VK_NULL_HANDLE);
+		vkQueueWaitIdle(graphics_queue_);
 
-		vkFreeCommandBuffers(device_, commandPool, 1, &commandBuffer);
+		vkFreeCommandBuffers(vulkan_device_, command_pool_, 1, &commandBuffer);
 	}
 
-	void GameDevice::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+	void GameDevice::copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 	{
-		VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+		VkCommandBuffer commandBuffer = begin_single_time_commands();
 
 		VkBufferCopy copyRegion{};
 		copyRegion.srcOffset = 0;  // Optional
@@ -597,15 +594,15 @@ namespace vulkancraft
 		copyRegion.size = size;
 		vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-		endSingleTimeCommands(commandBuffer);
+		end_single_time_commands(commandBuffer);
 	}
 
-	void GameDevice::copyBufferToImage
+	void GameDevice::copy_buffer_to_image
 	(
 		VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount
 	)
 	{
-		VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+		VkCommandBuffer commandBuffer = begin_single_time_commands();
 
 		VkBufferImageCopy region{};
 		region.bufferOffset = 0;
@@ -630,10 +627,10 @@ namespace vulkancraft
 			&region
 		);
 
-		endSingleTimeCommands(commandBuffer);
+		end_single_time_commands(commandBuffer);
 	}
 
-	void GameDevice::createImageWithInfo
+	void GameDevice::create_image_with_info
 	(
 		const VkImageCreateInfo& imageInfo,
 		VkMemoryPropertyFlags properties,
@@ -641,25 +638,25 @@ namespace vulkancraft
 		VkDeviceMemory& imageMemory
 	)
 	{
-		if (vkCreateImage(device_, &imageInfo, nullptr, &image) != VK_SUCCESS)
+		if (vkCreateImage(vulkan_device_, &imageInfo, nullptr, &image) != VK_SUCCESS)
 		{
 			throw std::runtime_error("VkImage 类创建失败");
 		}
 
 		VkMemoryRequirements memRequirements;
-		vkGetImageMemoryRequirements(device_, image, &memRequirements);
+		vkGetImageMemoryRequirements(vulkan_device_, image, &memRequirements);
 
 		VkMemoryAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.allocationSize = memRequirements.size;
 		allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
-		if (vkAllocateMemory(device_, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
+		if (vkAllocateMemory(vulkan_device_, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
 		{
 			throw std::runtime_error("VkImage 内存分配失败");
 		}
 
-		if (vkBindImageMemory(device_, image, imageMemory, 0) != VK_SUCCESS)
+		if (vkBindImageMemory(vulkan_device_, image, imageMemory, 0) != VK_SUCCESS)
 		{
 			throw std::runtime_error("VkImage 内存绑定失败");
 		}

@@ -15,21 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\gameplay_logic\game_window.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gameplay_logic\game_main.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gameplay_logic\game_render_app.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vulkan_base\game_device.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\gameplay_logic\game_window.cpp">
+    <ClCompile Include="src\gameplay_logic\base_game_object.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gameplay_logic\game_camera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\gameplay_logic\game_main.cpp">
@@ -38,8 +27,91 @@
     <ClCompile Include="src\gameplay_logic\game_render_app.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\gameplay_logic\game_window.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan_base\game_buffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan_base\game_descriptors.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="src\vulkan_base\game_device.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\vulkan_base\game_swap_chain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan_base_render\game_model.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan_base_render\game_pipeline.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan_base_render\game_renderer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan_base_render\game_texture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game_render_system\base_render_system.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game_render_system\point_light_system.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\gameplay_logic\base_game_object.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameplay_logic\game_camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameplay_logic\game_main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameplay_logic\game_render_app.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameplay_logic\game_window.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan_base\game_buffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan_base\game_descriptors.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan_base\game_device.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan_base\game_swap_chain.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan_base_render\game_frame_info.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan_base_render\game_model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan_base_render\game_pipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan_base_render\game_renderer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan_base_render\game_texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan_base_render\game_utils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game_render_system\base_render_system.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game_render_system\point_light_system.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

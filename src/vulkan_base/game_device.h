@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-// Vulkan
+// vulkan
 #include <vulkan/vulkan.h>
 
 namespace vulkancraft
@@ -15,26 +15,26 @@ namespace vulkancraft
 	struct SwapChainSupportDetails
 	{
 		VkSurfaceCapabilitiesKHR capabilities;
-		std::vector<VkSurfaceFormatKHR> formats;
-		std::vector<VkPresentModeKHR> presentModes;
+		std::vector<VkSurfaceFormatKHR> formats_vector;
+		std::vector<VkPresentModeKHR> present_mode_vector;
 	};
 
 	struct QueueFamilyIndices
 	{
-		uint32_t graphicsFamily;
-		uint32_t presentFamily;
-		bool graphicsFamilyHasValue = false;
-		bool presentFamilyHasValue = false;
-		bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
+		uint32_t graphics_family = 0;
+		uint32_t present_family = 0;
+		bool graphics_family_has_value = false;
+		bool present_family_has_value = false;
+		bool isComplete() { return graphics_family_has_value && present_family_has_value; }
 	};
 
 	class GameDevice
 	{
 	public:
 #ifdef NDEBUG
-		const bool enableValidationLayers = false;
+		const bool enable_validation_layers_ = false;
 #else
-		const bool enableValidationLayers = true;
+		const bool enable_validation_layers_ = true;
 #endif
 
 		GameDevice(GameWindow& window);
@@ -46,72 +46,87 @@ namespace vulkancraft
 		GameDevice(GameDevice&&) = delete;
 		GameDevice& operator=(GameDevice&&) = delete;
 
-		VkCommandPool getCommandPool() { return commandPool; }
-		VkDevice device() { return device_; }
+		VkCommandPool get_command_pool() { return command_pool_; }
+
+		// 得到 Vulkan 逻辑设备
+		VkDevice get_vulkan_device() { return vulkan_device_; }
+
+		// 得到 Vulkan 物理设备
+		VkPhysicalDevice get_physical_device() { return physical_device_; }
+
 		VkSurfaceKHR surface() { return surface_; }
-		VkQueue graphicsQueue() { return graphicsQueue_; }
-		VkQueue presentQueue() { return presentQueue_; }
+		VkQueue graphics_queue() { return graphics_queue_; }
+		VkQueue present_queue() { return present_queue_; }
 
-		SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(physicalDevice); }
+		SwapChainSupportDetails get_swap_chain_support() { return query_swap_chain_support(physical_device_); }
 		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-		QueueFamilyIndices findPhysicalQueueFamilies() { return findQueueFamilies(physicalDevice); }
-		VkFormat findSupportedFormat(
-			const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-
-		VkPhysicalDevice getPhysicalDevice() { return physicalDevice; }
+		QueueFamilyIndices find_physical_queue_families() { return find_queue_families(physical_device_); }
+		VkFormat find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
 		// Buffer Helper Functions
-		void createBuffer(
+		void create_buffer
+		(
 			VkDeviceSize size,
 			VkBufferUsageFlags usage,
 			VkMemoryPropertyFlags properties,
 			VkBuffer& buffer,
-			VkDeviceMemory& bufferMemory);
-		VkCommandBuffer beginSingleTimeCommands();
-		void endSingleTimeCommands(VkCommandBuffer commandBuffer);
-		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-		void copyBufferToImage(
-			VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
+			VkDeviceMemory& buffer_memory
+		);
 
-		void createImageWithInfo(
+		VkCommandBuffer begin_single_time_commands();
+		void end_single_time_commands(VkCommandBuffer command_buffer);
+		void copy_buffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size);
+
+		void copy_buffer_to_image
+		(
+			VkBuffer buffer,
+			VkImage image,
+			uint32_t width,
+			uint32_t height,
+			uint32_t layer_count
+		);
+
+		void create_image_with_info
+		(
 			const VkImageCreateInfo& imageInfo,
 			VkMemoryPropertyFlags properties,
 			VkImage& image,
-			VkDeviceMemory& imageMemory);
+			VkDeviceMemory& image_memory
+		);
 
-		VkPhysicalDeviceProperties properties;
+		VkPhysicalDeviceProperties properties_;
 
 	private:
-		void createInstance();
-		void setupDebugMessenger();
-		void createSurface();
-		void pickPhysicalDevice();
-		void createLogicalDevice();
-		void createCommandPool();
+		void create_vulkan_instance();
+		void setup_debug_messenger();
+		void create_surface();
+		void pick_physical_device();
+		void create_logical_device();
+		void create_command_pool();
 
 		// helper functions
-		bool isDeviceSuitable(VkPhysicalDevice device);
-		std::vector<const char*> getRequiredExtensions();
-		bool checkValidationLayerSupport();
-		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-		void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
-		void hasRequiredInstanceExtensions();
-		bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-		SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+		bool is_device_suitable(VkPhysicalDevice physical_device);
+		std::vector<const char*> get_required_extension_vector();
+		bool check_validation_layer_support();
+		QueueFamilyIndices find_queue_families(VkPhysicalDevice physical_device);
+		void populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT& create_info);
+		void has_required_instance_extensions();
+		bool check_device_extension_support(VkPhysicalDevice physical_device);
+		SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device);
 
-		VkInstance instance;
-		VkDebugUtilsMessengerEXT debugMessenger;
-		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-		GameWindow& window;
-		VkCommandPool commandPool;
+		VkInstance instance_;
+		VkDebugUtilsMessengerEXT debug_messenger_;
+		VkPhysicalDevice physical_device_ = VK_NULL_HANDLE;
+		GameWindow& game_window_;
+		VkCommandPool command_pool_;
 
-		VkDevice device_;
+		VkDevice vulkan_device_;
 		VkSurfaceKHR surface_;
-		VkQueue graphicsQueue_;
-		VkQueue presentQueue_;
+		VkQueue graphics_queue_;
+		VkQueue present_queue_;
 
-		const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
-		const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+		const std::vector<const char*> validation_layer_vector_ = { "VK_LAYER_KHRONOS_validation" };
+		const std::vector<const char*> device_extension_vector_ = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 	};
 
 }  // namespace vulkancraft
