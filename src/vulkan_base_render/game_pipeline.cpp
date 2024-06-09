@@ -29,24 +29,23 @@ namespace vulkancraft
 		vkDestroyPipeline(game_device_.get_vulkan_device(), graphics_pipeline_, nullptr);
 	}
 
-	std::vector<char> VulkanRenderPipeline::read_file(const std::string& filepath)
+	std::vector<char> VulkanRenderPipeline::read_file(const std::string& file_path)
 	{
-		// TODO: 这里填写 Shader 的路径
-		std::string enginePath = 0;
-		std::ifstream file{ "TODO: Path", std::ios::ate | std::ios::binary };
+		// HACK: 这里从磁盘读取 shader 二进制文件
+		std::ifstream file{ file_path, std::ios::ate | std::ios::binary };
 
 		if (!file.is_open())
 		{
-			throw std::runtime_error("failed to open file: " + enginePath);
+			throw std::runtime_error("打开 shader 二进制文件失败，使用的路径为：" + file_path);
 		}
 
-		size_t fileSize = static_cast<size_t>(file.tellg());
-		std::vector<char> buffer(fileSize);
+		size_t file_size = static_cast<size_t>(file.tellg());
+		std::vector<char> buffer(file_size);
 
 		file.seekg(0);
-		file.read(buffer.data(), fileSize);
-
+		file.read(buffer.data(), file_size);
 		file.close();
+
 		return buffer;
 	}
 

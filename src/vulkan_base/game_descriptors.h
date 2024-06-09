@@ -59,9 +59,9 @@ namespace vulkancraft
 		public:
 			Builder(GameDevice& lveDevice) : game_device_{ lveDevice } {}
 
-			Builder& addPoolSize(VkDescriptorType descriptor_type, uint32_t count);
-			Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);
-			Builder& setMaxSets(uint32_t count);
+			Builder& add_pool_size(VkDescriptorType descriptor_type, uint32_t count);
+			Builder& set_pool_flags(VkDescriptorPoolCreateFlags flags);
+			Builder& set_max_sets(uint32_t count);
 			std::unique_ptr<VulkanBaseDescriptorPool> build() const;
 
 		private:

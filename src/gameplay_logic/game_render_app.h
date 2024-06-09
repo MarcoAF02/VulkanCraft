@@ -1,37 +1,36 @@
 
 #pragma once
 
-#include "game_window.h"
-#include "../vulkan_base/game_device.h"
-
-// stl
-#include <iostream>
-#include <memory>
-#include <string>
+#include "render_system_include.h"
 
 namespace vulkancraft
 {
 	// 游戏渲染全流程类（Vulkan）
-	class GameRednerApp
+	class GameRender
 	{
 	public:
 
-		GameRednerApp();
-		~GameRednerApp();
+		GameRender();
+		~GameRender();
 
-		void update_render_window_content();
+		void update_render_window_content(); // 渲染窗口主循环
+		void create_global_pool(); // 创建全局描述符池
+		void initialize_render_system(); // 初始化渲染系统
+		void load_game_object(); // 加载游戏对象
 
 		const int kWidth = 1280;
 		const int kHeight = 800;
 
-		const std::string KWindowName = "VulkanCraft";
+		const std::string kWindowName = "VulkanCraft";
 
 	private:
 
-		// HACK: SDL 事件处理之所以会出现在这里，是因为渲染循环中有很多其他类和功能，不单单属于 SDL 窗口
-
-		GameWindow game_window_{ kWidth, kHeight, KWindowName };
+		GameWindow game_window_{ kWidth, kHeight, kWindowName };
 		GameDevice game_device_{game_window_};
-		SDL_Event sdl_event_; // SDL 事件处理
+		GameRenderer game_renderer_{game_window_, game_device_};
+
+		std::unique_ptr<VulkanBaseDescriptorPool> global_pool_ {}; // 全局描述符池
+		std::unique_ptr<GameTexture> game_base_texture_ {}; // 游戏贴图
+		BaseGameObject::Map game_object_map_; // 以字典储存的 game_object
 	};
 }

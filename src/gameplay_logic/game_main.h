@@ -12,5 +12,5 @@
 
 class GameMain
 {
-	vulkancraft::GameRednerApp game_render_app_;
+	vulkancraft::GameRender game_render_app_;
 };

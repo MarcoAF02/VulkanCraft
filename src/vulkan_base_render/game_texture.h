@@ -11,16 +11,16 @@
 
 namespace vulkancraft
 {
-	class Texture
+	class GameTexture
 	{
 	public:
-		Texture(GameDevice& game_device, const std::string& file_path);
-		~Texture();
+		GameTexture(GameDevice& game_device, const std::string& file_path);
+		~GameTexture();
 
-		Texture(const Texture&) = delete;
-		Texture& operator=(const Texture&) = delete;
-		Texture(Texture&&) = delete;
-		Texture& operator=(Texture&&) = delete;
+		GameTexture(const GameTexture&) = delete;
+		GameTexture& operator=(const GameTexture&) = delete;
+		GameTexture(GameTexture&&) = delete;
+		GameTexture& operator=(GameTexture&&) = delete;
 
 		VkSampler get_sampler() { return sampler_; }
 		VkImageView get_image_view() { return image_view_; }

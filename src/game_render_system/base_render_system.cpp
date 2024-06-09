@@ -68,8 +68,8 @@ namespace vulkancraft
 		vulkan_render_pipeline_ = std::make_unique<VulkanRenderPipeline>
 		(
 			game_device_,
-			"shaders/simple_shader.vert.spv",
-			"shaders/simple_shader.frag.spv",
+			"shaders/base_render_shader.vert.spv",
+			"shaders/base_render_shader.frag.spv",
 			pipelineConfig
 		);
 	}
@@ -93,7 +93,7 @@ namespace vulkancraft
 		for (auto& kv : frameInfo.game_objects)
 		{
 			auto& obj = kv.second;
-			if (obj.model == nullptr) continue;
+			if (obj.model_ == nullptr) continue;
 
 			SimplePushConstantData push{};
 			push.modelMatrix = obj.transform_.mat4();

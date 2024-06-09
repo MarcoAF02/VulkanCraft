@@ -38,14 +38,14 @@ namespace vulkancraft
 
 	GameModel::~GameModel() { }
 
-	std::unique_ptr<GameModel> GameModel::create_model_from_file(GameDevice& device, const std::string& filepath)
+	std::unique_ptr<GameModel> GameModel::create_model_from_file(GameDevice& game_device, const std::string& file_path)
 	{
 		Builder builder{};
 
-		// TODO: 这里从磁盘加载模型，使用相对路径
-		// builder.loadModel(ENGINE_DIR + filepath);
+		// HACK: 这里从磁盘加载模型，使用相对路径
+		builder.load_model(file_path);
 
-		return std::make_unique<GameModel>(device, builder);
+		return std::make_unique<GameModel>(game_device, builder);
 	}
 
 	void GameModel::create_vertex_buffers(const std::vector<Vertex>& vertices)

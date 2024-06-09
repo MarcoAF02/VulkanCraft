@@ -31,6 +31,7 @@ namespace vulkancraft
 		SDL_Window* sdl_window_ = nullptr;
 		SDL_Surface* sdl_surface_ = nullptr;
 		SDL_Renderer* sdl_renderer_ = nullptr; // SDL 基础渲染器 （注意它不要被什么别的函数带走）
+		SDL_Event sdl_event_; // SDL 事件处理
 
 		// TODO: 判断 Frame Buffer 尺寸是否改变的变量
 

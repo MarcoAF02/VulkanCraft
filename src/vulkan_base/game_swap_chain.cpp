@@ -14,6 +14,10 @@ namespace vulkancraft
 {
 	GameSwapChain::GameSwapChain(GameDevice& deviceRef, VkExtent2D extent) : game_device_{ deviceRef }, window_extent_{ extent }
 	{
+		std::cout << "========================================" << std::endl;
+		std::cout << "GameSwapChain 类初始化成功" << std::endl;
+		std::cout << "========================================" << std::endl;
+
 		init();
 	}
 

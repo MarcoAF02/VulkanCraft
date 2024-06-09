@@ -14,7 +14,7 @@
 
 namespace vulkancraft
 {
-	Texture::Texture(GameDevice& device, const std::string& filepath) : game_device_{ device }
+	GameTexture::GameTexture(GameDevice& device, const std::string& filepath) : game_device_{ device }
 	{
 		// int channels;
 		int m_BytesPerPixel;
@@ -90,7 +90,7 @@ namespace vulkancraft
 		stbi_image_free(data);
 	}
 
-	Texture::~Texture()
+	GameTexture::~GameTexture()
 	{
 		vkDestroyImage(game_device_.get_vulkan_device(), image_, nullptr);
 		vkFreeMemory(game_device_.get_vulkan_device(), image_memory_, nullptr);
@@ -98,7 +98,7 @@ namespace vulkancraft
 		vkDestroySampler(game_device_.get_vulkan_device(), sampler_, nullptr);
 	}
 
-	void Texture::transition_image_layout(VkImageLayout oldLayout, VkImageLayout newLayout)
+	void GameTexture::transition_image_layout(VkImageLayout oldLayout, VkImageLayout newLayout)
 	{
 		VkCommandBuffer commandBuffer = game_device_.begin_single_time_commands();
 
@@ -143,7 +143,7 @@ namespace vulkancraft
 		game_device_.end_single_time_commands(commandBuffer);
 	}
 
-	void Texture::generate_mipmaps()
+	void GameTexture::generate_mipmaps()
 	{
 		VkFormatProperties formatProperties;
 		vkGetPhysicalDeviceFormatProperties(game_device_.get_physical_device(), image_format_, &formatProperties);

@@ -73,20 +73,20 @@ namespace vulkancraft
 
 	// *************** Descriptor Pool Builder *********************
 
-	VulkanBaseDescriptorPool::Builder& VulkanBaseDescriptorPool::Builder::addPoolSize
+	VulkanBaseDescriptorPool::Builder& VulkanBaseDescriptorPool::Builder::add_pool_size
 	(
 		VkDescriptorType descriptorType, uint32_t count) {
 		pool_size_vector_.push_back({ descriptorType, count });
 		return *this;
 	}
 
-	VulkanBaseDescriptorPool::Builder& VulkanBaseDescriptorPool::Builder::setPoolFlags(VkDescriptorPoolCreateFlags flags)
+	VulkanBaseDescriptorPool::Builder& VulkanBaseDescriptorPool::Builder::set_pool_flags(VkDescriptorPoolCreateFlags flags)
 	{
 		pool_flags_ = flags;
 		return *this;
 	}
 
-	VulkanBaseDescriptorPool::Builder& VulkanBaseDescriptorPool::Builder::setMaxSets(uint32_t count)
+	VulkanBaseDescriptorPool::Builder& VulkanBaseDescriptorPool::Builder::set_max_sets(uint32_t count)
 	{
 		max_sets_ = count;
 		return *this;
@@ -217,7 +217,7 @@ namespace vulkancraft
 			write.dstSet = set;
 		}
 
-		vkUpdateDescriptorSets(pool_.game_device_.get_vulkan_device(), write_vector_.size(), write_vector_.data(), 0, nullptr);
+		vkUpdateDescriptorSets(pool_.game_device_.get_vulkan_device(), static_cast<uint32_t>(write_vector_.size()), write_vector_.data(), 0, nullptr);
 	}
 
 }  // namespace vulkancraft

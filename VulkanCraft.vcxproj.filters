@@ -60,6 +60,9 @@
     <ClCompile Include="src\game_render_system\point_light_system.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\input_system\keyboard_input_controller.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gameplay_logic\base_game_object.h">
@@ -113,5 +116,18 @@
     <ClInclude Include="src\game_render_system\point_light_system.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\input_system\keyboard_input_controller.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameplay_logic\render_system_include.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\base_render_shader.frag" />
+    <None Include="shaders\base_render_shader.vert" />
+    <None Include="shaders\point_light.frag" />
+    <None Include="shaders\point_light.vert" />
+    <None Include="scripts\compile_shaders.cmd" />
   </ItemGroup>
 </Project>
