@@ -11,9 +11,6 @@ namespace vulkancraft
 	class KeyboardMovementController
 	{
 	public:
-
-		const Uint8* kKeyboardState_ = SDL_GetKeyboardState(NULL); // 检测键盘按下状态
-
 		struct KeyMap
 		{
 			// 移动
@@ -37,6 +34,7 @@ namespace vulkancraft
 		float move_speed_ = 1.6f;
 		float rotate_speed_ = 1.2f;
 
-		void move_in_plane_xz(GameWindow* game_window, float delta_time, BaseGameObject& game_object);
+		const Uint8* kKeyboardState_ = nullptr; // SDL 按键输入读取
+		void move_in_plane_xz(SDL_Window* sdl_window, float delta_time, BaseGameObject& game_object);
 	};
 }

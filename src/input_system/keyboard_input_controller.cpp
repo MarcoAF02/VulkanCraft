@@ -3,8 +3,12 @@
 
 namespace vulkancraft
 {
-	void KeyboardMovementController::move_in_plane_xz(GameWindow* game_window, float delta_time, BaseGameObject& game_object)
+	void KeyboardMovementController::move_in_plane_xz(SDL_Window* sdl_window, float delta_time, BaseGameObject& game_object)
 	{
+		kKeyboardState_ = SDL_GetKeyboardState(NULL); // 检测键盘按下状态
+
+		
+
 		// 上下左右旋转，看
 		glm::vec3 rotate {0, 0, 0};
 

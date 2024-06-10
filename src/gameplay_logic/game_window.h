@@ -42,6 +42,8 @@ namespace vulkancraft
 		GameWindow(const GameWindow&) = delete;
 		GameWindow& operator = (const GameWindow&) = delete;
 
+		SDL_Window* get_window() const { return sdl_window_; }
+
 		// HACK: ´´½¨ Vulkan Surface
 		void create_vulkan_window(VkInstance instance, VkSurfaceKHR* surface);
 

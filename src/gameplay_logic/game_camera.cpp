@@ -71,7 +71,7 @@ namespace vulkancraft
 		set_view_direction(position, target - position, up);
 	}
 
-	void GameBaseCamera::set_view_Yxz(glm::vec3 position, glm::vec3 rotation)
+	void GameBaseCamera::set_view_yxz(glm::vec3 position, glm::vec3 rotation)
 	{
 		const float c3 = glm::cos(rotation.z);
 		const float s3 = glm::sin(rotation.z);

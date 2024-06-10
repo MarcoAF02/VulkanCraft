@@ -2,6 +2,7 @@
 #pragma once
 
 #include "render_system_include.h"
+#include "game_camera.h"
 
 namespace vulkancraft
 {
@@ -15,7 +16,6 @@ namespace vulkancraft
 
 		void update_render_window_content(); // 渲染窗口主循环
 		void create_global_pool(); // 创建全局描述符池
-		void initialize_render_system(); // 初始化渲染系统
 		void load_game_object(); // 加载游戏对象
 
 		const int kWidth = 1280;
@@ -32,5 +32,6 @@ namespace vulkancraft
 		std::unique_ptr<VulkanBaseDescriptorPool> global_pool_ {}; // 全局描述符池
 		std::unique_ptr<GameTexture> game_base_texture_ {}; // 游戏贴图
 		BaseGameObject::Map game_object_map_; // 以字典储存的 game_object
+
 	};
 }

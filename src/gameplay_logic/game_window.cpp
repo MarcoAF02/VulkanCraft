@@ -64,7 +64,7 @@ namespace vulkancraft
 			throw std::runtime_error("SDL Renderer 创建失败");
 		}
 
-		test_draw_sdl_rect();
+		// test_draw_sdl_rect();
 	}
 
 	void GameWindow::test_draw_sdl_rect()
@@ -86,7 +86,7 @@ namespace vulkancraft
 
 	void GameWindow::recreate_sdl_surface()
 	{
-		test_draw_sdl_rect();
+		// test_draw_sdl_rect();
 
 		// TODO: 重建 Vulkan 交换链
 	}
