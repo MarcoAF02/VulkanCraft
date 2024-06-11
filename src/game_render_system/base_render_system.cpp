@@ -90,7 +90,7 @@ namespace vulkancraft
 			nullptr
 		);
 
-		for (auto& kv : frameInfo.game_objects)
+		for (auto& kv : frameInfo.game_object_map)
 		{
 			auto& obj = kv.second;
 			if (obj.model_ == nullptr) continue;

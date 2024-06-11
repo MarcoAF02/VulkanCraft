@@ -44,7 +44,7 @@ namespace vulkancraft
 			return BaseGameObject{ current_id++ };
 		}
 
-		static BaseGameObject make_point_light(float intensity = 10.f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f));
+		static BaseGameObject make_point_light(float intensity = 10.0f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f));
 
 		BaseGameObject(const BaseGameObject&) = delete;
 		BaseGameObject& operator = (const BaseGameObject&) = delete;

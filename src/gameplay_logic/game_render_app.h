@@ -15,7 +15,6 @@ namespace vulkancraft
 		~GameRender();
 
 		void update_render_window_content(); // 渲染窗口主循环
-		void create_global_pool(); // 创建全局描述符池
 		void load_game_object(); // 加载游戏对象
 
 		const int kWidth = 1280;

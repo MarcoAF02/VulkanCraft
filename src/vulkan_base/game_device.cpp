@@ -324,23 +324,12 @@ namespace vulkancraft
 
 	std::vector<const char*> GameDevice::get_required_extension_vector()
 	{
-		uint32_t extensionCount = 0;
+		uint32_t glfw_extension_count = 0;
+		const char** glfw_extension_array;
+		glfw_extension_array = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
 
-		// 先确定扩展的数量，知道 Vector 要开多大
-		if (!SDL_Vulkan_GetInstanceExtensions(game_window_.sdl_window_, &extensionCount, nullptr))
-		{
-			throw std::runtime_error("尝试获取 Vulkan 扩展数量失败");
-		}
+		std::vector<const char*> extensions(glfw_extension_array, glfw_extension_array + glfw_extension_count);
 
-		std::vector<const char*> extensions(extensionCount);
-
-		// 然后确定扩展的实际内容
-		if (!SDL_Vulkan_GetInstanceExtensions(game_window_.sdl_window_, &extensionCount, extensions.data()))
-		{
-			throw std::runtime_error("尝试获取 Vulkan 扩展内容失败");
-		}
-
-		// 然后把验证层塞进去
 		if (enable_validation_layers_)
 		{
 			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);

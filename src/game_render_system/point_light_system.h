@@ -8,8 +8,9 @@
 #include "../vulkan_base_render/game_pipeline.h"
 
 // std
-#include <memory>
+#include <iostream>
 #include <vector>
+#include <memory>
 
 namespace vulkancraft
 {
@@ -26,8 +27,8 @@ namespace vulkancraft
 		void render(FrameInfo& frame_info);
 
 	private:
-		void createPipelineLayout(VkDescriptorSetLayout global_set_layout);
-		void createPipeline(VkRenderPass render_pass);
+		void create_pipeline_layout(VkDescriptorSetLayout global_set_layout);
+		void create_pipeline(VkRenderPass render_pass);
 
 		GameDevice& game_device_;
 

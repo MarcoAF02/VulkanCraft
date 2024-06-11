@@ -7,34 +7,38 @@
 // lib
 #include <vulkan/vulkan.h>
 
+// HACK: 此处注意内存对齐
+// std - 140: alignas(16) 
+
 namespace vulkancraft
 {
-	const int kMaxLightCount = 32; // 目前的设计是场景中最多 32 个灯光
+	// 这个数值如果变化 shader 内也要跟上
+	const int kMaxLightCount = 256; // 目前的设计是场景中最多 256 个灯光
 
 	struct PointLight
 	{
-		glm::vec4 position { };  // ignore w
-		glm::vec4 color { };     // w is intensity
+		alignas(16) glm::vec4 position { };  // ignore w
+		alignas(16) glm::vec4 color { };     // w is intensity
 	};
 
 	struct GlobalUbo
 	{
-		glm::mat4 projection{ 1.f };
-		glm::mat4 view{ 1.f };
-		glm::mat4 inverse_view{ 1.f };
-		glm::vec4 ambient_light_color{ 1.f, 1.f, 1.f, .02f };  // w is intensity
-		PointLight point_lights_[kMaxLightCount];
-		int num_lights;
+		alignas(16) glm::mat4 projection{ 1.f };
+		alignas(16) glm::mat4 view{ 1.f };
+		alignas(16) glm::mat4 inverse_view{ 1.f };
+		alignas(16) glm::vec4 ambient_light_color{ 1.0f, 1.0f, 1.0f, 0.2f };  // w is intensity
+		alignas(16) PointLight point_lights[kMaxLightCount];
+		alignas(4) int num_lights;
 	};
 
 	struct FrameInfo
 	{
-		int frame_index;
-		float frame_time;
-		VkCommandBuffer command_buffer;
+		alignas(4) int frame_index;
+		alignas(8) float frame_time;
+		alignas(8) VkCommandBuffer command_buffer;
 		GameBaseCamera& camera;
-		VkDescriptorSet global_descriptor_set;
-		BaseGameObject::Map& game_objects;
+		alignas(8) VkDescriptorSet global_descriptor_set;
+		alignas(8) BaseGameObject::Map& game_object_map;
 	};
 
 }  // namespace vulkancraft

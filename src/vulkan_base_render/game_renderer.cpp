@@ -18,14 +18,13 @@ namespace vulkancraft
 
 	void GameRenderer::recreate_swap_chain()
 	{
-		auto extent = game_window_.getExtent();
+		VkExtent2D extent = game_window_.get_extent();
 
-		// TODO: 需要在这里找另一个东西处理窗口大小为 0 的情况
+		// 处理窗口大小为 0 的情况
 		while (extent.width == 0 || extent.height == 0)
 		{
-			extent = game_window_.getExtent();
-
-			// HACK: 这里去掉了 glfwWaitEvents();
+			extent = game_window_.get_extent();
+			glfwWaitEvents();
 		}
 
 		vkDeviceWaitIdle(game_device_.get_vulkan_device());
