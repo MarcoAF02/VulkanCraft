@@ -15,20 +15,20 @@ namespace vulkancraft
 		PipelineConfigInfo(const PipelineConfigInfo&) = delete;
 		PipelineConfigInfo& operator = (const PipelineConfigInfo&) = delete;
 
-		std::vector<VkVertexInputBindingDescription> binding_description_vector_{};
-		std::vector<VkVertexInputAttributeDescription> attribute_description_vector_{};
+		std::vector<VkVertexInputBindingDescription> binding_description_vector_ = {};
+		std::vector<VkVertexInputAttributeDescription> attribute_description_vector_ = {};
 
-		VkPipelineViewportStateCreateInfo viewport_info_;
-		VkPipelineInputAssemblyStateCreateInfo input_assembly_info_;
-		VkPipelineRasterizationStateCreateInfo rasterization_info_;
-		VkPipelineMultisampleStateCreateInfo multisample_info_;
-		VkPipelineColorBlendAttachmentState color_blend_attachment_;
-		VkPipelineColorBlendStateCreateInfo color_blend_info_;
-		VkPipelineDepthStencilStateCreateInfo depth_stencil_info_;
+		VkPipelineViewportStateCreateInfo viewport_info_ = {};
+		VkPipelineInputAssemblyStateCreateInfo input_assembly_info_ = {};
+		VkPipelineRasterizationStateCreateInfo rasterization_info_ = {};
+		VkPipelineMultisampleStateCreateInfo multisample_info_ = {};
+		VkPipelineColorBlendAttachmentState color_blend_attachment_ = {};
+		VkPipelineColorBlendStateCreateInfo color_blend_info_ = {};
+		VkPipelineDepthStencilStateCreateInfo depth_stencil_info_ = {};
 
-		std::vector<VkDynamicState> dynamic_state_enable_vector_;
+		std::vector<VkDynamicState> dynamic_state_enable_vector_ = {};
 
-		VkPipelineDynamicStateCreateInfo dynamic_state_info_;
+		VkPipelineDynamicStateCreateInfo dynamic_state_info_ = {};
 		VkPipelineLayout pipeline_layout_ = nullptr;
 		VkRenderPass render_pass_ = nullptr;
 		uint32_t subpass_ = 0;

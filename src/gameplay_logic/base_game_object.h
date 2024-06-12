@@ -23,7 +23,7 @@ namespace vulkancraft
 		// https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
 		glm::mat4 mat4();
 
-		glm::mat3 normalMatrix();
+		glm::mat3 normal_matrix();
 	};
 
 	struct PointLightComponent
@@ -35,7 +35,7 @@ namespace vulkancraft
 	{
 	public:
 
-		using id_t = unsigned int;
+		using id_t = unsigned _int64;
 		using Map = std::unordered_map<id_t, BaseGameObject>;
 
 		static BaseGameObject create_game_object()
@@ -48,6 +48,8 @@ namespace vulkancraft
 
 		BaseGameObject(const BaseGameObject&) = delete;
 		BaseGameObject& operator = (const BaseGameObject&) = delete;
+
+		BaseGameObject() = default;
 		BaseGameObject(BaseGameObject&&) = default;
 		BaseGameObject& operator = (BaseGameObject&&) = default;
 

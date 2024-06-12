@@ -1,9 +1,9 @@
 
-#include "base_game_object.h"
+#include "physics_aabb.h"
 
 namespace vulkancraft
 {
-	glm::mat4 TransformComponent::mat4()
+	glm::mat4 ColliderTransformComponent::mat4()
 	{
 		const float c3 = glm::cos(rotation.z);
 		const float s3 = glm::sin(rotation.z);
@@ -37,7 +37,7 @@ namespace vulkancraft
 		};
 	}
 
-	glm::mat3 TransformComponent::normal_matrix()
+	glm::mat3 ColliderTransformComponent::normal_matrix()
 	{
 		const float c3 = glm::cos(rotation.z);
 		const float s3 = glm::sin(rotation.z);
@@ -67,16 +67,4 @@ namespace vulkancraft
 		};
 	}
 
-	BaseGameObject BaseGameObject::make_point_light(float intensity, float radius, glm::vec3 color)
-	{
-		BaseGameObject gameObj = BaseGameObject::create_game_object();
-
-		gameObj.color_ = color;
-		gameObj.transform_.scale.x = radius;
-		gameObj.point_light_ = std::make_unique<PointLightComponent>();
-		gameObj.point_light_ -> light_intensity = intensity;
-
-		return gameObj;
-	}
-
-}  // namespace vulkancraft
+}

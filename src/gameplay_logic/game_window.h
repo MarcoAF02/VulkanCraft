@@ -4,6 +4,7 @@
 #define GLFW_INCLUDE_VULKAN // 创建 Vulkan 上下文
 #include <GLFW/glfw3.h>
 
+#include <iostream>
 #include <string>
 
 namespace vulkancraft
@@ -11,7 +12,7 @@ namespace vulkancraft
 	class GameWindow
 	{
 	public:
-		GameWindow(int w, int h, std::string name);
+		GameWindow(int width, int height, std::string window_name);
 		~GameWindow();
 
 		GameWindow(const GameWindow&) = delete;

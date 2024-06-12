@@ -81,9 +81,9 @@ namespace vulkancraft
 			std::cout << "GameDevice 类初始化成功" << std::endl;
 			std::cout << "========================================" << std::endl;
 		}
-		catch (std::string &e)
+		catch (const std::exception& e)
 		{
-			throw std::runtime_error(e + "GameDevice 类初始化失败");
+			std::cerr << "GameDevice 类初始化失败：" << e.what() << std::endl;
 		}
 	}
 

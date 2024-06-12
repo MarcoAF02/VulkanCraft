@@ -60,10 +60,11 @@ void main()
 		float blinnTerm = dot(surfaceNormal, halfAngle);
 		blinnTerm = clamp(blinnTerm, 0, 1);
 		blinnTerm = pow(blinnTerm, 512.0); // higher values -> sharper highlight
-		specularLight += intensity * blinnTerm;
+		// specularLight += intensity * blinnTerm;
+		specularLight = intensity; // 此处不使用高光
 	}
 
-	vec3 imageColor = texture(image, fragUV).rgb;
+	vec3 imageColor = texture(image, fragUV * 4).rgb;
 
 	outColor = vec4((diffuseLight * imageColor + specularLight * imageColor), 1.0);
 }

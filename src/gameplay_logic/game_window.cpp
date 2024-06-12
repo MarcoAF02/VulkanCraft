@@ -8,7 +8,18 @@ namespace vulkancraft
 {
 	GameWindow::GameWindow(int width, int height, std::string window_name) : width_{ width }, height_{ height }, window_name_{ window_name }
 	{
-		init_window();
+		try
+		{
+			init_window();
+
+			std::cout << "========================================" << std::endl;
+			std::cout << "GameWindow 类初始化成功" << std::endl;
+			std::cout << "========================================" << std::endl;
+		}
+		catch (const std::exception& e)
+		{
+			std::cerr << "GameWindow 类初始化失败：" << e.what() << std::endl;
+		}
 	}
 
 	GameWindow::~GameWindow()

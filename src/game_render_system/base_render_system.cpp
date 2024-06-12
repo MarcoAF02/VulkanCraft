@@ -97,7 +97,7 @@ namespace vulkancraft
 
 			SimplePushConstantData push{};
 			push.modelMatrix = obj.transform_.mat4();
-			push.normalMatrix = obj.transform_.normalMatrix();
+			push.normalMatrix = obj.transform_.normal_matrix();
 
 			vkCmdPushConstants
 			(
