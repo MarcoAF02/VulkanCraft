@@ -23,6 +23,7 @@
     <ClCompile Include="src\gameplay_logic\base_game_object.cpp" />
     <ClCompile Include="src\gameplay_logic\game_camera.cpp" />
     <ClCompile Include="src\gameplay_logic\game_main.cpp" />
+    <ClCompile Include="src\gameplay_logic\game_object_manager.cpp" />
     <ClCompile Include="src\gameplay_logic\game_render_app.cpp" />
     <ClCompile Include="src\gameplay_logic\game_window.cpp" />
     <ClCompile Include="src\game_physics_system\physics_aabb.cpp" />
@@ -41,6 +42,7 @@
   <ItemGroup>
     <ClInclude Include="src\gameplay_logic\base_game_object.h" />
     <ClInclude Include="src\gameplay_logic\game_camera.h" />
+    <ClInclude Include="src\gameplay_logic\game_object_manager.h" />
     <ClInclude Include="src\gameplay_logic\game_render_app.h" />
     <ClInclude Include="src\gameplay_logic\game_window.h" />
     <ClInclude Include="src\gameplay_logic\render_system_include.h" />

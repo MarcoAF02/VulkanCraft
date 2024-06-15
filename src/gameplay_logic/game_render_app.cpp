@@ -139,7 +139,7 @@ namespace vulkancraft
 	void GameRender::load_game_object()
 	{
 		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, "models/block.obj");
-		auto stone_obj = BaseGameObject::create_game_object();
+		BaseGameObject stone_obj = BaseGameObject::create_game_object();
 
 		stone_obj.model_ = stone_model;
 		stone_obj.transform_.translation = {0.0f, 0.6f, 0.0f};
@@ -147,6 +147,10 @@ namespace vulkancraft
 		stone_obj.transform_.scale = {1.0f, 1.0f, 1.0f};
 
 		game_object_map_.emplace(stone_obj.get_id(), std::move(stone_obj));
+
+		// TODO: 这里实现拷贝构造函数创造一个一模一样的 GameObject 放到 GameObject Manager 中被多线程单例类管理
+
+		// std::cout << stone_obj.model_ << std::endl;
 
 		// 硬编码灯光
 		std::vector<glm::vec3> light_color_vector

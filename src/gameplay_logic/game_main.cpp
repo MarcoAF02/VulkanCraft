@@ -1,6 +1,7 @@
 
 #include "game_window.h"
 #include "game_render_app.h"
+#include "../gameplay_logic/base_game_object.h"
 
 // stl
 #include <iostream>
@@ -8,6 +9,14 @@
 #include <string>
 #include <stdexcept>
 #include <thread>
+#include <unordered_map>
+
+std::unordered_map<unsigned _int64, vulkancraft::BaseGameObject> sharing_game_object_map_;
+
+// TODO: 需要一个线程安全的单例类，完成的操作为：
+// 1. 把上面这个 unordered_map 放进去
+
+// 注意 render app 类内的 gameobject_map 和单例类里的 gameobject_map 不是一种东西
 
 // 函数声明
 void create_render_app();
