@@ -7,6 +7,15 @@ namespace vulkancraft
 	{
 		create_global_pool();
 		initialize_render_system();
+
+		try
+		{
+			game_object_manager_ = GameObjectManager::get_instance();
+		}
+		catch (const std::exception& e)
+		{
+			throw std::runtime_error("Render App 中的 GameObjectManager 单例类初始化失败：" + std::string(e.what()));
+		}
 	}
 
 	GameRender::~GameRender() { }
@@ -146,11 +155,18 @@ namespace vulkancraft
 		stone_obj.transform_.rotation = {0.0f, 0.0f, 0.0f};
 		stone_obj.transform_.scale = {1.0f, 1.0f, 1.0f};
 
+		GameObjectPublicData stone_obj_public_data = 
+		{
+			stone_obj.get_id(),
+			false,
+			stone_obj.transform_
+		};
+
+		// 公共数据放入 game object manager
+		game_object_manager_ -> insert_sharing_game_object_data(stone_obj.get_id(), stone_obj_public_data);
+
+		// 渲染数据放入 game object map
 		game_object_map_.emplace(stone_obj.get_id(), std::move(stone_obj));
-
-		// TODO: 这里实现拷贝构造函数创造一个一模一样的 GameObject 放到 GameObject Manager 中被多线程单例类管理
-
-		// std::cout << stone_obj.model_ << std::endl;
 
 		// 硬编码灯光
 		std::vector<glm::vec3> light_color_vector

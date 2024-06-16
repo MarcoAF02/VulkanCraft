@@ -105,7 +105,7 @@ namespace vulkancraft
 
 	bool AABBCollider::is_ray_intersects_aabb(glm::vec3 ray_origin, glm::vec3 ray_direction)
 	{
-		// TODO: 自己想一下...
+		// TODO: 暂时不需要，但是不保证之后不会用到...
 
 		return false;
 	}

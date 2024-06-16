@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "../gameplay_logic/game_object_manager.h"
 #include "render_system_include.h"
 #include "game_camera.h"
 
@@ -32,6 +33,8 @@ namespace vulkancraft
 #pragma endregion
 
 	private:
+
+		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
 
 		GameWindow game_window_{ kWidth, kHeight, kWindowName };
 		GameDevice game_device_{game_window_};
