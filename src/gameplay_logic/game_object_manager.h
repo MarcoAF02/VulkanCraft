@@ -63,7 +63,7 @@ namespace vulkancraft
 
 	private:
 
-		// TODO: 这个 once_flag 是个啥
+		// TODO: 这个 once_flag 是个啥？
 		static std::once_flag init_instance_flag_;
 		static std::shared_ptr<GameObjectManager> instance_;
 
