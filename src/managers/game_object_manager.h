@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "base_game_object.h"
+#include "../gameplay_logic/base_game_object.h"
+#include "../game_physics_system/physics_aabb.h"
 
 // libs
 #include <glm/gtc/matrix_transform.hpp>
@@ -21,12 +22,15 @@ namespace vulkancraft
 	class GameObjectPublicData
 	{
 	public:
-		GameObjectPublicData(id_t obj_id, bool is_static, TransformComponent transform_component);
+		TransformComponent transform_pub_ = {};
+		AABBCollider aabb_collider_;
+
+		GameObjectPublicData(id_t obj_id, bool is_static, TransformComponent transform_component, AABBCollider aabb_collider);
+		id_t get_pub_id() {return id_pub_;}
 
 	private:
 		id_t id_pub_ = 0;
 		bool is_static_ = false;
-		TransformComponent transform_pub_ = {};
 
 		// 禁用默认构造函数
 		GameObjectPublicData() = default;
@@ -50,20 +54,19 @@ namespace vulkancraft
 		static std::shared_ptr<GameObjectManager> get_instance();
 
 		// 根据 ID 得到共享 game_object 数据
-		std::shared_ptr<GameObjectPublicData> get_sharing_obj_by_id(id_t obj_id);
+		std::shared_ptr<GameObjectPublicData> get_sharing_obj_by_id(const id_t obj_id);
 
 		// 插入共享 game_object 数据（插入行为需要在内存中拷贝一份，而不是给指针）
 		void insert_sharing_game_object_data(const id_t obj_id, const GameObjectPublicData game_object_data);
 
 		// 添加需要进行物理计算的 game_object
-		void add_physical_obj_by_id(id_t obj_id);
+		void add_physical_obj_by_id(const id_t obj_id);
 
 		// 得到需要应用物理计算的 vector（得到指针数组的引用）
 		std::vector<std::shared_ptr<GameObjectPublicData>>& get_physical_obj_vector();
 
 	private:
 
-		// TODO: 这个 once_flag 是个啥？
 		static std::once_flag init_instance_flag_;
 		static std::shared_ptr<GameObjectManager> instance_;
 

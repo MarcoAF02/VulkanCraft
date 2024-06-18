@@ -1,7 +1,9 @@
 
 #pragma once
 
-#include "../gameplay_logic/game_object_manager.h"
+#include "../managers/game_object_manager.h" // 游戏对象管理器
+#include "../managers/thread_state_manager.h" // 线程管理器
+#include "../game_physics_system/physics_aabb.h"
 #include "render_system_include.h"
 #include "game_camera.h"
 
@@ -35,6 +37,7 @@ namespace vulkancraft
 	private:
 
 		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
+		std::shared_ptr<ThreadStateManager> thread_state_manager_; // 线程监视器
 
 		GameWindow game_window_{ kWidth, kHeight, kWindowName };
 		GameDevice game_device_{game_window_};

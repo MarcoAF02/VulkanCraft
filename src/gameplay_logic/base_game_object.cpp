@@ -69,7 +69,7 @@ namespace vulkancraft
 
 	BaseGameObject BaseGameObject::make_point_light(float intensity, float radius, glm::vec3 color)
 	{
-		BaseGameObject gameObj = BaseGameObject::create_game_object();
+		BaseGameObject gameObj = BaseGameObject::create_game_object(false);
 
 		gameObj.color_ = color;
 		gameObj.transform_.scale.x = radius;

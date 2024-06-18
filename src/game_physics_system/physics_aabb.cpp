@@ -3,78 +3,7 @@
 
 namespace vulkancraft
 {
-
-#pragma region Collider Transform 相关函数
-
-	glm::mat4 ColliderTransformComponent::mat4()
-	{
-		const float c3 = glm::cos(rotation.z);
-		const float s3 = glm::sin(rotation.z);
-		const float c2 = glm::cos(rotation.x);
-		const float s2 = glm::sin(rotation.x);
-		const float c1 = glm::cos(rotation.y);
-		const float s1 = glm::sin(rotation.y);
-
-		return glm::mat4
-		{
-			{
-				scale.x * (c1 * c3 + s1 * s2 * s3),
-				scale.x * (c2 * s3),
-				scale.x * (c1 * s2 * s3 - c3 * s1),
-				0.0f,
-			},
-			{
-				scale.y * (c3 * s1 * s2 - c1 * s3),
-				scale.y * (c2 * c3),
-				scale.y * (c1 * c3 * s2 + s1 * s3),
-				0.0f,
-			},
-			{
-				scale.z * (c2 * s1),
-				scale.z * (-s2),
-				scale.z * (c1 * c2),
-				0.0f,
-			},
-
-			{translation.x, translation.y, translation.z, 1.0f}
-		};
-	}
-
-	glm::mat3 ColliderTransformComponent::normal_matrix()
-	{
-		const float c3 = glm::cos(rotation.z);
-		const float s3 = glm::sin(rotation.z);
-		const float c2 = glm::cos(rotation.x);
-		const float s2 = glm::sin(rotation.x);
-		const float c1 = glm::cos(rotation.y);
-		const float s1 = glm::sin(rotation.y);
-		const glm::vec3 invScale = 1.0f / scale;
-
-		return glm::mat3
-		{
-			{
-				invScale.x * (c1 * c3 + s1 * s2 * s3),
-				invScale.x * (c2 * s3),
-				invScale.x * (c1 * s2 * s3 - c3 * s1),
-			},
-			{
-				invScale.y * (c3 * s1 * s2 - c1 * s3),
-				invScale.y * (c2 * c3),
-				invScale.y * (c1 * c3 * s2 + s1 * s3),
-			},
-			{
-				invScale.z * (c2 * s1),
-				invScale.z * (-s2),
-				invScale.z * (c1 * c2),
-			},
-		};
-	}
-
-#pragma endregion
-
-#pragma region AABBCollider 相关函数
-	
-	AABBCollider::AABBCollider(TransformComponent& transform_component, unsigned _int64& id)
+	AABBCollider::AABBCollider(const TransformComponent& transform_component, const id_t& id)
 	{
 		collider_transform_component_.translation = transform_component.translation;
 		collider_transform_component_.rotation = transform_component.rotation;
@@ -93,7 +22,7 @@ namespace vulkancraft
 		aabb_range_ = std::make_pair(aabb_min, aabb_max); // 确定 AABB 的范围
 	}
 
-	bool AABBCollider::is_point_inside_aabb(glm::vec3 point_pos)
+	bool AABBCollider::is_point_inside_aabb(const glm::vec3 point_pos)
 	{
 		return
 		{
@@ -103,11 +32,44 @@ namespace vulkancraft
 		};
 	}
 
-	bool AABBCollider::is_ray_intersects_aabb(glm::vec3 ray_origin, glm::vec3 ray_direction)
+	bool AABBCollider::is_ray_intersects_aabb(const glm::vec3 ray_origin, const glm::vec3 ray_direction)
 	{
-		// TODO: 暂时不需要，但是不保证之后不会用到...
+		// 获取 AABB 的最小和最大顶点
+		const glm::vec3& min = aabb_range_.first;
+		const glm::vec3& max = aabb_range_.second;
 
-		return false;
+		glm::vec3 inv_dir; // 射线的方向向量分量的倒数，用于后续计算
+
+		if (!glm::all(glm::notEqual(ray_direction, glm::vec3(0)))) return false; // 避免除以 0 的情况
+
+		inv_dir.x = 1.0f / ray_direction.x;
+		inv_dir.y = 1.0f / ray_direction.y;
+		inv_dir.z = 1.0f / ray_direction.z;
+
+		// 计算射线在三个坐标轴方向上的参数
+		float tmin = -(ray_origin.x * inv_dir.x + ray_origin.y * inv_dir.y + ray_origin.z * inv_dir.z);
+		float tmax = tmin;
+		float tymin = tmin;
+		float tymax = tmax;
+		float tzmin = tmin;
+		float tzmax = tmax;
+
+		// 根据射线方向的不同正负，调整 tmin 和 tmax 的值
+		if (inv_dir.x < 0.0f) std::swap(tmin, tmax);
+		if (inv_dir.y < 0.0f) std::swap(tymin, tymax);
+		if (inv_dir.z < 0.0f) std::swap(tzmin, tzmax);
+
+		// 计算射线与 AABB 边界在x, y, z轴上的交点参数，取最大最小值以确定交点范围
+		tmin = std::max({ tmin, tymin, tzmin });
+		tmax = std::min({ tmax, tymax, tzmax });
+
+		if (tmax < 0) return false; // 如果 tmax < 0，表示射线朝向背离 AABB，不相交
+
+		// 如果 tmin > tmax，表示射线穿过 AABB 的边缘，不相交
+		// 或者说，如果 tmin > tmax，射线在离开 AABB 后才与 AABB 的边界相交
+		if (tmin > tmax) return false;
+
+		return tmin >= 0; // 如果 tmin >= 0，则射线与 AABB 相交
 	}
 
 	bool AABBCollider::is_two_aabb_collision(AABBCollider& other_collider)
@@ -122,7 +84,5 @@ namespace vulkancraft
 			get_aabb_range().second.z >= other_collider.get_aabb_range().first.z)
 		};
 	}
-
-#pragma endregion
 
 }

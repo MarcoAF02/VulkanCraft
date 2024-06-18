@@ -11,10 +11,11 @@ namespace vulkancraft
 		try
 		{
 			game_object_manager_ = GameObjectManager::get_instance();
+			thread_state_manager_ = ThreadStateManager::get_instance();
 		}
 		catch (const std::exception& e)
 		{
-			throw std::runtime_error("Render App 中的 GameObjectManager 单例类初始化失败：" + std::string(e.what()));
+			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
 	}
 
@@ -82,7 +83,7 @@ namespace vulkancraft
 				global_set_layout_->get_descriptor_set_layout()
 			);
 
-		viewer_object_ = BaseGameObject::create_game_object();
+		viewer_object_ = BaseGameObject::create_game_object(false);
 		viewer_object_.transform_.translation.z = -2.5f;
 	}
 
@@ -143,30 +144,86 @@ namespace vulkancraft
 		}
 
 		vkDeviceWaitIdle(game_device_.get_vulkan_device());
+		thread_state_manager_ -> set_render_thread_state_to_phy(true); // 将渲染线程结束的标志设置为 true
+
+		std::cout << std::endl << "====== 渲染线程结束 ======" << std::endl;
 	}
 
 	void GameRender::load_game_object()
 	{
 		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, "models/block.obj");
-		BaseGameObject stone_obj = BaseGameObject::create_game_object();
+		BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
 
 		stone_obj.model_ = stone_model;
 		stone_obj.transform_.translation = {0.0f, 0.6f, 0.0f};
 		stone_obj.transform_.rotation = {0.0f, 0.0f, 0.0f};
 		stone_obj.transform_.scale = {1.0f, 1.0f, 1.0f};
 
-		GameObjectPublicData stone_obj_public_data = 
+		// 生成方块的 Box Collider
+		AABBCollider collider =
+		{
+			stone_obj.transform_,
+			stone_obj.get_id()
+		};
+
+		// 生成方块全局共享数据
+		GameObjectPublicData stone_obj_public_data =
 		{
 			stone_obj.get_id(),
-			false,
-			stone_obj.transform_
+			stone_obj.get_static_state(),
+			stone_obj.transform_,
+			collider
 		};
 
 		// 公共数据放入 game object manager
-		game_object_manager_ -> insert_sharing_game_object_data(stone_obj.get_id(), stone_obj_public_data);
+		game_object_manager_->insert_sharing_game_object_data(stone_obj.get_id(), stone_obj_public_data);
+
+		if (!stone_obj.get_static_state()) // 非静态物体需要进行物理计算
+		{
+			game_object_manager_->add_physical_obj_by_id(stone_obj.get_id());
+		}
 
 		// 渲染数据放入 game object map
 		game_object_map_.emplace(stone_obj.get_id(), std::move(stone_obj));
+
+		// ==================== HACK 分界线 HACK ==================== //
+
+		std::shared_ptr<GameModel> stone_model_2 = GameModel::create_model_from_file(game_device_, "models/block.obj");
+		BaseGameObject stone_obj_2 = BaseGameObject::create_game_object(false);
+
+		stone_obj_2.model_ = stone_model_2;
+		stone_obj_2.transform_.translation = { 1.0f, 0.6f, 0.0f };
+		stone_obj_2.transform_.rotation = { 0.0f, 0.0f, 0.0f };
+		stone_obj_2.transform_.scale = { 1.0f, 1.0f, 1.0f };
+
+		// 生成方块的 Box Collider
+		AABBCollider collider_2 =
+		{
+			stone_obj_2.transform_,
+			stone_obj_2.get_id()
+		};
+
+		// 生成方块全局共享数据
+		GameObjectPublicData stone_obj_public_data_2 =
+		{
+			stone_obj_2.get_id(),
+			stone_obj_2.get_static_state(),
+			stone_obj_2.transform_,
+			collider_2
+		};
+
+		// 公共数据放入 game object manager
+		game_object_manager_->insert_sharing_game_object_data(stone_obj_2.get_id(), stone_obj_public_data_2);
+
+		if (!stone_obj_2.get_static_state()) // 非静态物体需要进行物理计算
+		{
+			game_object_manager_->add_physical_obj_by_id(stone_obj_2.get_id());
+		}
+
+		// 渲染数据放入 game object map
+		game_object_map_.emplace(stone_obj_2.get_id(), std::move(stone_obj_2));
+
+		// ==================== HACK 分界线 HACK ==================== //
 
 		// 硬编码灯光
 		std::vector<glm::vec3> light_color_vector
@@ -219,7 +276,7 @@ namespace vulkancraft
 	void GameRender::test_load_viking_room()
 	{
 		std::shared_ptr<GameModel> lve_model = GameModel::create_model_from_file(game_device_, "models/viking_room.obj");
-		auto viking_room = BaseGameObject::create_game_object();
+		auto viking_room = BaseGameObject::create_game_object(false);
 		viking_room.model_ = lve_model;
 		viking_room.transform_.translation = { 0.0f, 0.6f, 0.0f };
 		viking_room.transform_.rotation = { 3.1415926f / 2.0f, 3.1415926f, 0.0f };

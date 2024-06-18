@@ -38,10 +38,10 @@ namespace vulkancraft
 		using id_t = unsigned _int64;
 		using Map = std::unordered_map<id_t, BaseGameObject>;
 
-		static BaseGameObject create_game_object()
+		static BaseGameObject create_game_object(bool is_static)
 		{
 			static unsigned _int64 current_id = 0;
-			return BaseGameObject{ current_id++ };
+			return BaseGameObject{ current_id++ , is_static };
 		}
 
 		static BaseGameObject make_point_light(float intensity = 10.0f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f));
@@ -66,7 +66,7 @@ namespace vulkancraft
 
 		bool is_static_ = false; // 该游戏对象是否是静态的
 		id_t id_ = 0;
-		BaseGameObject(id_t obj_id) : id_{ obj_id } {}
+		BaseGameObject(id_t obj_id, bool is_static) : id_{ obj_id } , is_static_{ is_static } {}
 	};
 
 }  // namespace vulkancraft
