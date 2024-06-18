@@ -10,7 +10,6 @@
 // HACK: AABB 碰撞盒的确定逻辑：
 // 1. 将生成方块后的具体坐标给到 AABB 盒类
 // 2. 1 的具体坐标为 AABB 盒的中心，参数来自对方的 TransformComponent
-// 3. 创建函数：AABB 是否和 AABB 相交，点是否和 AABB 相交
 // AABB 碰撞盒的 id 应该和 GameObject 的 ID 相同
 
 struct vulkancraft::TransformComponent;
@@ -32,7 +31,7 @@ namespace vulkancraft
 		// 基础功能：判断点是否在 AABB 内
 		bool is_point_inside_aabb(const glm::vec3 point_pos);
 
-		// 基础功能，判断一条射线是否与 AABB 相交
+		// 基础功能，平板法判断一条射线是否与 AABB 相交，将 AABB 包围盒想象成 6 个平行于坐标轴的无限延展平面
 		bool is_ray_intersects_aabb(const glm::vec3 ray_origin, const glm::vec3 ray_direction);
 
 		// 基础功能，判断一个 AABB 碰撞盒是否与另一个 AABB 碰撞盒相交

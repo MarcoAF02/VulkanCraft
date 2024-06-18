@@ -47,7 +47,7 @@ void create_render_app()
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "GameRender App 创建失败：" << e.what() << std::endl;
+		std::cerr << "GameRender App 创建失败：" << e.what() << std::endl;
 	}
 }
 
@@ -59,6 +59,6 @@ void create_physical_app()
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "GamePhysical App 创建失败：" << e.what() << std::endl;
+		std::cerr << "GamePhysical App 创建失败：" << e.what() << std::endl;
 	}
 }

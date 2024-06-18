@@ -20,6 +20,7 @@ namespace vulkancraft
 
 	std::shared_ptr<GameObjectManager> GameObjectManager::get_instance()
 	{
+		// 确保它只被执行了一次
 		std::call_once(init_instance_flag_, GameObjectManager::init_singleton);
 		return instance_;
 	}

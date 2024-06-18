@@ -36,7 +36,6 @@ namespace vulkancraft
 		GameObjectPublicData() = default;
 	};
 
-	// 这个 map 和渲染系统里的 map 一致
 	using PublicObjMap = std::unordered_map<id_t, GameObjectPublicData>;
 
 	class GameObjectManager // 多线程单例类

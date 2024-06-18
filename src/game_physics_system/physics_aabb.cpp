@@ -76,6 +76,7 @@ namespace vulkancraft
 	{
 		return
 		{
+			// 第一个的最左侧小于或等于第二个的最右侧（想象一下），就算相交
 			(get_aabb_range().first.x <= other_collider.get_aabb_range().second.x &&
 			get_aabb_range().second.x >= other_collider.get_aabb_range().first.x) &&
 			(get_aabb_range().first.y <= other_collider.get_aabb_range().second.y &&
