@@ -1,6 +1,9 @@
 
 #pragma once
 
+// stl
+#include <chrono>
+
 // glm 数学库
 #include <glm/glm.hpp>
 
@@ -26,17 +29,22 @@ namespace vulkancraft
 		// 旋转被控制的物体
 		void rotate_control(GLFWwindow* window, float delta_time, BaseGameObject& game_object);
 
+		// 鼠标静止时阻止视角转动
+		void fix_mouse_offset();
+
 		// DEBUG 打印鼠标移动信息
 		void print_mouse_position();
 
 	private:
 
+		// 上一帧的鼠标动量
 		double last_pos_x_ = 0.0;
 		double last_pos_y_ = 0.0;
 
-		float look_speed_ = 1.2f;
+		float look_speed_ = 1.0f;
 
-		glm::vec2 mouse_move_input_ = {0, 0};
+		glm::vec2 mouse_offset_ = {0, 0};
+		glm::vec2 last_mouse_offset_ = {0, 0};
 	};
 
 }

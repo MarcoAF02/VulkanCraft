@@ -11,7 +11,7 @@ namespace vulkancraft
 
 	void MouseRotateController::cursor_position_callback_static(GLFWwindow* window, double xpos, double ypos)
 	{
-		auto controller = static_cast<MouseRotateController*>(glfwGetWindowUserPointer(window));
+		MouseRotateController* controller = static_cast<MouseRotateController*>(glfwGetWindowUserPointer(window));
 
 		if (controller)
 		{
@@ -21,29 +21,32 @@ namespace vulkancraft
 
 	void MouseRotateController::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	{
-		mouse_move_input_.x = static_cast<float>(xpos - last_pos_x_);
-		mouse_move_input_.y = static_cast<float>(ypos - last_pos_y_);
-
-		// 误差修正
-		if (mouse_move_input_.x == 1 || mouse_move_input_.x == -1) mouse_move_input_.x = 0;
-		if (mouse_move_input_.y == 1 || mouse_move_input_.y == -1) mouse_move_input_.y = 0;
+		mouse_offset_.x = static_cast<float>(xpos - last_pos_x_);
+		mouse_offset_.y = static_cast<float>(ypos - last_pos_y_);
 
 		last_pos_x_ = xpos;
 		last_pos_y_ = ypos;
 	}
 
+	void MouseRotateController::fix_mouse_offset()
+	{
+		glm::vec2 current_mouse_offset = mouse_offset_;
+		if (current_mouse_offset == last_mouse_offset_) mouse_offset_ = { 0, 0 };
+		last_mouse_offset_ = current_mouse_offset;
+	}
+
 	void MouseRotateController::print_mouse_position()
 	{
-		if (mouse_move_input_.x == 0 || mouse_move_input_.y == 0) return;
-		std::cout << "鼠标动量为：" << mouse_move_input_.x << " " << mouse_move_input_.y << std::endl;
+		std::cout << "鼠标动量为：" << mouse_offset_.x << " " << mouse_offset_.y << std::endl;
 	}
 
 	void MouseRotateController::rotate_control(GLFWwindow* window, float delta_time, BaseGameObject& game_object)
 	{
+		fix_mouse_offset();
 		glm::vec3 rotate{ 0 };
 
-		rotate.x -= mouse_move_input_.y;
-		rotate.y += mouse_move_input_.x;
+		rotate.x -= mouse_offset_.y;
+		rotate.y += mouse_offset_.x;
 
 		if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon())
 		{
