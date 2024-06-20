@@ -49,6 +49,12 @@ namespace vulkancraft
 
 		GameBaseCamera viewer_camera_; // 观察摄像机
 		BaseGameObject viewer_object_; // 观察者游戏物体，控制器通过这个控制创建出来的摄像机
+
+		MouseRotateController mouse_rotate_comtroller_ = // 鼠标控制器
+		{
+			game_window_.get_glfw_window()
+		};
+
 		KeyboardMovementController camera_controller_; // 键盘控制器
 
 		std::unique_ptr<SimpleRenderSystem> simple_render_system_;

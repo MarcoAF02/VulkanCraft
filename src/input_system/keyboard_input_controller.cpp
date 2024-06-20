@@ -40,6 +40,20 @@ namespace vulkancraft
 		{
 			game_object.transform_.translation += move_speed_ * delta_time * glm::normalize(moveDir);
 		}
+
+		// 下面处理一些 菜单/UI 逻辑
+
+		if (glfwGetKey(glfw_window, key_map_.unlock_cursor) == GLFW_PRESS)
+		{
+			// 显示鼠标指针并允许光标离开窗口
+			glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+
+		if (glfwGetKey(glfw_window, key_map_.lock_cursor) == GLFW_PRESS)
+		{
+			// 隐藏鼠标指针并将其固定在窗口内
+			glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		}
 	}
 
 }  // namespace vulkancraft

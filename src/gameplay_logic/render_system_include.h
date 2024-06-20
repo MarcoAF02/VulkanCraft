@@ -11,6 +11,7 @@
 #include "../game_render_system/base_render_system.h"
 #include "../game_render_system/point_light_system.h"
 #include "../gameplay_logic/game_camera.h"
+#include "../input_system/mouse_rotate_controller.h"
 #include "../input_system/keyboard_input_controller.h"
 
 // libs

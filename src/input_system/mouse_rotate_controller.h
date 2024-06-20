@@ -1,0 +1,42 @@
+
+#pragma once
+
+// glm 数学库
+#include <glm/glm.hpp>
+
+#include "../gameplay_logic/game_window.h"
+#include "../gameplay_logic/base_game_object.h"
+
+// GameWindow 中有 GLFWwindow
+
+namespace vulkancraft
+{
+	class MouseRotateController
+	{
+	public:
+
+		MouseRotateController(GLFWwindow* window);
+
+		// 静态回调函数，处理鼠标位置变化
+		static void cursor_position_callback_static(GLFWwindow* window, double xpos, double ypos);
+
+		// 鼠标位置回调函数
+		void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+
+		// 旋转被控制的物体
+		void rotate_control(GLFWwindow* window, float delta_time, BaseGameObject& game_object);
+
+		// DEBUG 打印鼠标移动信息
+		void print_mouse_position();
+
+	private:
+
+		double last_pos_x_ = 0.0;
+		double last_pos_y_ = 0.0;
+
+		float look_speed_ = 1.2f;
+
+		glm::vec2 mouse_move_input_ = {0, 0};
+	};
+
+}

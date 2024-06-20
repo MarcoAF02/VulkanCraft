@@ -100,6 +100,10 @@ namespace vulkancraft
 			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
 			current_time = new_time;
 
+			// HACK: 这里处理键盘鼠标移动控制的功能
+			// mouse_rotate_comtroller_.print_mouse_position();
+			mouse_rotate_comtroller_.rotate_control(game_window_.get_glfw_window(), frame_time, viewer_object_);
+
 			camera_controller_.move_in_plane_xz(game_window_.get_glfw_window(), frame_time, viewer_object_);
 			viewer_camera_.set_view_yxz(viewer_object_.transform_.translation, viewer_object_.transform_.rotation);
 

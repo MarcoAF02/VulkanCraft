@@ -75,6 +75,18 @@
     <ClCompile Include="src\managers\thread_state_manager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\game_physics_system\rigidbody_system.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\base_tools\math_tools.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gameplay_logic\character_controller.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input_system\mouse_rotate_controller.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gameplay_logic\base_game_object.h">
@@ -141,6 +153,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\managers\thread_state_manager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game_physics_system\rigidbody_system.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\base_tools\math_tools.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameplay_logic\character_controller.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input_system\mouse_rotate_controller.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

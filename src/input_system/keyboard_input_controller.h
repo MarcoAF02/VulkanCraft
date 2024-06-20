@@ -4,6 +4,9 @@
 #include "../gameplay_logic/game_window.h"
 #include "../gameplay_logic/base_game_object.h"
 
+// stl
+#include <chrono>
+
 // 键盘输入管理类集合
 
 namespace vulkancraft
@@ -23,6 +26,9 @@ namespace vulkancraft
 			int look_right = GLFW_KEY_RIGHT;
 			int look_up = GLFW_KEY_UP;
 			int look_down = GLFW_KEY_DOWN;
+
+			int unlock_cursor = GLFW_KEY_ESCAPE; // 解锁鼠标光标
+			int lock_cursor = GLFW_KEY_LEFT_ALT; // 锁定鼠标光标
 		};
 
 		void move_in_plane_xz(GLFWwindow* glfw_window, float delta_time, BaseGameObject& game_object);
