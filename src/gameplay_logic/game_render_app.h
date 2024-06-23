@@ -42,7 +42,9 @@ namespace vulkancraft
 		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
 		std::shared_ptr<ThreadStateManager> thread_state_manager_; // 线程监视器
 
+		// TODO: GameWindow 需要搬走，移动到 game main app 中去并用 shared ptr 管理
 		GameWindow game_window_{ kWidth, kHeight, kWindowName };
+
 		GameDevice game_device_{game_window_};
 		GameRenderer game_renderer_{game_window_, game_device_};
 

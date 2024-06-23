@@ -15,8 +15,11 @@
 // 注意 render app 类内的 gameobject_map 和单例类里的 gameobject_map 不是一种东西
 
 // 函数声明
-void create_render_app();
-void create_physical_app();
+void create_game_window(); // 创建游戏窗口
+void create_render_app(); // 创建渲染线程
+void create_physical_app(); // 创建物理线程
+
+// TODO: 这个物理线程还需要一个线程，就是对 AABB Collider 的队列优化
 
 // HACK: 全游戏的入口点
 int main(void)
@@ -61,4 +64,9 @@ void create_physical_app()
 	{
 		std::cerr << "GamePhysical App 创建失败：" << e.what() << std::endl;
 	}
+}
+
+void create_game_window()
+{
+
 }

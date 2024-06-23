@@ -8,5 +8,7 @@
 
 namespace vulkancraft
 {
-	// TODO: 编写一个 MoveTowards 函数给其他功能调用
+	// 用法同 Unity 引擎的 MoveTowards()
+	template<typename T>
+	glm::vec3 move_towards(const glm::vec3& current, const glm::vec3& target, T max_distance);
 }

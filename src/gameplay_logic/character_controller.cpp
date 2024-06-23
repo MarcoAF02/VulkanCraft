@@ -56,4 +56,10 @@ namespace vulkancraft
 		mouse_rotate_controller_.rotate_control(glfw_window_, fixed_delta_time, camera_game_obj_, kRotateX);
 	}
 
+	void CharacterController::update_player_collision(float delta_time)
+	{
+		character_rigidbody_.ground_check(character_collider_, delta_time);
+		character_rigidbody_.free_falling(delta_time);
+	}
+
 }

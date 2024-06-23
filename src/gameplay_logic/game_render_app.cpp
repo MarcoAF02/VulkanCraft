@@ -156,7 +156,7 @@ namespace vulkancraft
 	void GameRender::load_game_object()
 	{
 		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, "models/block.obj");
-		BaseGameObject stone_obj = BaseGameObject::create_game_object(true);
+		BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
 
 		stone_obj.model_ = stone_model;
 		stone_obj.transform_.translation = {0.0f, 0.6f, 0.0f};
@@ -193,7 +193,7 @@ namespace vulkancraft
 		// ==================== HACK ·Ö½çÏß HACK ==================== //
 
 		std::shared_ptr<GameModel> stone_model_2 = GameModel::create_model_from_file(game_device_, "models/block.obj");
-		BaseGameObject stone_obj_2 = BaseGameObject::create_game_object(true);
+		BaseGameObject stone_obj_2 = BaseGameObject::create_game_object(false);
 
 		stone_obj_2.model_ = stone_model_2;
 		stone_obj_2.transform_.translation = { 1.0f, 0.6f, 0.0f };

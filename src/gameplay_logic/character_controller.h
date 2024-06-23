@@ -51,11 +51,12 @@ namespace vulkancraft
 		void move(float fixed_delta_time);
 		void rotate(float fixed_delta_time);
 
-		// 这个类会被喂给实体管理器，最终在渲染，模拟线程创建前被创建，实体管理器（的指针）作为参数传递给两个 App
+		// TODO: 跳起来顶头回落
+		void update_player_collision(float delta_time); // 自由落体更新
 
-		// TODO: 让玩家撞到方块就停下来，包括移动，上升，下落等
-		// 对于重力下落，玩家从脚下四个点向下发射射线，任意一条射线检测到了 AABB Collider，无论它是不是静态的，都算在地上。
-		// 对于移动撞墙，将玩家移动方向的向量转换为世界空间向量，计算这个向量与碰到的 AABB Collider 的夹角，大于某个值就阻止玩家移动
+		// 自由落体和地面检测是物理的，撞墙判断是 character controller 的
+
+		// 这个类会被喂给实体管理器，最终在渲染，模拟线程创建前被创建，实体管理器（的指针）作为参数传递给两个 App
 
 	private:
 
@@ -82,6 +83,7 @@ namespace vulkancraft
 			character_game_obj_.get_id()
 		};
 
+		// TODO: 这个东西要放在物理线程中循环
 		Rigidbody character_rigidbody_;
 		GLFWwindow* glfw_window_;
 
