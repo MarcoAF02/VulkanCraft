@@ -3,6 +3,7 @@
 
 #include "../managers/game_object_manager.h" // 游戏对象管理器
 #include "../managers/thread_state_manager.h" // 线程管理器
+#include "../gameplay_logic/game_entity_manager.h"
 #include "../game_physics_system/physics_aabb.h"
 #include "render_system_include.h"
 #include "game_camera.h"
@@ -10,15 +11,15 @@
 namespace vulkancraft
 {
 	// 游戏渲染全流程类（Vulkan）
-	class GameRender
+	class GameRenderApp
 	{
 	public:
 
-		GameRender();
-		~GameRender();
+		GameRenderApp();
+		~GameRenderApp();
 
-		GameRender(const GameRender&) = delete;
-		GameRender& operator = (const GameRender&) = delete;
+		GameRenderApp(const GameRenderApp&) = delete;
+		GameRenderApp& operator = (const GameRenderApp&) = delete;
 
 		void initialize_render_system(); // 初始化渲染系统
 		void update_render_window_content(); // 渲染窗口主循环
@@ -41,10 +42,9 @@ namespace vulkancraft
 
 		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
 		std::shared_ptr<ThreadStateManager> thread_state_manager_; // 线程监视器
+		std::shared_ptr<GameEntityManager> entity_manager_;
 
-		// TODO: GameWindow 需要搬走，移动到 game main app 中去并用 shared ptr 管理
-		GameWindow game_window_{ kWidth, kHeight, kWindowName };
-
+		GameWindow game_window_{kWidth, kHeight, kWindowName}; // 游戏窗口
 		GameDevice game_device_{game_window_};
 		GameRenderer game_renderer_{game_window_, game_device_};
 

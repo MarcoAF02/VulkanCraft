@@ -72,10 +72,7 @@ namespace vulkancraft
 
 		KeyboardMovementController keyboard_move_controller_;
 
-		MouseRotateController mouse_rotate_controller_ =
-		{
-			glfw_window_
-		};
+		std::unique_ptr<MouseRotateController> mouse_rotate_controller_;
 
 		AABBCollider character_collider_ =
 		{

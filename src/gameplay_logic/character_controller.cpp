@@ -6,6 +6,8 @@ namespace vulkancraft
 	CharacterController::CharacterController(GLFWwindow* glfw_window)
 	{
 		glfw_window_ = glfw_window;
+
+		mouse_rotate_controller_ = std::make_unique<MouseRotateController>(glfw_window_);
 	}
 
 	CharacterController::~CharacterController() { }
@@ -52,8 +54,8 @@ namespace vulkancraft
 
 	void CharacterController::rotate(float fixed_delta_time)
 	{
-		mouse_rotate_controller_.rotate_control(glfw_window_, fixed_delta_time, character_game_obj_, kRotateY);
-		mouse_rotate_controller_.rotate_control(glfw_window_, fixed_delta_time, camera_game_obj_, kRotateX);
+		mouse_rotate_controller_ -> rotate_control(glfw_window_, fixed_delta_time, character_game_obj_, kRotateY);
+		mouse_rotate_controller_ -> rotate_control(glfw_window_, fixed_delta_time, camera_game_obj_, kRotateX);
 	}
 
 	void CharacterController::update_player_collision(float delta_time)

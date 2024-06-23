@@ -3,7 +3,7 @@
 
 namespace vulkancraft
 {
-	GameRender::GameRender()
+	GameRenderApp::GameRenderApp()
 	{
 		create_global_pool();
 		initialize_render_system();
@@ -19,9 +19,9 @@ namespace vulkancraft
 		}
 	}
 
-	GameRender::~GameRender() { }
+	GameRenderApp::~GameRenderApp() { }
 
-	void GameRender::create_global_pool()
+	void GameRenderApp::create_global_pool()
 	{
 		global_pool_ =
 			VulkanBaseDescriptorPool::Builder(game_device_)
@@ -31,7 +31,7 @@ namespace vulkancraft
 			.build();
 	}
 
-	void GameRender::initialize_render_system()
+	void GameRenderApp::initialize_render_system()
 	{
 		ubo_buffer_vector_.resize((GameSwapChain::kMaxFramesInFlight));
 
@@ -87,7 +87,7 @@ namespace vulkancraft
 		viewer_object_.transform_.translation.z = -2.5f;
 	}
 
-	void GameRender::update_render_window_content()
+	void GameRenderApp::update_render_window_content()
 	{
 		load_game_object();
 		std::chrono::steady_clock::time_point current_time = std::chrono::high_resolution_clock::now();
@@ -153,7 +153,7 @@ namespace vulkancraft
 		std::cout << std::endl << "====== 渲染线程结束 ======" << std::endl;
 	}
 
-	void GameRender::load_game_object()
+	void GameRenderApp::load_game_object()
 	{
 		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, "models/block.obj");
 		BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
@@ -257,7 +257,7 @@ namespace vulkancraft
 		}
 	}
 
-	void GameRender::load_object_texture()
+	void GameRenderApp::load_object_texture()
 	{
 		game_base_texture_ = std::make_unique<GameTexture>(game_device_, "textures/cobblestone.png");
 
@@ -268,7 +268,7 @@ namespace vulkancraft
 
 #pragma region 测试用函数实现
 
-	void GameRender::test_load_viking_room_texture()
+	void GameRenderApp::test_load_viking_room_texture()
 	{
 		game_base_texture_ = std::make_unique<GameTexture>(game_device_, "textures/viking_room.png");
 
@@ -277,7 +277,7 @@ namespace vulkancraft
 		image_info_.image_layout = game_base_texture_->get_image_layout();
 	}
 
-	void GameRender::test_load_viking_room()
+	void GameRenderApp::test_load_viking_room()
 	{
 		std::shared_ptr<GameModel> lve_model = GameModel::create_model_from_file(game_device_, "models/viking_room.obj");
 		auto viking_room = BaseGameObject::create_game_object(true);

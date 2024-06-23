@@ -9,13 +9,17 @@
 
 namespace vulkancraft
 {
-	// 这里储存各个实体的引用计数智能指针的引用，并负责各种实体的管理
-	// 在游戏开始运行时，这个类作为参数传递给不同线程
+	// TODO: 这个必须做成单例类
 	class GameEntityManager
 	{
 	public:
+		GameEntityManager(std::shared_ptr<GameWindow> game_window);
+		~GameEntityManager();
 
 		std::shared_ptr<CharacterController> character_controller_;
+
+	private:
+		std::shared_ptr<GameWindow> game_window_;
 	};
 
 }
