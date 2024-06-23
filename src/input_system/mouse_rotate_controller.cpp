@@ -40,13 +40,32 @@ namespace vulkancraft
 		std::cout << "鼠标动量为：" << mouse_offset_.x << " " << mouse_offset_.y << std::endl;
 	}
 
-	void MouseRotateController::rotate_control(GLFWwindow* window, float delta_time, BaseGameObject& game_object)
+	void MouseRotateController::rotate_control(GLFWwindow* window, float delta_time, BaseGameObject& game_object, RotateState kRotateState)
 	{
 		fix_mouse_offset();
+
 		glm::vec3 rotate{ 0 };
 
-		rotate.x -= mouse_offset_.y;
-		rotate.y += mouse_offset_.x;
+		if (kRotateState == kRotateNone)
+		{
+			rotate = { 0, 0, 0 };
+		}
+
+		if (kRotateState == kRotateAll)
+		{
+			rotate.x -= mouse_offset_.y;
+			rotate.y += mouse_offset_.x;
+		}
+
+		if (kRotateState == kRotateX)
+		{
+			rotate.x -= mouse_offset_.y;
+		}
+
+		if (kRotateState == kRotateY)
+		{
+			rotate.y += mouse_offset_.x;
+		}
 
 		if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon())
 		{

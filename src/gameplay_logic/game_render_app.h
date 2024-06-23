@@ -17,6 +17,9 @@ namespace vulkancraft
 		GameRender();
 		~GameRender();
 
+		GameRender(const GameRender&) = delete;
+		GameRender& operator = (const GameRender&) = delete;
+
 		void initialize_render_system(); // 初始化渲染系统
 		void update_render_window_content(); // 渲染窗口主循环
 		void load_game_object(); // 加载游戏对象

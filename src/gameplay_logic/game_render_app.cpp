@@ -102,9 +102,9 @@ namespace vulkancraft
 
 			// HACK: 这里处理键盘鼠标移动控制的功能
 			// mouse_rotate_comtroller_.print_mouse_position();
-			mouse_rotate_comtroller_.rotate_control(game_window_.get_glfw_window(), frame_time, viewer_object_);
+			mouse_rotate_comtroller_.rotate_control(game_window_.get_glfw_window(), frame_time, viewer_object_, kRotateAll);
 
-			camera_controller_.move_in_plane_xz(game_window_.get_glfw_window(), frame_time, viewer_object_);
+			camera_controller_.move_in_plane_xz(game_window_.get_glfw_window(), frame_time, viewer_object_, kRotateAll);
 			viewer_camera_.set_view_yxz(viewer_object_.transform_.translation, viewer_object_.transform_.rotation);
 
 			float aspect = game_renderer_.get_aspect_ratio();
@@ -156,7 +156,7 @@ namespace vulkancraft
 	void GameRender::load_game_object()
 	{
 		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, "models/block.obj");
-		BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
+		BaseGameObject stone_obj = BaseGameObject::create_game_object(true);
 
 		stone_obj.model_ = stone_model;
 		stone_obj.transform_.translation = {0.0f, 0.6f, 0.0f};
@@ -193,7 +193,7 @@ namespace vulkancraft
 		// ==================== HACK 分界线 HACK ==================== //
 
 		std::shared_ptr<GameModel> stone_model_2 = GameModel::create_model_from_file(game_device_, "models/block.obj");
-		BaseGameObject stone_obj_2 = BaseGameObject::create_game_object(false);
+		BaseGameObject stone_obj_2 = BaseGameObject::create_game_object(true);
 
 		stone_obj_2.model_ = stone_model_2;
 		stone_obj_2.transform_.translation = { 1.0f, 0.6f, 0.0f };
@@ -280,7 +280,7 @@ namespace vulkancraft
 	void GameRender::test_load_viking_room()
 	{
 		std::shared_ptr<GameModel> lve_model = GameModel::create_model_from_file(game_device_, "models/viking_room.obj");
-		auto viking_room = BaseGameObject::create_game_object(false);
+		auto viking_room = BaseGameObject::create_game_object(true);
 		viking_room.model_ = lve_model;
 		viking_room.transform_.translation = { 0.0f, 0.6f, 0.0f };
 		viking_room.transform_.rotation = { 3.1415926f / 2.0f, 3.1415926f, 0.0f };

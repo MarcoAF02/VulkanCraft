@@ -9,6 +9,7 @@
 
 #include "../gameplay_logic/game_window.h"
 #include "../gameplay_logic/base_game_object.h"
+#include "../base_tools/enumeration_tools.h"
 
 // GameWindow 中有 GLFWwindow
 
@@ -27,7 +28,7 @@ namespace vulkancraft
 		void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 
 		// 旋转被控制的物体
-		void rotate_control(GLFWwindow* window, float delta_time, BaseGameObject& game_object);
+		void rotate_control(GLFWwindow* window, float delta_time, BaseGameObject& game_object, RotateState kRotateState);
 
 		// 鼠标静止时阻止视角转动
 		void fix_mouse_offset();
@@ -41,7 +42,7 @@ namespace vulkancraft
 		double last_pos_x_ = 0.0;
 		double last_pos_y_ = 0.0;
 
-		float look_speed_ = 1.0f;
+		float look_speed_ = 1.2f;
 
 		glm::vec2 mouse_offset_ = {0, 0};
 		glm::vec2 last_mouse_offset_ = {0, 0};

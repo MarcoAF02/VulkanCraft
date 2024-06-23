@@ -87,6 +87,9 @@
     <ClCompile Include="src\input_system\mouse_rotate_controller.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\gameplay_logic\game_entity_manager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gameplay_logic\base_game_object.h">
@@ -165,6 +168,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\input_system\mouse_rotate_controller.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\base_tools\enumeration_tools.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameplay_logic\game_entity_manager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

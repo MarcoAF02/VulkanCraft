@@ -3,6 +3,8 @@
 
 #include "../gameplay_logic/game_window.h"
 #include "../gameplay_logic/base_game_object.h"
+#include "../game_physics_system/physics_aabb.h"
+#include "../base_tools/enumeration_tools.h"
 
 // stl
 #include <chrono>
@@ -27,11 +29,19 @@ namespace vulkancraft
 			int look_up = GLFW_KEY_UP;
 			int look_down = GLFW_KEY_DOWN;
 
+			// TODO: UI 菜单功能单独开一个控制器
 			int unlock_cursor = GLFW_KEY_ESCAPE; // 解锁鼠标光标
 			int lock_cursor = GLFW_KEY_LEFT_ALT; // 锁定鼠标光标
 		};
 
-		void move_in_plane_xz(GLFWwindow* glfw_window, float delta_time, BaseGameObject& game_object);
+		// 键盘控制观察者的操作
+		void move_in_plane_xz(GLFWwindow* glfw_window, float delta_time, BaseGameObject& game_object, RotateState kRotateState);
+
+		// 键盘控制玩家移动
+		void player_move(GLFWwindow* glfw_window, float delta_time, BaseGameObject& player_obj);
+
+		// 菜单按键操作
+		void control_pause_menu(GLFWwindow* glfw_window);
 
 		KeyMappings key_map_{};
 		float move_speed_{ 1.6f };

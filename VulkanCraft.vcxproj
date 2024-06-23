@@ -24,6 +24,7 @@
     <ClCompile Include="src\gameplay_logic\base_game_object.cpp" />
     <ClCompile Include="src\gameplay_logic\character_controller.cpp" />
     <ClCompile Include="src\gameplay_logic\game_camera.cpp" />
+    <ClCompile Include="src\gameplay_logic\game_entity_manager.cpp" />
     <ClCompile Include="src\gameplay_logic\game_main.cpp" />
     <ClCompile Include="src\gameplay_logic\game_render_app.cpp" />
     <ClCompile Include="src\gameplay_logic\game_window.cpp" />
@@ -46,10 +47,12 @@
     <ClCompile Include="src\vulkan_base_render\game_texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\base_tools\enumeration_tools.h" />
     <ClInclude Include="src\base_tools\math_tools.h" />
     <ClInclude Include="src\gameplay_logic\base_game_object.h" />
     <ClInclude Include="src\gameplay_logic\character_controller.h" />
     <ClInclude Include="src\gameplay_logic\game_camera.h" />
+    <ClInclude Include="src\gameplay_logic\game_entity_manager.h" />
     <ClInclude Include="src\gameplay_logic\game_render_app.h" />
     <ClInclude Include="src\gameplay_logic\game_window.h" />
     <ClInclude Include="src\gameplay_logic\physical_simulation_app.h" />

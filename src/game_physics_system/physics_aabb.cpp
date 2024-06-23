@@ -32,7 +32,7 @@ namespace vulkancraft
 		};
 	}
 
-	bool AABBCollider::is_ray_intersects_aabb(const glm::vec3 ray_origin, const glm::vec3 ray_direction)
+	bool AABBCollider::is_ray_intersects_aabb(const glm::vec3 ray_origin, const glm::vec3 ray_direction) const
 	{
 		// 获取 AABB 的最小和最大顶点
 		const glm::vec3& min = aabb_range_.first;
@@ -84,6 +84,24 @@ namespace vulkancraft
 			(get_aabb_range().first.z <= other_collider.get_aabb_range().second.z &&
 			get_aabb_range().second.z >= other_collider.get_aabb_range().first.z)
 		};
+	}
+
+	std::vector<glm::vec3> AABBCollider::get_aabb_bottom_vertices() const
+	{
+		std::vector<glm::vec3> bottom_vertices_vector(4);
+
+		glm::vec3 min = aabb_range_.first;
+		glm::vec3 max = aabb_range_.second;
+
+		float bottomY = min.y;
+
+		// 分别计算四个顶点的坐标
+		bottom_vertices_vector[0] = glm::vec3(min.x, bottomY, min.z); // 左后角
+		bottom_vertices_vector[1] = glm::vec3(max.x, bottomY, min.z); // 右后角
+		bottom_vertices_vector[2] = glm::vec3(min.x, bottomY, max.z); // 左前角
+		bottom_vertices_vector[3] = glm::vec3(max.x, bottomY, max.z); // 右前角
+
+		return bottom_vertices_vector;
 	}
 
 }
