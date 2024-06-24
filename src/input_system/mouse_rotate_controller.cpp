@@ -3,10 +3,13 @@
 
 namespace vulkancraft
 {
-	MouseRotateController::MouseRotateController(GLFWwindow* window)
+	MouseRotateController::MouseRotateController() { }
+
+	void MouseRotateController::initialize(GLFWwindow* window)
 	{
-		glfwSetWindowUserPointer(window, this);
-		glfwSetCursorPosCallback(window, MouseRotateController::cursor_position_callback_static);
+		glfw_window_ = window; // ¥Ê¥¢GLFWwindow÷∏’Î
+		glfwSetWindowUserPointer(glfw_window_, this);
+		glfwSetCursorPosCallback(glfw_window_, MouseRotateController::cursor_position_callback_static);
 	}
 
 	void MouseRotateController::cursor_position_callback_static(GLFWwindow* window, double xpos, double ypos)

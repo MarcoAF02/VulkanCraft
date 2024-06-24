@@ -36,7 +36,7 @@ namespace vulkancraft
 
 		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
 		std::shared_ptr<ThreadStateManager> thread_state_manager_; // 线程监视器
-		std::shared_ptr<GameEntityManager> entity_manager_;
+		std::shared_ptr<GameEntityManager> game_entity_manager_;
 
 		GameWindow game_window_{ kWidth, kHeight, kWindowName }; // 游戏窗口
 		GameDevice game_device_{ game_window_ };
@@ -46,15 +46,21 @@ namespace vulkancraft
 		std::unique_ptr<GameTexture> game_base_texture_ {}; // 游戏贴图
 		BaseGameObject::Map game_object_map_; // 以字典储存的 game_object
 
+		PlayerCameraView player_camera_view_;
+		glm::vec3 player_spawn_point_ = {0.0f, 0.0f, -2.5f};
+
+		// TODO: 下面这四个会被 character controller 自带
+		// TODO: 这两个东西重新搬到 character controller 里去
 		GameBaseCamera viewer_camera_; // 观察摄像机
 		BaseGameObject viewer_object_; // 观察者游戏物体，控制器通过这个控制创建出来的摄像机
 
-		MouseRotateController mouse_rotate_comtroller_ = // 鼠标控制器
-		{
-			game_window_.get_glfw_window()
-		};
+		//MouseRotateController mouse_rotate_comtroller_ = // 鼠标控制器
+		//{
+		//	game_window_.get_glfw_window()
+		//};
 
-		KeyboardMovementController camera_controller_; // 键盘控制器
+		//KeyboardMovementController camera_controller_; // 键盘控制器
+		// TODO: 上面这四个会被 character controller 自带
 
 		std::unique_ptr<SimpleRenderSystem> simple_render_system_;
 		std::unique_ptr<PointLightSystem> point_light_system_; // 渲染系统放在这里

@@ -12,7 +12,7 @@ namespace vulkancraft
 		{
 			game_object_manager_ = GameObjectManager::get_instance();
 			thread_state_manager_ = ThreadStateManager::get_instance();
-			entity_manager_ = GameEntityManager::get_instance(game_window_.get_glfw_window());
+			game_entity_manager_ = GameEntityManager::get_instance();
 		}
 		catch (const std::exception& e)
 		{
@@ -85,7 +85,7 @@ namespace vulkancraft
 			);
 
 		viewer_object_ = BaseGameObject::create_game_object(false);
-		viewer_object_.transform_.translation.z = -2.5f;
+		//viewer_object_.transform_.translation.z = -2.5f;
 	}
 
 	void GameRenderApp::update_render_window_content()
@@ -93,9 +93,15 @@ namespace vulkancraft
 		load_game_object();
 		std::chrono::steady_clock::time_point current_time = std::chrono::high_resolution_clock::now();
 
+		game_entity_manager_->create_player();
+		game_entity_manager_->get_character_controller()->init_character_controller(player_spawn_point_);
+
 		while (!game_window_.should_close())
 		{
 			glfwPollEvents();
+
+			std::cout << game_window_.get_extent().width << std::endl;
+			// std::cout << game_window_.get_glfw_window() << std::endl;
 
 			std::chrono::steady_clock::time_point new_time = std::chrono::high_resolution_clock::now();
 			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
@@ -103,13 +109,29 @@ namespace vulkancraft
 
 			// HACK: 这里处理键盘鼠标移动控制的功能
 			// mouse_rotate_comtroller_.print_mouse_position();
-			mouse_rotate_comtroller_.rotate_control(game_window_.get_glfw_window(), frame_time, viewer_object_, kRotateAll);
+			//mouse_rotate_comtroller_.rotate_control(game_window_.get_glfw_window(), frame_time, viewer_object_, kRotateAll);
 
-			camera_controller_.move_in_plane_xz(game_window_.get_glfw_window(), frame_time, viewer_object_, kRotateAll);
+			//camera_controller_.move_in_plane_xz(game_window_.get_glfw_window(), frame_time, viewer_object_, kRotateAll);
+
+			//game_entity_manager_->get_character_controller() -> update_camera_viewer_transform();
+			//viewer_object_.transform_ = game_entity_manager_ -> get_character_controller() -> get_camera_viewer_transform();
+
+			// TODO: 先设置玩家角色位置，旋转和 Collider，再设置摄像机的参数和位置
+
 			viewer_camera_.set_view_yxz(viewer_object_.transform_.translation, viewer_object_.transform_.rotation);
 
-			float aspect = game_renderer_.get_aspect_ratio();
-			viewer_camera_.set_perspective_projection(glm::radians(50.f), aspect, 0.1f, 100.f);
+			player_camera_view_.aspect = game_renderer_.get_aspect_ratio();
+			player_camera_view_.fovy = glm::radians(50.f);
+			player_camera_view_.near = 0.1f;
+			player_camera_view_.far = 200.0f;
+
+			viewer_camera_.set_perspective_projection
+			(
+				player_camera_view_.fovy,
+				player_camera_view_.aspect,
+				player_camera_view_.near,
+				player_camera_view_.far
+			);
 
 			if (VkCommandBuffer_T* command_buffer = game_renderer_.begin_frame())
 			{

@@ -9,6 +9,12 @@ namespace vulkancraft
 		{
 			game_object_manager_ = GameObjectManager::get_instance();
 			thread_state_manager_ = ThreadStateManager::get_instance();
+			game_entity_manager_ = GameEntityManager::get_instance();
+
+			// 得到全局原子指针
+			GLFWwindow* glfwWindow = global_glfw_window_ptr.load(std::memory_order_acquire);
+
+			std::cout << glfwWindow << std::endl;
 		}
 		catch (const std::exception& e)
 		{

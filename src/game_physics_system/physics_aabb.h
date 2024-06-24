@@ -41,7 +41,7 @@ namespace vulkancraft
 
 		id_t get_id() { return id_; } // 得到 id
 		void set_id(id_t new_id) {id_ = new_id;} // 设置新 id
-		std::pair<glm::vec3, glm::vec3> get_aabb_range() {return aabb_range_;} // 得到 AABB 碰撞盒的范围
+		std::pair<glm::vec3, glm::vec3> get_aabb_range() const {return aabb_range_;} // 得到 AABB 碰撞盒的范围
 
 	private:
 

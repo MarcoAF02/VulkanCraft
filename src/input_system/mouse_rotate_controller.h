@@ -19,7 +19,10 @@ namespace vulkancraft
 	{
 	public:
 
-		MouseRotateController(GLFWwindow* window);
+		MouseRotateController();
+
+		// 初始化鼠标控制器
+		void initialize(GLFWwindow* window);
 
 		// 静态回调函数，处理鼠标位置变化
 		static void cursor_position_callback_static(GLFWwindow* window, double xpos, double ypos);
@@ -46,6 +49,8 @@ namespace vulkancraft
 
 		glm::vec2 mouse_offset_ = {0, 0};
 		glm::vec2 last_mouse_offset_ = {0, 0};
+
+		GLFWwindow* glfw_window_ = nullptr;
 	};
 
 }

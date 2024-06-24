@@ -6,6 +6,8 @@
 
 namespace vulkancraft
 {
+	std::atomic<GLFWwindow*> global_glfw_window_ptr{ nullptr };
+
 	GameWindow::GameWindow(int width, int height, std::string window_name) : width_{ width }, height_{ height }, window_name_{ window_name }
 	{
 		try
@@ -24,6 +26,11 @@ namespace vulkancraft
 
 	GameWindow::~GameWindow()
 	{
+		if (glfw_window_ == global_glfw_window_ptr.load(std::memory_order_acquire))
+		{
+			global_glfw_window_ptr.store(nullptr, std::memory_order_release);
+		}
+
 		glfwDestroyWindow(glfw_window_);
 		glfwTerminate();
 	}
@@ -39,9 +46,11 @@ namespace vulkancraft
 		glfwSetFramebufferSizeCallback(glfw_window_, frame_buffer_resize_callback);
 
 		// 隐藏鼠标指针并将其固定在窗口内
-		glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		glfwSetInputMode(glfw_window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);	// 启用鼠标原始输入
+		//glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		//glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		//glfwSetInputMode(glfw_window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);	// 启用鼠标原始输入
+
+		global_glfw_window_ptr.store(glfw_window_, std::memory_order_release);
 	}
 
 	void GameWindow::create_vulkan_window(VkInstance instance, VkSurfaceKHR* surface)

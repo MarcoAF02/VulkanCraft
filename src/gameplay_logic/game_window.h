@@ -9,6 +9,8 @@
 
 namespace vulkancraft
 {
+	extern std::atomic<GLFWwindow*> global_glfw_window_ptr; // 声明一个全局原子指针
+
 	class GameWindow
 	{
 	public:
