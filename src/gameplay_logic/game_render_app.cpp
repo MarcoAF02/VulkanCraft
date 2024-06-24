@@ -12,6 +12,7 @@ namespace vulkancraft
 		{
 			game_object_manager_ = GameObjectManager::get_instance();
 			thread_state_manager_ = ThreadStateManager::get_instance();
+			entity_manager_ = GameEntityManager::get_instance(game_window_.get_glfw_window());
 		}
 		catch (const std::exception& e)
 		{

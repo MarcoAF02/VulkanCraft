@@ -59,7 +59,11 @@ namespace vulkancraft
 
 				if (accumulator_step_ <= kTimeStep) break; // CD 时间没到就不循环
 
+				// ==================== HACK 这下面是物理循环 ==================== //
+
 				calculate_aabb_collider();
+
+				// ==================== HACK 这上面是物理循环 ==================== //
 
 				accumulator_ -= kTimePerUpdate; // 更新 accumulator（默认减去 1/60）
 				accumulator_step_ = 0.0f; // 重置更新 CD 时间

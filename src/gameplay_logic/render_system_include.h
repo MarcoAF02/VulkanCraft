@@ -2,6 +2,7 @@
 #pragma once
 
 #include "game_window.h"
+#include "game_camera.h"
 #include "../vulkan_base/game_device.h"
 #include "../vulkan_base/game_buffer.h"
 #include "../vulkan_base/game_descriptors.h"
@@ -13,6 +14,10 @@
 #include "../gameplay_logic/game_camera.h"
 #include "../input_system/mouse_rotate_controller.h"
 #include "../input_system/keyboard_input_controller.h"
+#include "../managers/game_object_manager.h" // 游戏对象管理器
+#include "../managers/thread_state_manager.h" // 线程管理器
+#include "../gameplay_logic/game_entity_manager.h"
+#include "../game_physics_system/physics_aabb.h"
 
 // libs
 #define GLM_FORCE_RADIANS

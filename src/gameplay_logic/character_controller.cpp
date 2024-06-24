@@ -6,7 +6,6 @@ namespace vulkancraft
 	CharacterController::CharacterController(GLFWwindow* glfw_window)
 	{
 		glfw_window_ = glfw_window;
-
 		mouse_rotate_controller_ = std::make_unique<MouseRotateController>(glfw_window_);
 	}
 

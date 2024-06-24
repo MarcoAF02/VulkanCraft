@@ -3,6 +3,7 @@
 
 #include "../managers/game_object_manager.h"
 #include "../managers/thread_state_manager.h"
+#include "../gameplay_logic/game_entity_manager.h"
 
 #include <iostream>
 #include <chrono>
@@ -29,6 +30,7 @@ namespace vulkancraft
 
 		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
 		std::shared_ptr<ThreadStateManager> thread_state_manager_; // 线程管理单例
+		std::shared_ptr<GameEntityManager> game_entity_manager_; // 实体管理器单例
 
 		// 追赶模式的循环时间
 		const double kTargetFps = 60.0; // 物理更新的目标帧率

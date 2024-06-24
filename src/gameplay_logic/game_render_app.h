@@ -1,12 +1,7 @@
 
 #pragma once
 
-#include "../managers/game_object_manager.h" // 游戏对象管理器
-#include "../managers/thread_state_manager.h" // 线程管理器
-#include "../gameplay_logic/game_entity_manager.h"
-#include "../game_physics_system/physics_aabb.h"
 #include "render_system_include.h"
-#include "game_camera.h"
 
 namespace vulkancraft
 {
@@ -21,15 +16,14 @@ namespace vulkancraft
 		GameRenderApp(const GameRenderApp&) = delete;
 		GameRenderApp& operator = (const GameRenderApp&) = delete;
 
+		const int kWidth = 1280;
+		const int kHeight = 800;
+		const std::string kWindowName = "VulkanCraft";
+
 		void initialize_render_system(); // 初始化渲染系统
 		void update_render_window_content(); // 渲染窗口主循环
 		void load_game_object(); // 加载游戏对象
 		void load_object_texture(); // 加载纹理贴图
-
-		const int kWidth = 1280;
-		const int kHeight = 800;
-
-		const std::string kWindowName = "VulkanCraft";
 
 #pragma region 测试用函数
 
@@ -44,9 +38,9 @@ namespace vulkancraft
 		std::shared_ptr<ThreadStateManager> thread_state_manager_; // 线程监视器
 		std::shared_ptr<GameEntityManager> entity_manager_;
 
-		GameWindow game_window_{kWidth, kHeight, kWindowName}; // 游戏窗口
-		GameDevice game_device_{game_window_};
-		GameRenderer game_renderer_{game_window_, game_device_};
+		GameWindow game_window_{ kWidth, kHeight, kWindowName }; // 游戏窗口
+		GameDevice game_device_{ game_window_ };
+		GameRenderer game_renderer_{ game_window_, game_device_ };
 
 		std::unique_ptr<VulkanBaseDescriptorPool> global_pool_ {}; // 全局描述符池
 		std::unique_ptr<GameTexture> game_base_texture_ {}; // 游戏贴图

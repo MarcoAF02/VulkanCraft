@@ -69,10 +69,10 @@ namespace vulkancraft
 		static std::once_flag init_instance_flag_;
 		static std::shared_ptr<GameObjectManager> instance_;
 
+		mutable std::mutex mutex_; // 用于保护线程安全的互斥锁
+
 		PublicObjMap sharing_object_map_; // 共享数据的游戏物体
 		std::vector<std::shared_ptr<GameObjectPublicData>> physical_game_obj_vector_; // 需要应用物理计算的游戏物体
-
-		mutable std::mutex mutex_; // 用于保护线程安全的互斥锁
 
 		// 初始化单例
 		static void init_singleton();
