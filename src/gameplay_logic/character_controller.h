@@ -19,6 +19,14 @@ class vulkancraft::Rigidbody; // 物理系统
 class vulkancraft::KeyboardMovementController; // 键盘控制器
 class vulkancraft::MouseRotateController; // 鼠标旋转控制器
 
+// TODO List:
+// 1. 玩家控制器实现地面检测
+// 2. 玩家控制器重力下落，配合 1 实现落在地上
+// 3. 玩家撞墙时停止移动，可以通过获取碰撞目标 Collider 面的法线实现
+// 4. 玩家跳跃，跳跃顶头取消向上的向量重新下落
+// 5. 移动插值平滑阻尼和撞墙重置移动速度
+// 6. 思考怎么实现材质系统，不同的方块显示不同的纹理
+
 namespace vulkancraft
 {
 	// 玩家相机视野的参数

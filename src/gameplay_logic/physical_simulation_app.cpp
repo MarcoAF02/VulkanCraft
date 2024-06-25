@@ -15,7 +15,7 @@ namespace vulkancraft
 			while (glfw_window_ == nullptr)
 			{
 				glfw_window_ = global_glfw_window_ptr.load(std::memory_order_acquire);
-				std::cout << "物理线程正在试图获取 GLFW 窗口指针，如果持续看到该信息，则 GameWindow 类初始化失败" << std::endl;
+				// std::cout << "物理线程正在试图获取 GLFW 窗口指针，如果持续看到该信息，则 GameWindow 类初始化失败" << std::endl;
 			}
 		}
 		catch (const std::exception& e)
