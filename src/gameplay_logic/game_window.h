@@ -4,6 +4,7 @@
 #define GLFW_INCLUDE_VULKAN // 创建 Vulkan 上下文
 #include <GLFW/glfw3.h>
 
+// std
 #include <iostream>
 #include <string>
 
@@ -30,15 +31,15 @@ namespace vulkancraft
 		void create_vulkan_window(VkInstance instance, VkSurfaceKHR* surface);
 
 	private:
-		static void frame_buffer_resize_callback(GLFWwindow* window, int width, int height);
-		void init_window();
-
 		int width_;
 		int height_;
 		bool frame_buffer_resized_ = false;
 
 		std::string window_name_;
 		GLFWwindow* glfw_window_;
+
+		static void frame_buffer_resize_callback(GLFWwindow* window, int width, int height);
+		void init_window();
 	};
 
 }  // namespace vulkancraft

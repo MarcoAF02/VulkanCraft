@@ -9,12 +9,14 @@ namespace vulkancraft
 		{
 			game_object_manager_ = GameObjectManager::get_instance();
 			thread_state_manager_ = ThreadStateManager::get_instance();
-			game_entity_manager_ = GameEntityManager::get_instance();
+			game_entity_manager_ = GameEntityManager::get_instance(); // 这里已经生成玩家了
 
 			// 得到全局原子指针
-			GLFWwindow* glfwWindow = global_glfw_window_ptr.load(std::memory_order_acquire);
-
-			std::cout << glfwWindow << std::endl;
+			while (glfw_window_ == nullptr)
+			{
+				glfw_window_ = global_glfw_window_ptr.load(std::memory_order_acquire);
+				std::cout << "物理线程正在试图获取 GLFW 窗口指针，如果持续看到该信息，则 GameWindow 类初始化失败" << std::endl;
+			}
 		}
 		catch (const std::exception& e)
 		{
@@ -49,6 +51,7 @@ namespace vulkancraft
 			previous_step_ = current_step;
 
 			accumulator_step_ += elapsed_step.count(); // 累加间隔时间
+			float accumulator_delta_time = static_cast<float>(accumulator_step_) / 1e9f; // 物理间隔高精度纳秒转换回 float 类型，单位为秒
 
 			// if (accumulator_step_ <= kTimeStep) continue; // 大锁：CD 时间没到，放弃追赶更新
 
@@ -68,6 +71,8 @@ namespace vulkancraft
 				// ==================== HACK 这下面是物理循环 ==================== //
 
 				calculate_aabb_collider();
+
+				game_entity_manager_->get_character_controller()->move(accumulator_delta_time, glfw_window_);
 
 				// ==================== HACK 这上面是物理循环 ==================== //
 

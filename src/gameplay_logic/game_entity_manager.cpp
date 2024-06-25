@@ -7,14 +7,21 @@ namespace vulkancraft
 	std::once_flag GameEntityManager::init_instance_flag_;
 	std::shared_ptr<GameEntityManager> GameEntityManager::instance_ = nullptr;
 
-	GameEntityManager::GameEntityManager(GLFWwindow* glfw_window) { }
-	GameEntityManager::GameEntityManager() { }
+	GameEntityManager::GameEntityManager()
+	{
+		create_player();
+	}
 
 	GameEntityManager::~GameEntityManager() { }
 
 	void GameEntityManager::create_player()
 	{
-		character_controller_ = std::make_shared<CharacterController>();
+		std::lock_guard<std::mutex> lock(mutex_); // 添加锁保护
+
+		if (!character_controller_) // 确保玩家只有一个，不会被多次初始化
+		{
+			character_controller_ = std::make_shared<CharacterController>();
+		}
 	}
 
 	void GameEntityManager::init_singleton()
@@ -29,9 +36,9 @@ namespace vulkancraft
 		return instance_;
 	}
 
-	std::shared_ptr<CharacterController> GameEntityManager::get_character_controller() const
+	std::shared_ptr<CharacterController> GameEntityManager::get_character_controller()
 	{
-		return character_controller_; // 这里是只读的，不用加锁
+		return character_controller_;
 	}
 
 }

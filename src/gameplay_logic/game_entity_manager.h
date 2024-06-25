@@ -6,7 +6,6 @@
 // std
 #include <vector>
 #include <memory>
-#include <condition_variable> // 条件变量，用于不同线程间的通信
 
 // 单例类：游戏实体管理器
 namespace vulkancraft
@@ -15,7 +14,6 @@ namespace vulkancraft
 	{
 	public:
 		GameEntityManager();
-		GameEntityManager(GLFWwindow* glfw_window);
 		~GameEntityManager();
 
 		GameEntityManager(const GameEntityManager&) = delete;
@@ -24,7 +22,7 @@ namespace vulkancraft
 		void create_player();
 
 		static std::shared_ptr<GameEntityManager> get_instance();
-		std::shared_ptr<CharacterController> get_character_controller() const;
+		std::shared_ptr<CharacterController> get_character_controller();
 
 	private:
 		static std::once_flag init_instance_flag_;

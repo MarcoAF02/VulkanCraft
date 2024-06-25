@@ -12,7 +12,7 @@ namespace vulkancraft
 		{
 			game_object_manager_ = GameObjectManager::get_instance();
 			thread_state_manager_ = ThreadStateManager::get_instance();
-			game_entity_manager_ = GameEntityManager::get_instance();
+			game_entity_manager_ = GameEntityManager::get_instance(); // 这里已经生成玩家了
 		}
 		catch (const std::exception& e)
 		{
@@ -84,8 +84,6 @@ namespace vulkancraft
 				global_set_layout_->get_descriptor_set_layout()
 			);
 
-		viewer_object_ = BaseGameObject::create_game_object(false);
-		//viewer_object_.transform_.translation.z = -2.5f;
 	}
 
 	void GameRenderApp::update_render_window_content()
@@ -93,45 +91,35 @@ namespace vulkancraft
 		load_game_object();
 		std::chrono::steady_clock::time_point current_time = std::chrono::high_resolution_clock::now();
 
-		game_entity_manager_->create_player();
+		// HACK: 初始化玩家
 		game_entity_manager_->get_character_controller()->init_character_controller(player_spawn_point_);
+
+		// std::cout << game_window_.get_glfw_window() << std::endl;
 
 		while (!game_window_.should_close())
 		{
 			glfwPollEvents();
 
-			std::cout << game_window_.get_extent().width << std::endl;
-			// std::cout << game_window_.get_glfw_window() << std::endl;
+			// std::cout << game_window_.get_extent().width << std::endl;
 
 			std::chrono::steady_clock::time_point new_time = std::chrono::high_resolution_clock::now();
 			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
 			current_time = new_time;
 
-			// HACK: 这里处理键盘鼠标移动控制的功能
-			// mouse_rotate_comtroller_.print_mouse_position();
-			//mouse_rotate_comtroller_.rotate_control(game_window_.get_glfw_window(), frame_time, viewer_object_, kRotateAll);
+			// HACK: 打印玩家数据
+			// game_entity_manager_->get_character_controller() -> print_player_details();
 
-			//camera_controller_.move_in_plane_xz(game_window_.get_glfw_window(), frame_time, viewer_object_, kRotateAll);
-
-			//game_entity_manager_->get_character_controller() -> update_camera_viewer_transform();
-			//viewer_object_.transform_ = game_entity_manager_ -> get_character_controller() -> get_camera_viewer_transform();
-
-			// TODO: 先设置玩家角色位置，旋转和 Collider，再设置摄像机的参数和位置
-
-			viewer_camera_.set_view_yxz(viewer_object_.transform_.translation, viewer_object_.transform_.rotation);
+			// HACK: 设置观察摄像机
+			viewer_camera_ = game_entity_manager_->get_character_controller()->get_player_camera();
 
 			player_camera_view_.aspect = game_renderer_.get_aspect_ratio();
-			player_camera_view_.fovy = glm::radians(50.f);
+			player_camera_view_.fovy = glm::radians(60.0f);
 			player_camera_view_.near = 0.1f;
 			player_camera_view_.far = 200.0f;
 
-			viewer_camera_.set_perspective_projection
-			(
-				player_camera_view_.fovy,
-				player_camera_view_.aspect,
-				player_camera_view_.near,
-				player_camera_view_.far
-			);
+			game_entity_manager_->get_character_controller()->init_mouse_rotate(game_window_.get_glfw_window());
+			game_entity_manager_->get_character_controller()->rotate(frame_time, game_window_.get_glfw_window());
+			game_entity_manager_->get_character_controller()->set_player_camera(player_camera_view_);
 
 			if (VkCommandBuffer_T* command_buffer = game_renderer_.begin_frame())
 			{
@@ -154,7 +142,7 @@ namespace vulkancraft
 
 				// std::cout << sizeof(ubo) << std::endl;
 
-				point_light_system_ -> update(frame_info, ubo);
+				point_light_system_->update(frame_info, ubo);
 				ubo_buffer_vector_[frame_index]->write_to_buffer(&ubo);
 				ubo_buffer_vector_[frame_index]->flush();
 
@@ -162,8 +150,8 @@ namespace vulkancraft
 				game_renderer_.begin_swap_chain_render_pass(command_buffer);
 
 				// order here matters
-				simple_render_system_ -> render_game_objects(frame_info);
-				point_light_system_ -> render(frame_info);
+				simple_render_system_->render_game_objects(frame_info);
+				point_light_system_->render(frame_info);
 
 				game_renderer_.end_swap_chain_render_pass(command_buffer);
 				game_renderer_.end_frame();
@@ -171,7 +159,7 @@ namespace vulkancraft
 		}
 
 		vkDeviceWaitIdle(game_device_.get_vulkan_device());
-		thread_state_manager_ -> set_render_thread_state_to_phy(true); // 将渲染线程结束的标志设置为 true
+		thread_state_manager_->set_render_thread_state_to_phy(true); // 将渲染线程结束的标志设置为 true
 
 		std::cout << std::endl << "====== 渲染线程结束 ======" << std::endl;
 	}
@@ -182,15 +170,19 @@ namespace vulkancraft
 		BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
 
 		stone_obj.model_ = stone_model;
-		stone_obj.transform_.translation = {0.0f, 0.6f, 0.0f};
-		stone_obj.transform_.rotation = {0.0f, 0.0f, 0.0f};
-		stone_obj.transform_.scale = {1.0f, 1.0f, 1.0f};
+		stone_obj.transform_.translation = { 0.0f, 0.6f, 0.0f };
+		stone_obj.transform_.rotation = { 0.0f, 0.0f, 0.0f };
+		stone_obj.transform_.scale = { 1.0f, 1.0f, 1.0f };
 
 		// 生成方块的 Box Collider
 		AABBCollider collider =
 		{
+			false,
 			stone_obj.transform_,
-			stone_obj.get_id()
+			stone_obj.get_id(),
+			true,
+			0.0f,
+			0.0f
 		};
 
 		// 生成方块全局共享数据
@@ -226,8 +218,12 @@ namespace vulkancraft
 		// 生成方块的 Box Collider
 		AABBCollider collider_2 =
 		{
+			false,
 			stone_obj_2.transform_,
-			stone_obj_2.get_id()
+			stone_obj_2.get_id(),
+			true,
+			0.0f,
+			0.0f
 		};
 
 		// 生成方块全局共享数据

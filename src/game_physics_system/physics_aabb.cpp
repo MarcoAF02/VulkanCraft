@@ -3,23 +3,68 @@
 
 namespace vulkancraft
 {
-	AABBCollider::AABBCollider(const TransformComponent& transform_component, const id_t& id)
+	AABBCollider::AABBCollider
+	(
+		const bool is_character_collider,
+		const TransformComponent& transform_component,
+		const id_t& id,
+		const bool is_default_size,
+		const float height,
+		const float width
+	)
 	{
 		collider_transform_component_.translation = transform_component.translation;
 		collider_transform_component_.rotation = transform_component.rotation;
 		collider_transform_component_.scale = transform_component.scale;
 
 		set_id(id);
-		set_aabb_collider_transform();
+
+		if (is_character_collider)
+		{
+			set_character_collider_size(height, width);
+		}
+		else
+		{
+			set_aabb_collider_transform(is_default_size, height, width);
+		}
 	}
 
-	void AABBCollider::set_aabb_collider_transform()
+	void AABBCollider::set_aabb_collider_transform(const bool is_default_size, const float height, const float width)
 	{
-		glm::vec3 half_size = glm::vec3(default_aabb_side_length_ / 2, default_aabb_side_length_ / 2, default_aabb_side_length_ / 2);
+		glm::vec3 half_size;
+
+		if (is_default_size) // 默认尺寸大小
+		{
+			half_size = glm::vec3(default_aabb_side_length_ / 2, default_aabb_side_length_ / 2, default_aabb_side_length_ / 2);
+		}
+		else // 自定义尺寸大小
+		{
+			half_size = glm::vec3(width / 2, height / 2, width / 2);
+		}
+
+		// 更新 AABB 的最小和最大坐标
 		glm::vec3 aabb_min = collider_transform_component_.translation - half_size;
 		glm::vec3 aabb_max = collider_transform_component_.translation + half_size;
 
 		aabb_range_ = std::make_pair(aabb_min, aabb_max); // 确定 AABB 的范围
+	}
+
+	void AABBCollider::set_character_collider_size(const float height, const float width)
+	{
+		glm::vec3 half_size = glm::vec3(width / 2, height / 2, width / 2); // 计算半尺寸大小
+
+		glm::vec3 collider_offset = // 计算玩家坐标偏移，让 AABB Collider 底部等于玩家脚踩的地面
+		{
+			collider_transform_component_.translation.x,
+			collider_transform_component_.translation.y + height / 2,
+			collider_transform_component_.translation.z
+		};
+
+		// 更新 AABB 的最小和最大坐标
+		glm::vec3 aabb_min = collider_offset - half_size;
+		glm::vec3 aabb_max = collider_offset + half_size;
+
+		aabb_range_ = std::make_pair(aabb_min, aabb_max);
 	}
 
 	bool AABBCollider::is_point_inside_aabb(const glm::vec3 point_pos)

@@ -23,10 +23,23 @@ namespace vulkancraft
 		using id_t = unsigned _int64;
 		TransformComponent collider_transform_component_{};
 
-		AABBCollider(const TransformComponent& transform_component, const id_t& id);
+		AABBCollider
+		(
+			const bool is_character_collider,
+			const TransformComponent& transform_component,
+			const id_t& id,
+			const bool is_default_size,
+			const float height,
+			const float width
+		);
 
-		// 根据传入的 AABB Transform 信息设置 Collider 的 AABB 信息
-		void set_aabb_collider_transform();
+		// 设置 AABB Collider 的函数，是普通游戏物体就用第一个函数，是角色就用第二个函数
+
+		// 根据传入的 AABB Transform 信息设置 Collider 的 AABB 信息，默认设置为长宽为 1 的方块 Collider
+		void set_aabb_collider_transform(const bool is_default_size, const float height, const float width);
+
+		// 设置角色的 AABB Collider
+		void set_character_collider_size(const float height, const float width);
 
 		// 基础功能：判断点是否在 AABB 内
 		bool is_point_inside_aabb(const glm::vec3 point_pos);
@@ -48,7 +61,6 @@ namespace vulkancraft
 		id_t id_ = 0; // 记录该 AABB 碰撞盒的 ID
 		float default_aabb_side_length_ = 1.0f; // 默认的 AABB 碰撞盒边长
 
-		// aabb_min, aabb_max
 		std::pair<glm::vec3, glm::vec3> aabb_range_; // 记录 aabb 碰撞盒的范围
 	};
 }

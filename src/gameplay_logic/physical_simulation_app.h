@@ -5,6 +5,7 @@
 #include "../managers/thread_state_manager.h"
 #include "../gameplay_logic/game_entity_manager.h"
 
+// std
 #include <iostream>
 #include <chrono>
 #include <cmath>
@@ -24,6 +25,7 @@ namespace vulkancraft
 		void calculate_aabb_collider(); // 检测动态物体是否相互碰撞
 
 	private:
+		GLFWwindow* glfw_window_ = nullptr; // 渲染线程内的窗口指针
 
 		using Clock = std::chrono::high_resolution_clock; // Clock 类型名
 		using Duration = std::chrono::duration<double>;

@@ -42,25 +42,14 @@ namespace vulkancraft
 		GameDevice game_device_{ game_window_ };
 		GameRenderer game_renderer_{ game_window_, game_device_ };
 
-		std::unique_ptr<VulkanBaseDescriptorPool> global_pool_ {}; // 全局描述符池
-		std::unique_ptr<GameTexture> game_base_texture_ {}; // 游戏贴图
+		std::unique_ptr<VulkanBaseDescriptorPool> global_pool_{}; // 全局描述符池
+		std::unique_ptr<GameTexture> game_base_texture_{}; // 游戏贴图
 		BaseGameObject::Map game_object_map_; // 以字典储存的 game_object
 
-		PlayerCameraView player_camera_view_;
-		glm::vec3 player_spawn_point_ = {0.0f, 0.0f, -2.5f};
+		PlayerCameraView player_camera_view_; // 构造玩家相机观察矩阵
+		glm::vec3 player_spawn_point_ = { 0.0f, 0.0f, 0.0f }; // 玩家出生点
 
-		// TODO: 下面这四个会被 character controller 自带
-		// TODO: 这两个东西重新搬到 character controller 里去
 		GameBaseCamera viewer_camera_; // 观察摄像机
-		BaseGameObject viewer_object_; // 观察者游戏物体，控制器通过这个控制创建出来的摄像机
-
-		//MouseRotateController mouse_rotate_comtroller_ = // 鼠标控制器
-		//{
-		//	game_window_.get_glfw_window()
-		//};
-
-		//KeyboardMovementController camera_controller_; // 键盘控制器
-		// TODO: 上面这四个会被 character controller 自带
 
 		std::unique_ptr<SimpleRenderSystem> simple_render_system_;
 		std::unique_ptr<PointLightSystem> point_light_system_; // 渲染系统放在这里

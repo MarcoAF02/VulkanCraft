@@ -40,10 +40,17 @@ namespace vulkancraft
 		CharacterController(const CharacterController&) = delete;
 		CharacterController& operator = (const CharacterController&) = delete;
 
+		// 初始化 character controller
 		void init_character_controller(glm::vec3 spawn_point);
 
-		// 更新相机观察者的位置
-		void update_camera_viewer_transform();
+		// 设置并更新玩家主相机
+		void set_player_camera(PlayerCameraView camera_view);
+
+		// 得到玩家观察相机
+		GameBaseCamera& get_player_camera();
+
+		// 初始化鼠标视角控制器
+		void init_mouse_rotate(GLFWwindow* glfw_window);
 
 		// 玩家身体会左右旋转，只有摄像机会上下旋转
 		void move(float fixed_delta_time, GLFWwindow* glfw_window);
@@ -51,9 +58,6 @@ namespace vulkancraft
 
 		// TODO: 跳起来顶头回落
 		void update_player_collision(float delta_time); // 自由落体更新
-
-		// 得到相机观察物体的坐标（只用坐标就可以了，这足够控制摄像机位置）
-		TransformComponent get_camera_viewer_transform();
 
 #pragma region DEBUG 用函数
 
@@ -70,21 +74,24 @@ namespace vulkancraft
 		float character_height_ = 1.8f; // 人类的身高
 		float character_width_ = 0.6f; // 人类的宽度
 
-		// TODO: 把 Camera 放在这里
 		glm::vec3 spawn_point_ = glm::vec3 {0, 0, 0};
-		TransformComponent camera_viewer_transform_;
 
-		// GameBaseCamera 类在 Render App 中，不能放在这里
 		BaseGameObject character_game_obj_; // 不能上下旋转，只能左右旋转
-		BaseGameObject camera_game_obj_; // 摄像机用的游戏物体，用于给摄像机上下旋转
+		BaseGameObject camera_game_obj_; // 摄像机用的观察游戏物体，用于给摄像机上下旋转
+
+		GameBaseCamera player_camera_; // 玩家摄像机
 
 		KeyboardMovementController keyboard_move_controller_;
 		MouseRotateController mouse_rotate_controller_;
 
 		AABBCollider character_collider_ =
 		{
+			true,
 			character_game_obj_.transform_,
-			character_game_obj_.get_id()
+			character_game_obj_.get_id(),
+			false,
+			character_height_,
+			character_width_
 		};
 
 		// TODO: 这个东西要放在物理线程中循环
