@@ -16,7 +16,7 @@
 #include "../input_system/keyboard_input_controller.h"
 #include "../managers/game_object_manager.h" // 游戏对象管理器
 #include "../managers/thread_state_manager.h" // 线程管理器
-#include "../gameplay_logic/game_entity_manager.h"
+#include "../managers/game_entity_manager.h"
 #include "../game_physics_system/physics_aabb.h"
 
 // libs

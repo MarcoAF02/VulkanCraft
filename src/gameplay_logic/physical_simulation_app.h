@@ -3,7 +3,7 @@
 
 #include "../managers/game_object_manager.h"
 #include "../managers/thread_state_manager.h"
-#include "../gameplay_logic/game_entity_manager.h"
+#include "../managers/game_entity_manager.h"
 
 // std
 #include <iostream>

@@ -3,7 +3,7 @@
 #include "game_render_app.h"
 #include "physical_simulation_app.h"
 #include "../managers/game_object_manager.h"
-#include "../gameplay_logic/game_entity_manager.h"
+#include "../managers/game_entity_manager.h"
 
 // std
 #include <iostream>
