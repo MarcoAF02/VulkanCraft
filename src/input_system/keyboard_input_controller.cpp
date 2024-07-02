@@ -79,6 +79,10 @@ namespace vulkancraft
 		if (glfwGetKey(glfw_window, key_map_.move_right) == GLFW_PRESS) moveDir += rightDir;
 		if (glfwGetKey(glfw_window, key_map_.move_left) == GLFW_PRESS) moveDir -= rightDir;
 
+		// TODO: 上下移动应该只存在于飞行模式
+		if (glfwGetKey(glfw_window, key_map_.move_up) == GLFW_PRESS) moveDir += upDir;
+		if (glfwGetKey(glfw_window, key_map_.move_down) == GLFW_PRESS) moveDir -= upDir;
+
 		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon())
 		{
 			player_obj.transform_.translation += move_speed_ * delta_time * glm::normalize(moveDir);

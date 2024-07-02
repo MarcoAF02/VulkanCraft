@@ -22,8 +22,8 @@ namespace vulkancraft
 			int move_right = GLFW_KEY_D;
 			int move_forward = GLFW_KEY_W;
 			int move_backward = GLFW_KEY_S;
-			int move_up = GLFW_KEY_E;
-			int move_down = GLFW_KEY_Q;
+			int move_up = GLFW_KEY_SPACE;
+			int move_down = GLFW_KEY_LEFT_SHIFT;
 			int look_left = GLFW_KEY_LEFT;
 			int look_right = GLFW_KEY_RIGHT;
 			int look_up = GLFW_KEY_UP;

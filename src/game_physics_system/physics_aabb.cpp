@@ -77,44 +77,44 @@ namespace vulkancraft
 		};
 	}
 
-	bool AABBCollider::is_ray_intersects_aabb(const glm::vec3 ray_origin, const glm::vec3 ray_direction) const
+	bool AABBCollider::is_ray_intersects_aabb(const glm::vec3 ray_origin, const glm::vec3 ray_direction, const float max_length) const
 	{
-		// 获取 AABB 的最小和最大顶点
+		// 这里的内存可能因为物理线程先初始化完成导致访问不到
 		const glm::vec3& min = aabb_range_.first;
 		const glm::vec3& max = aabb_range_.second;
 
-		glm::vec3 inv_dir; // 射线的方向向量分量的倒数，用于后续计算
+		glm::vec3 inv_dir;
 
-		if (!glm::all(glm::notEqual(ray_direction, glm::vec3(0)))) return false; // 避免除以 0 的情况
+		// 避免除以 0 的情况
+		if (ray_direction.x == 0 && ray_direction.y == 0 && ray_direction.z == 0) return false;
 
-		inv_dir.x = 1.0f / ray_direction.x;
-		inv_dir.y = 1.0f / ray_direction.y;
-		inv_dir.z = 1.0f / ray_direction.z;
+		// 设置射线方向分量的倒数，若分量为 0，则设为 INFINITY
+		inv_dir.x = ray_direction.x != 0 ? 1.0f / ray_direction.x : INFINITY;
+		inv_dir.y = ray_direction.y != 0 ? 1.0f / ray_direction.y : INFINITY;
+		inv_dir.z = ray_direction.z != 0 ? 1.0f / ray_direction.z : INFINITY;
 
-		// 计算射线在三个坐标轴方向上的参数
-		float tmin = -(ray_origin.x * inv_dir.x + ray_origin.y * inv_dir.y + ray_origin.z * inv_dir.z);
-		float tmax = tmin;
-		float tymin = tmin;
-		float tymax = tmax;
-		float tzmin = tmin;
-		float tzmax = tmax;
+		// 计算射线在三个坐标轴上的参数
+		float t1 = (min.x - ray_origin.x) * inv_dir.x;
+		float t2 = (max.x - ray_origin.x) * inv_dir.x;
+		float t3 = (max.y - ray_origin.y) * inv_dir.y;
+		float t4 = (min.y - ray_origin.y) * inv_dir.y;
+		float t5 = (min.z - ray_origin.z) * inv_dir.z;
+		float t6 = (max.z - ray_origin.z) * inv_dir.z;
 
-		// 根据射线方向的不同正负，调整 tmin 和 tmax 的值
-		if (inv_dir.x < 0.0f) std::swap(tmin, tmax);
-		if (inv_dir.y < 0.0f) std::swap(tymin, tymax);
-		if (inv_dir.z < 0.0f) std::swap(tzmin, tzmax);
+		float tmin = std::max(std::min(t1, t2), std::max(std::min(t3, t4), std::min(t5, t6)));
+		float tmax = std::min(std::max(t1, t2), std::min(std::max(t3, t4), std::max(t5, t6)));
 
-		// 计算射线与 AABB 边界在x, y, z轴上的交点参数，取最大最小值以确定交点范围
-		tmin = std::max({ tmin, tymin, tzmin });
-		tmax = std::min({ tmax, tymax, tzmax });
+		if (max_length < 0) // 传入的参数如果小于 0 则表示没有最大长度限制
+		{
+			return tmin <= tmax && tmin >= 0; // 判断射线是否与 AABB 相交
+		}
+		else // 应用最大长度限制
+		{
+			tmax = std::min(tmax, max_length);
+			tmin = std::max(tmin, 0.0f); // 确保 tmin 在有效范围内
 
-		if (tmax < 0) return false; // 如果 tmax < 0，表示射线朝向背离 AABB，不相交
-
-		// 如果 tmin > tmax，表示射线穿过 AABB 的边缘，不相交
-		// 或者说，如果 tmin > tmax，射线在离开 AABB 后才与 AABB 的边界相交
-		if (tmin > tmax) return false;
-
-		return tmin >= 0; // 如果 tmin >= 0，则射线与 AABB 相交
+			return tmin <= tmax && tmin >= 0; // 判断射线是否与 AABB 相交
+		}
 	}
 
 	bool AABBCollider::is_two_aabb_collision(AABBCollider& other_collider)

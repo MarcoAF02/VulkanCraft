@@ -106,10 +106,13 @@ namespace vulkancraft
 		camera_game_obj_.transform_.scale = { 1, 1, 1 }; // 相机的缩放不用改变
 	}
 
-	void CharacterController::update_player_collision(float delta_time)
+	void CharacterController::update_player_physics(float delta_time)
 	{
-		character_rigidbody_.ground_check(character_collider_, delta_time);
-		character_rigidbody_.free_falling(delta_time);
+		character_rigidbody_.ground_check(character_collider_, delta_time, ground_check_max_length_); // 地面检测
+
+		// 计算重力下落
+		character_rigidbody_.free_falling(delta_time, character_game_obj_.transform_.translation);
+		character_rigidbody_.free_falling(delta_time, camera_game_obj_.transform_.translation);
 	}
 
 	void CharacterController::set_player_camera(PlayerCameraView camera_view)

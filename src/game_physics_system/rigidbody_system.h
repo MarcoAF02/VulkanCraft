@@ -17,8 +17,8 @@ namespace vulkancraft
 		Rigidbody();
 		~Rigidbody();
 
-		void ground_check(AABBCollider& aabb_collider, float delta_time); // 因重力下落的 AABB Collider
-		glm::vec3 free_falling(float delta_time); // 返回一个自由落体用的向量
+		void ground_check(AABBCollider& aabb_collider, float delta_time, float max_length); // 因重力下落的 AABB Collider
+		void free_falling(float delta_time, glm::vec3& target_pos); // 返回一个自由落体用的向量
 
 	private:
 

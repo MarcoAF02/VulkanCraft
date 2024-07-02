@@ -20,12 +20,14 @@ class vulkancraft::KeyboardMovementController; // 键盘控制器
 class vulkancraft::MouseRotateController; // 鼠标旋转控制器
 
 // TODO List:
-// 1. 玩家控制器实现地面检测
+// 1. 玩家控制器实现地面检测（完成）
 // 2. 玩家控制器重力下落，配合 1 实现落在地上
 // 3. 玩家撞墙时停止移动，可以通过获取碰撞目标 Collider 面的法线实现
 // 4. 玩家跳跃，跳跃顶头取消向上的向量重新下落
 // 5. 移动插值平滑阻尼和撞墙重置移动速度
 // 6. 思考怎么实现材质系统，不同的方块显示不同的纹理
+// 7. 按 esc 解锁鼠标，按左 alt 锁定鼠标。菜单操作逻辑新开一个输入系统
+// TODO: 做到 6 之前，回头优化 3
 
 namespace vulkancraft
 {
@@ -65,7 +67,7 @@ namespace vulkancraft
 		void rotate(float fixed_delta_time, GLFWwindow* glfw_window);
 
 		// TODO: 跳起来顶头回落
-		void update_player_collision(float delta_time); // 自由落体更新
+		void update_player_physics(float delta_time); // 自由落体更新
 
 #pragma region DEBUG 用函数
 
@@ -81,6 +83,9 @@ namespace vulkancraft
 
 		float character_height_ = 1.8f; // 人类的身高
 		float character_width_ = 0.6f; // 人类的宽度
+
+		// HACK: 这个别改，保持 0.1f...
+		float ground_check_max_length_ = 0.1f; // 脚底射线检测的长度限制
 
 		glm::vec3 spawn_point_ = glm::vec3 {0, 0, 0};
 

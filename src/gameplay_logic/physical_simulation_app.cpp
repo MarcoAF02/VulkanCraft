@@ -11,7 +11,7 @@ namespace vulkancraft
 			thread_state_manager_ = ThreadStateManager::get_instance();
 			game_entity_manager_ = GameEntityManager::get_instance(); // 这里已经生成玩家了
 
-			// 得到全局原子指针
+			// 得到全局原子指针，这里进行阻塞以等待渲染线程创建完成
 			while (glfw_window_ == nullptr)
 			{
 				glfw_window_ = global_glfw_window_ptr.load(std::memory_order_acquire);
@@ -23,7 +23,7 @@ namespace vulkancraft
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
 
-		update_physical_simulation(); // 一上来就计算
+		update_physical_simulation(); // 计算物理模拟循环
 	}
 
 	PhysicalSimulationApp::~PhysicalSimulationApp() { }
@@ -70,9 +70,13 @@ namespace vulkancraft
 
 				// ==================== HACK 这下面是物理循环 ==================== //
 
+				// HACK: 延迟 10 毫秒后再开始物理计算，防止类未初始化完毕
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
 				calculate_aabb_collider();
 
 				game_entity_manager_->get_character_controller()->move(accumulator_delta_time, glfw_window_);
+				game_entity_manager_->get_character_controller()->update_player_physics(accumulator_delta_time);
 
 				// ==================== HACK 这上面是物理循环 ==================== //
 
