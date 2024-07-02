@@ -16,6 +16,18 @@ struct vulkancraft::TransformComponent;
 
 namespace vulkancraft
 {
+	// 记录 AABB 从哪个方向怼另一个 AABB
+	enum class CollisionSide
+	{
+		None,
+		Top,
+		Bottom,
+		Left,
+		Right,
+		Front,
+		Back
+	};
+
 	class AABBCollider
 	{
 	public:
@@ -42,13 +54,16 @@ namespace vulkancraft
 		void set_character_collider_size(const float height, const float width);
 
 		// 基础功能：判断点是否在 AABB 内
-		bool is_point_inside_aabb(const glm::vec3 point_pos);
+		bool is_point_inside_aabb(const glm::vec3 point_pos) const;
 
 		// 基础功能，平板法判断一条射线是否与 AABB 相交，将 AABB 包围盒想象成 6 个平行于坐标轴的无限延展平面
 		bool is_ray_intersects_aabb(const glm::vec3 ray_origin, const glm::vec3 ray_direction, const float max_length) const;
 
 		// 基础功能，判断一个 AABB 碰撞盒是否与另一个 AABB 碰撞盒相交
-		bool is_two_aabb_collision(AABBCollider& other_collider);
+		bool is_two_aabb_collision(AABBCollider& other_collider) const;
+
+		// 基础功能，判断与之碰撞的 AABB 盒来自哪个方向
+		CollisionSide get_collision_side_with(AABBCollider& other_collider) const;
 
 		std::vector<glm::vec3> get_aabb_bottom_vertices() const; // 得到 AABB Collider 的四个落脚点
 

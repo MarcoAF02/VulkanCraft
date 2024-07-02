@@ -22,7 +22,7 @@ namespace vulkancraft
 		PhysicalSimulationApp& operator = (const PhysicalSimulationApp&) = delete;
 
 		void update_physical_simulation(); // 循环更新物理模拟
-		void calculate_aabb_collider(); // 检测动态物体是否相互碰撞
+		void calculate_aabb_collider(); // 两两检测动态物体是否相互碰撞
 
 	private:
 		GLFWwindow* glfw_window_ = nullptr; // 渲染线程内的窗口指针

@@ -24,11 +24,6 @@ void create_physical_app(); // 创建物理线程
 // HACK: 全游戏的入口点
 int main(void)
 {
-	// TODO: 创建游戏窗口
-	// TODO: 游戏窗口管理器必须是个单例类
-	// TODO: 游戏实体管理器也必须是一个单例类
-	// TODO: 这两个类是单例类，但是其内含的数据在堆内存中，单例类确保的是任何时候指针都指向同一块内存区域
-
 	try
 	{
 		std::thread render_thread(create_render_app);

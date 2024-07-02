@@ -73,10 +73,11 @@ namespace vulkancraft
 				// HACK: 延迟 10 毫秒后再开始物理计算，防止类未初始化完毕
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-				calculate_aabb_collider();
+				// calculate_aabb_collider(); // 两两检测动态物体的 Collider 是否有碰撞
 
 				game_entity_manager_->get_character_controller()->move(accumulator_delta_time, glfw_window_);
 				game_entity_manager_->get_character_controller()->update_player_physics(accumulator_delta_time);
+				game_entity_manager_->get_character_controller()->update_player_collision();
 
 				// ==================== HACK 这上面是物理循环 ==================== //
 

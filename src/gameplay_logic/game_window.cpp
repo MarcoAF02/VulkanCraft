@@ -46,9 +46,9 @@ namespace vulkancraft
 		glfwSetFramebufferSizeCallback(glfw_window_, frame_buffer_resize_callback);
 
 		// 隐藏鼠标指针并将其固定在窗口内
-		//glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		//glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		//glfwSetInputMode(glfw_window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);	// 启用鼠标原始输入
+		glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(glfw_window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);	// 启用鼠标原始输入
 
 		global_glfw_window_ptr.store(glfw_window_, std::memory_order_release);
 	}

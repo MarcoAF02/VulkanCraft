@@ -21,9 +21,9 @@ class vulkancraft::MouseRotateController; // 鼠标旋转控制器
 
 // TODO List:
 // 1. 玩家控制器实现地面检测（完成）
-// 2. 玩家控制器重力下落，配合 1 实现落在地上
+// 2. 玩家控制器重力下落，配合 1 实现落在地上（完成）
 // 3. 玩家撞墙时停止移动，可以通过获取碰撞目标 Collider 面的法线实现
-// 4. 玩家跳跃，跳跃顶头取消向上的向量重新下落
+// 4. 玩家跳跃，跳跃顶头取消向上的向量重新下落（一样要采用向上的四轴射线检测）
 // 5. 移动插值平滑阻尼和撞墙重置移动速度
 // 6. 思考怎么实现材质系统，不同的方块显示不同的纹理
 // 7. 按 esc 解锁鼠标，按左 alt 锁定鼠标。菜单操作逻辑新开一个输入系统
@@ -66,8 +66,10 @@ namespace vulkancraft
 		void move(float fixed_delta_time, GLFWwindow* glfw_window);
 		void rotate(float fixed_delta_time, GLFWwindow* glfw_window);
 
-		// TODO: 跳起来顶头回落
+		// TODO: 跳起来顶头回落，需要使用顶头四轴射线检测
 		void update_player_physics(float delta_time); // 自由落体更新
+		void update_player_collision(); // 玩家 AABB 碰撞检测更新（玩家主动发起碰撞检测，不是 AABB 两两判断）
+		void handle_collision(AABBCollider& wall_collider);
 
 #pragma region DEBUG 用函数
 
@@ -77,6 +79,8 @@ namespace vulkancraft
 #pragma endregion
 
 	private:
+
+		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
 
 		// 人类的高度为 1.8 宽度为 0.6
 		// 摄像机不需要 AABB Collider，玩家角色需要

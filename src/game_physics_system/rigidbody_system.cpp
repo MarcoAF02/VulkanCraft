@@ -53,17 +53,17 @@ namespace vulkancraft
 
 		if (is_ground_) // 在地上
 		{
+			accumulator_ = 0.0f; // 时间累积归零
 			gravity_velocity = glm::vec3(0.0f, 0.0f, 0.0f);
 			gravity_speed = 0.0f;
 		}
 		else // 在空中
 		{
-			// TODO: 不要直接操控位移，要单独用一个变量不断累加速度
-			// TODO: 记录开始腾空的时间，时间慢慢变大，时间乘以重力累加仅下落向量
-			gravity_velocity += glm::vec3(0.0f, -1.0f, 0.0f) * kGravity * delta_time; // 应用重力加速度到速度上
+			accumulator_ += delta_time; // 累加时间
+			gravity_velocity += glm::vec3(0.0f, -1.0f, 0.0f) * kGravity * accumulator_ * delta_time; // 应用重力加速度到速度上
 			target_pos -= gravity_velocity; // 更新物体的垂直位置
 
-			std::cout << gravity_speed << std::endl;
+			// std::cout << accumulator_ << std::endl;
 		}
 	}
 }

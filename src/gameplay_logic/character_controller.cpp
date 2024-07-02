@@ -3,7 +3,18 @@
 
 namespace vulkancraft
 {
-	CharacterController::CharacterController() { }
+	CharacterController::CharacterController()
+	{
+		try
+		{
+			game_object_manager_ = GameObjectManager::get_instance();
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << "Character Controller 上的某个单例类创建失败：" << e.what() << std::endl;
+		}
+	}
+
 	CharacterController::~CharacterController() { }
 
 	GameBaseCamera& CharacterController::get_player_camera() { return player_camera_; }
@@ -79,7 +90,7 @@ namespace vulkancraft
 	void CharacterController::move(float fixed_delta_time, GLFWwindow* glfw_window)
 	{
 		// TODO: 这里应该可以设置玩家移动速度，视角转换速度
-		
+
 		// 键盘只控制移动，不控制玩家旋转
 		keyboard_move_controller_.player_move(glfw_window, fixed_delta_time, character_game_obj_);
 		camera_game_obj_.transform_.translation = character_game_obj_.transform_.translation + glm::vec3{ 0, -character_height_, 0 };
@@ -113,6 +124,63 @@ namespace vulkancraft
 		// 计算重力下落
 		character_rigidbody_.free_falling(delta_time, character_game_obj_.transform_.translation);
 		character_rigidbody_.free_falling(delta_time, camera_game_obj_.transform_.translation);
+	}
+
+	void CharacterController::update_player_collision()
+	{
+		// 对于注册进去的每个动态 AABB Collider
+		for (int i = 0; i < game_object_manager_->get_physical_obj_vector().size(); i++)
+		{
+			if (character_collider_.is_two_aabb_collision(game_object_manager_->get_physical_obj_vector()[i]->aabb_collider_))
+			{
+				// 把墙的参数传递给 handle_collision 函数
+				handle_collision(game_object_manager_->get_physical_obj_vector()[i]->aabb_collider_);
+			}
+		}
+	}
+
+	// TODO: 问一下通义千问这些代码的原理是什么，是怎么判断的
+	void CharacterController::handle_collision(AABBCollider& wall_collider)
+	{
+		// 创建一个新位置，初始化的值是当前的位置（碰撞前最后一帧的位置）
+		glm::vec3 player_collision_pos = character_collider_.collider_transform_component_.translation;
+
+		// 得到碰到的是哪一边
+		CollisionSide collision_side = character_collider_.get_collision_side_with(wall_collider);
+
+		// 得到墙的参数
+		glm::vec3 wall_min = wall_collider.get_aabb_range().first;
+		glm::vec3 wall_max = wall_collider.get_aabb_range().second;
+
+		// 根据碰撞方向调整新玩家位置
+		switch (collision_side)
+		{
+		case CollisionSide::Left:
+			player_collision_pos.x = wall_max.x + std::numeric_limits<float>::epsilon(); // 确保轻微错开，避免浮点误差导致的粘连
+			break;
+		case CollisionSide::Right:
+			player_collision_pos.x = wall_min.x - std::numeric_limits<float>::epsilon();
+			break;
+		case CollisionSide::Top:
+			std::cout << "顶部的碰撞不做处理" << std::endl;
+			// player_collision_pos.y = player_collision_pos.y - std::numeric_limits<float>::epsilon();
+			break;
+		case CollisionSide::Bottom:
+			std::cout << "底部的碰撞不做处理" << std::endl;
+			// player_collision_pos.y = player_collision_pos.y + std::numeric_limits<float>::epsilon();
+			break;
+		case CollisionSide::Front:
+			player_collision_pos.z = wall_max.z - std::numeric_limits<float>::epsilon();
+			break;
+		case CollisionSide::Back:
+			player_collision_pos.z = wall_max.z + std::numeric_limits<float>::epsilon();
+			break;
+		default:
+			break;
+		}
+
+		// 更新玩家位置
+		character_collider_.collider_transform_component_.translation = player_collision_pos;
 	}
 
 	void CharacterController::set_player_camera(PlayerCameraView camera_view)

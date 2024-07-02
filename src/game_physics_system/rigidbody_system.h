@@ -25,6 +25,8 @@ namespace vulkancraft
 		const float kGravity = 9.8f; // 全局重力
 		const float kEpsilon = 0.002f; // 防止检测到自己的极小值
 
+		float accumulator_ = 0.0f; // 时间差累积
+
 		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
 		bool is_ground_ = true; // 默认角色踩在地上
 	};

@@ -67,7 +67,7 @@ namespace vulkancraft
 		aabb_range_ = std::make_pair(aabb_min, aabb_max);
 	}
 
-	bool AABBCollider::is_point_inside_aabb(const glm::vec3 point_pos)
+	bool AABBCollider::is_point_inside_aabb(const glm::vec3 point_pos) const
 	{
 		return
 		{
@@ -117,7 +117,7 @@ namespace vulkancraft
 		}
 	}
 
-	bool AABBCollider::is_two_aabb_collision(AABBCollider& other_collider)
+	bool AABBCollider::is_two_aabb_collision(AABBCollider& other_collider) const
 	{
 		return
 		{
@@ -129,6 +129,34 @@ namespace vulkancraft
 			(get_aabb_range().first.z <= other_collider.get_aabb_range().second.z &&
 			get_aabb_range().second.z >= other_collider.get_aabb_range().first.z)
 		};
+	}
+
+	// TODO: 问一下通义千问这些代码的原理是什么，到底是怎么算的
+	// TODO: 这里的碰撞判断范围可能小了，要扩大判断范围
+	CollisionSide AABBCollider::get_collision_side_with(AABBCollider& other_collider) const
+	{
+		// 获取两个 AABB 的范围
+		auto this_range = get_aabb_range();
+		auto other_range = other_collider.get_aabb_range();
+
+		// 检查是否真的发生了碰撞。注意这里含有对 Y 轴的判断，属于是有但不需要作为
+		if (!is_two_aabb_collision(other_collider)) return CollisionSide::None;
+
+		glm::vec3 center_diff = (other_range.first + other_range.second) / 2.0f - (this_range.first + this_range.second) / 2.0f;
+
+		// 确定碰撞的方向
+		if (std::abs(center_diff.x) > std::abs(center_diff.y) && std::abs(center_diff.x) > std::abs(center_diff.z))
+		{
+			return center_diff.x > 0 ? CollisionSide::Right : CollisionSide::Left;
+		}
+		else if (std::abs(center_diff.y) > std::abs(center_diff.z))
+		{
+			return center_diff.y > 0 ? CollisionSide::Top : CollisionSide::Bottom;
+		}
+		else
+		{
+			return center_diff.z > 0 ? CollisionSide::Front : CollisionSide::Back;
+		}
 	}
 
 	std::vector<glm::vec3> AABBCollider::get_aabb_bottom_vertices() const
