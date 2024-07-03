@@ -90,6 +90,9 @@
     <ClCompile Include="src\managers\game_entity_manager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\gameplay_logic\system\terrain_generation.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gameplay_logic\base_game_object.h">
@@ -174,6 +177,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\managers\game_entity_manager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameplay_logic\system\terrain_generation.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

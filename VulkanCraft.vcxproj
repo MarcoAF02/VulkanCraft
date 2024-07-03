@@ -28,6 +28,7 @@
     <ClCompile Include="src\gameplay_logic\game_render_app.cpp" />
     <ClCompile Include="src\gameplay_logic\game_window.cpp" />
     <ClCompile Include="src\gameplay_logic\physical_simulation_app.cpp" />
+    <ClCompile Include="src\gameplay_logic\system\terrain_generation.cpp" />
     <ClCompile Include="src\game_physics_system\physics_aabb.cpp" />
     <ClCompile Include="src\game_physics_system\rigidbody_system.cpp" />
     <ClCompile Include="src\game_render_system\base_render_system.cpp" />
@@ -56,6 +57,7 @@
     <ClInclude Include="src\gameplay_logic\game_window.h" />
     <ClInclude Include="src\gameplay_logic\physical_simulation_app.h" />
     <ClInclude Include="src\gameplay_logic\render_system_include.h" />
+    <ClInclude Include="src\gameplay_logic\system\terrain_generation.h" />
     <ClInclude Include="src\game_physics_system\physics_aabb.h" />
     <ClInclude Include="src\game_physics_system\rigidbody_system.h" />
     <ClInclude Include="src\game_render_system\base_render_system.h" />
