@@ -24,7 +24,7 @@ namespace vulkancraft
 
 		stone_obj.model_ = stone_model;
 		stone_obj.transform_.translation = block_data.position;
-		stone_obj.transform_.rotation = block_data.position;
+		stone_obj.transform_.rotation = block_data.rotation;
 		stone_obj.transform_.scale = block_data.scale;
 
 		// 生成方块的 Box Collider
@@ -68,15 +68,62 @@ namespace vulkancraft
 			{ 1.0f, 1.0f, 1.0f }
 		};
 
+		new_data.position.x = 0;
+
+		for (int j = 0; j < width; j++) // 单独处理第一列
+		{
+			single_block_creator(new_data);
+			new_data.position.z += 1;
+		}
+
+		new_data.position.z = 0;
+
 		for (int i = 0; i < length; i++) // 对于 plane 的边长
 		{
-			for (int i = 0; i < width; i++) // 对于每个边长单位都生成这么多宽的方块
+			single_block_creator(new_data);
+			new_data.position.x += 1;
+
+			for (int j = 0; j < width; j++)
 			{
 				single_block_creator(new_data);
-
-				new_data.position.x += 1;
-				new_data.position.z += 1; // 更新数据
+				new_data.position.z += 1;
 			}
+
+			new_data.position.z = 0;
+		}
+	}
+
+	void TerrainGeneration::create_wall(int height, int width)
+	{
+		BlockGenerateData new_data =
+		{
+			{ 4.0f, 0.0f, 8.0f },
+			{ 0.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 1.0f }
+		};
+
+		new_data.position.x = 4.0f;
+
+		for (int j = 0; j < width; j++) // 单独处理第一列
+		{
+			single_block_creator(new_data);
+			new_data.position.y -= 1;
+		}
+
+		new_data.position.y = 0;
+
+		for (int i = 0; i < height; i++) // 对于 plane 的边长
+		{
+			single_block_creator(new_data);
+			new_data.position.x += 1;
+
+			for (int j = 0; j < width; j++)
+			{
+				single_block_creator(new_data);
+				new_data.position.y -= 1;
+			}
+
+			new_data.position.y = 0;
 		}
 	}
 

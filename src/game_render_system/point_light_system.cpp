@@ -91,8 +91,9 @@ namespace vulkancraft
 
 			// std::cout << kMaxLightCount << std::endl;
 
+			// HACK: µÆÄã²»Ğí×ª
 			// update light position
-			obj.transform_.translation = glm::vec3(rotateLight * glm::vec4(obj.transform_.translation, 1.f));
+			// obj.transform_.translation = glm::vec3(rotateLight * glm::vec4(obj.transform_.translation, 1.f));
 
 			// copy light to ubo
 			ubo.point_lights[lightIndex].position = glm::vec4(obj.transform_.translation, 1.f);

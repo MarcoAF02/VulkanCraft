@@ -22,11 +22,13 @@ namespace vulkancraft
 
 		void initialize_render_system(); // 初始化渲染系统
 		void update_render_window_content(); // 渲染窗口主循环
-		void load_game_object(); // 加载游戏对象
+		void create_terrain(); // 加载游戏对象
 		void load_object_texture(); // 加载纹理贴图
 
 #pragma region 测试用函数
 
+		void test_load_big_point_light(); // 加载一个巨大的点光源
+		void test_load_rotate_light(); // 加载硬编码的旋转灯光
 		void test_load_viking_room();
 		void test_load_viking_room_texture();
 
@@ -37,6 +39,8 @@ namespace vulkancraft
 		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
 		std::shared_ptr<ThreadStateManager> thread_state_manager_; // 线程监视器
 		std::shared_ptr<GameEntityManager> game_entity_manager_;
+
+		std::shared_ptr<TerrainGeneration> terrain_generation_; // 世界生成器
 
 		GameWindow game_window_{ kWidth, kHeight, kWindowName }; // 游戏窗口
 		GameDevice game_device_{ game_window_ };

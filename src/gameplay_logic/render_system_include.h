@@ -18,6 +18,7 @@
 #include "../managers/thread_state_manager.h" // 线程管理器
 #include "../managers/game_entity_manager.h"
 #include "../game_physics_system/physics_aabb.h"
+#include "system/terrain_generation.h" // 世界生成器
 
 // libs
 #define GLM_FORCE_RADIANS

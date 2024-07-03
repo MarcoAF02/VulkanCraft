@@ -23,6 +23,10 @@ namespace vulkancraft
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
 
+		// HACK: 延迟一小段时间后再开始物理计算，防止类未初始化完毕
+		// TODO: 后续的更新中，物理模拟改成阻塞到地形生成完成后再开始判断
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
 		update_physical_simulation(); // 计算物理模拟循环
 	}
 
@@ -69,9 +73,6 @@ namespace vulkancraft
 				if (accumulator_step_ <= kTimeStep) break; // CD 时间没到就不循环
 
 				// ==================== HACK 这下面是物理循环 ==================== //
-
-				// HACK: 延迟 10 毫秒后再开始物理计算，防止类未初始化完毕
-				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
 				// calculate_aabb_collider(); // 两两检测动态物体的 Collider 是否有碰撞
 

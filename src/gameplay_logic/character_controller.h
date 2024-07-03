@@ -68,8 +68,8 @@ namespace vulkancraft
 
 		// TODO: 跳起来顶头回落，需要使用顶头四轴射线检测
 		void update_player_physics(float delta_time); // 自由落体更新
-		void update_player_collision(); // 玩家 AABB 碰撞检测更新（玩家主动发起碰撞检测，不是 AABB 两两判断）
-		void handle_collision(AABBCollider& wall_collider);
+		void update_player_collision();
+		void handle_collision(AABBCollider& wall_collider); // 检测玩家 Collider 和墙体的碰撞
 
 #pragma region DEBUG 用函数
 
@@ -89,7 +89,7 @@ namespace vulkancraft
 		float character_width_ = 0.6f; // 人类的宽度
 
 		// HACK: 这个别改，保持 0.1f...
-		float ground_check_max_length_ = 0.1f; // 脚底射线检测的长度限制
+		float ground_check_max_length_ = 0.1f; // 脚底射线检测的长度
 
 		glm::vec3 spawn_point_ = glm::vec3 {0, 0, 0};
 

@@ -5,6 +5,7 @@
 
 // std
 #include <iostream>
+#include <vector>
 #include <string>
 #include <memory>
 
@@ -32,6 +33,7 @@ namespace vulkancraft
 		// 静态方块生成器
 		void single_block_creator(BlockGenerateData block_data);
 		void create_plane(int length, int width); // 直接创建一个平面
+		void create_wall(int height, int width); // 创建一面墙
 
 	private:
 
@@ -41,6 +43,5 @@ namespace vulkancraft
 		GameDevice& game_device_;
 		BaseGameObject::Map& game_object_map_;
 		std::shared_ptr<GameObjectManager> game_object_manager_;
-
 	};
 }

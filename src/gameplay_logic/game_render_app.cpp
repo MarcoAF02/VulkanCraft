@@ -18,6 +18,12 @@ namespace vulkancraft
 		{
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
+
+		terrain_generation_ = std::make_shared<TerrainGeneration>
+		(
+			game_device_,
+			game_object_map_
+		);
 	}
 
 	GameRenderApp::~GameRenderApp() { }
@@ -88,7 +94,7 @@ namespace vulkancraft
 
 	void GameRenderApp::update_render_window_content()
 	{
-		load_game_object();
+		create_terrain();
 		std::chrono::steady_clock::time_point current_time = std::chrono::high_resolution_clock::now();
 
 		// HACK: 初始化玩家
@@ -164,116 +170,15 @@ namespace vulkancraft
 		std::cout << std::endl << "====== 渲染线程结束 ======" << std::endl;
 	}
 
-	void GameRenderApp::load_game_object()
+	void GameRenderApp::create_terrain()
 	{
-		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, "models/block.obj");
-		BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
+		int plane_length = 20, plane_width = 20;
+		int wall_height = 6, wall_width = 6;
 
-		stone_obj.model_ = stone_model;
-		stone_obj.transform_.translation = { 0.0f, 0.6f, 0.0f };
-		stone_obj.transform_.rotation = { 0.0f, 0.0f, 0.0f };
-		stone_obj.transform_.scale = { 1.0f, 1.0f, 1.0f };
+		terrain_generation_ -> create_plane(plane_length, plane_width);
+		terrain_generation_ -> create_wall(wall_height, wall_width);
 
-		// 生成方块的 Box Collider
-		AABBCollider collider =
-		{
-			false,
-			stone_obj.transform_,
-			stone_obj.get_id(),
-			true,
-			0.0f,
-			0.0f
-		};
-
-		// 生成方块全局共享数据
-		GameObjectPublicData stone_obj_public_data =
-		{
-			stone_obj.get_id(),
-			stone_obj.get_static_state(),
-			stone_obj.transform_,
-			collider
-		};
-
-		// 公共数据放入 game object manager
-		game_object_manager_->insert_sharing_game_object_data(stone_obj.get_id(), stone_obj_public_data);
-
-		if (!stone_obj.get_static_state()) // 非静态物体需要进行物理计算
-		{
-			game_object_manager_->add_physical_obj_by_id(stone_obj.get_id());
-		}
-
-		// 渲染数据放入 game object map
-		game_object_map_.emplace(stone_obj.get_id(), std::move(stone_obj));
-
-		// ==================== HACK 分界线 HACK ==================== //
-
-		std::shared_ptr<GameModel> stone_model_2 = GameModel::create_model_from_file(game_device_, "models/block.obj");
-		BaseGameObject stone_obj_2 = BaseGameObject::create_game_object(false);
-
-		stone_obj_2.model_ = stone_model_2;
-		stone_obj_2.transform_.translation = { 1.0f, 0.6f, 0.0f };
-		stone_obj_2.transform_.rotation = { 0.0f, 0.0f, 0.0f };
-		stone_obj_2.transform_.scale = { 1.0f, 1.0f, 1.0f };
-
-		// 生成方块的 Box Collider
-		AABBCollider collider_2 =
-		{
-			false,
-			stone_obj_2.transform_,
-			stone_obj_2.get_id(),
-			true,
-			0.0f,
-			0.0f
-		};
-
-		// 生成方块全局共享数据
-		GameObjectPublicData stone_obj_public_data_2 =
-		{
-			stone_obj_2.get_id(),
-			stone_obj_2.get_static_state(),
-			stone_obj_2.transform_,
-			collider_2
-		};
-
-		// 公共数据放入 game object manager
-		game_object_manager_->insert_sharing_game_object_data(stone_obj_2.get_id(), stone_obj_public_data_2);
-
-		if (!stone_obj_2.get_static_state()) // 非静态物体需要进行物理计算
-		{
-			game_object_manager_->add_physical_obj_by_id(stone_obj_2.get_id());
-		}
-
-		// 渲染数据放入 game object map
-		game_object_map_.emplace(stone_obj_2.get_id(), std::move(stone_obj_2));
-
-		// ==================== HACK 分界线 HACK ==================== //
-
-		// 硬编码灯光
-		std::vector<glm::vec3> light_color_vector
-		{
-			{1.f, .1f, .1f},
-			{.1f, .1f, 1.f},
-			{.1f, 1.f, .1f},
-			{1.f, 1.f, .1f},
-			{.1f, 1.f, 1.f},
-			{1.f, 1.f, 1.f}
-		};
-
-		for (int i = 0; i < light_color_vector.size(); i++)
-		{
-			BaseGameObject point_light = BaseGameObject::make_point_light(2.0f);
-			point_light.color_ = light_color_vector[i];
-
-			auto rotate_light = glm::rotate
-			(
-				glm::mat4(1.f),
-				(i * glm::two_pi<float>()) / light_color_vector.size(),
-				{ 0.f, -1.f, 0.f }
-			);
-
-			point_light.transform_.translation = glm::vec3(rotate_light * glm::vec4(-1.f, -1.f, -1.f, 1.f));
-			game_object_map_.emplace(point_light.get_id(), std::move(point_light));
-		}
+		test_load_big_point_light();
 	}
 
 	void GameRenderApp::load_object_texture()
@@ -307,7 +212,44 @@ namespace vulkancraft
 		game_object_map_.emplace(viking_room.get_id(), std::move(viking_room));
 	}
 
-#pragma endregion
+	void GameRenderApp::test_load_big_point_light()
+	{
+		BaseGameObject point_light = BaseGameObject::make_point_light(6.0f);
+		point_light.color_ = glm::vec3(1.0f, 0.8f, 0.6f);
+		point_light.transform_.translation = {6.0f, -4.0f, 4.0f};
+		game_object_map_.emplace(point_light.get_id(), std::move(point_light));
+	}
 
+	void GameRenderApp::test_load_rotate_light()
+	{
+		// 硬编码灯光
+		std::vector<glm::vec3> light_color_vector
+		{
+			{1.f, .1f, .1f},
+			{.1f, .1f, 1.f},
+			{.1f, 1.f, .1f},
+			{1.f, 1.f, .1f},
+			{.1f, 1.f, 1.f},
+			{1.f, 1.f, 1.f}
+		};
+
+		for (int i = 0; i < light_color_vector.size(); i++)
+		{
+			BaseGameObject point_light = BaseGameObject::make_point_light(2.0f);
+			point_light.color_ = light_color_vector[i];
+
+			auto rotate_light = glm::rotate
+			(
+				glm::mat4(1.f),
+				(i * glm::two_pi<float>()) / light_color_vector.size(),
+				{ 0.f, -1.f, 0.f }
+			);
+
+			point_light.transform_.translation = glm::vec3(rotate_light * glm::vec4(-1.f, -1.f, -1.f, 1.f));
+			game_object_map_.emplace(point_light.get_id(), std::move(point_light));
+		}
+	}
+
+#pragma endregion
 
 }

@@ -60,6 +60,10 @@ namespace vulkancraft
 			collider_transform_component_.translation.z
 		};
 
+		// TODO: 头顶的位置有问题，AABB 踩在大 AABB 的范围内时无法判断相切
+		// TODO: 这个更新完以后，把之前的四轴射线检测地面判断去掉...
+		// TODO: 注意 Y 轴的上下方向是反的，回头修改
+
 		// 更新 AABB 的最小和最大坐标
 		glm::vec3 aabb_min = collider_offset - half_size;
 		glm::vec3 aabb_max = collider_offset + half_size;
@@ -79,7 +83,7 @@ namespace vulkancraft
 
 	bool AABBCollider::is_ray_intersects_aabb(const glm::vec3 ray_origin, const glm::vec3 ray_direction, const float max_length) const
 	{
-		// 这里的内存可能因为物理线程先初始化完成导致访问不到
+		// 这里的内存可能访问不到导致无效引用
 		const glm::vec3& min = aabb_range_.first;
 		const glm::vec3& max = aabb_range_.second;
 
@@ -117,7 +121,7 @@ namespace vulkancraft
 		}
 	}
 
-	bool AABBCollider::is_two_aabb_collision(AABBCollider& other_collider) const
+	bool AABBCollider::is_two_aabb_collision(const AABBCollider& other_collider) const
 	{
 		return
 		{
@@ -131,32 +135,20 @@ namespace vulkancraft
 		};
 	}
 
-	// TODO: 问一下通义千问这些代码的原理是什么，到底是怎么算的
-	// TODO: 这里的碰撞判断范围可能小了，要扩大判断范围
-	CollisionSide AABBCollider::get_collision_side_with(AABBCollider& other_collider) const
+	bool AABBCollider::is_two_aabb_touching(const AABBCollider& other_collider) const
 	{
-		// 获取两个 AABB 的范围
-		auto this_range = get_aabb_range();
-		auto other_range = other_collider.get_aabb_range();
+		const glm::vec3& min1 = aabb_range_.first;
+		const glm::vec3& max1 = aabb_range_.second;
+		const glm::vec3& min2 = other_collider.aabb_range_.first;
+		const glm::vec3& max2 = other_collider.aabb_range_.second;
 
-		// 检查是否真的发生了碰撞。注意这里含有对 Y 轴的判断，属于是有但不需要作为
-		if (!is_two_aabb_collision(other_collider)) return CollisionSide::None;
+		// 分别检查 x，y，z 轴（既不满足大于也不满足小于，就是等于）
+		if (min1.x > max2.x || max1.x < min2.x) return false;
+		if (min1.y > max2.y || max1.y < min2.y) return false;
+		if (min1.z > max2.z || max1.z < min2.z) return false;
 
-		glm::vec3 center_diff = (other_range.first + other_range.second) / 2.0f - (this_range.first + this_range.second) / 2.0f;
-
-		// 确定碰撞的方向
-		if (std::abs(center_diff.x) > std::abs(center_diff.y) && std::abs(center_diff.x) > std::abs(center_diff.z))
-		{
-			return center_diff.x > 0 ? CollisionSide::Right : CollisionSide::Left;
-		}
-		else if (std::abs(center_diff.y) > std::abs(center_diff.z))
-		{
-			return center_diff.y > 0 ? CollisionSide::Top : CollisionSide::Bottom;
-		}
-		else
-		{
-			return center_diff.z > 0 ? CollisionSide::Front : CollisionSide::Back;
-		}
+		// 如果所有轴都满足条件，则两个AABB相切
+		return true;
 	}
 
 	std::vector<glm::vec3> AABBCollider::get_aabb_bottom_vertices() const
@@ -166,13 +158,13 @@ namespace vulkancraft
 		glm::vec3 min = aabb_range_.first;
 		glm::vec3 max = aabb_range_.second;
 
-		float bottomY = min.y;
+		float bottom_y = min.y;
 
 		// 分别计算四个顶点的坐标
-		bottom_vertices_vector[0] = glm::vec3(min.x, bottomY, min.z); // 左后角
-		bottom_vertices_vector[1] = glm::vec3(max.x, bottomY, min.z); // 右后角
-		bottom_vertices_vector[2] = glm::vec3(min.x, bottomY, max.z); // 左前角
-		bottom_vertices_vector[3] = glm::vec3(max.x, bottomY, max.z); // 右前角
+		bottom_vertices_vector[0] = glm::vec3(min.x, bottom_y, min.z); // 左后角
+		bottom_vertices_vector[1] = glm::vec3(max.x, bottom_y, min.z); // 右后角
+		bottom_vertices_vector[2] = glm::vec3(min.x, bottom_y, max.z); // 左前角
+		bottom_vertices_vector[3] = glm::vec3(max.x, bottom_y, max.z); // 右前角
 
 		return bottom_vertices_vector;
 	}

@@ -19,6 +19,9 @@ namespace vulkancraft
 
 	void Rigidbody::ground_check(AABBCollider& aabb_collider, float delta_time, float max_length)
 	{
+		is_ground_ = true; // HACK: 暂时关闭重力
+		return;
+
 		glm::vec3 ray_direction(0.0f, +1.0f, 0.0f); // 射线发射的方向（和长度）
 
 		// 遍历角色底部的四个点
