@@ -3,8 +3,9 @@
 
 #include "../gameplay_logic/base_game_object.h"
 
-// stl
+// std
 #include <iostream>
+#include <array>
 #include <glm/glm.hpp>
 
 // HACK: AABB 碰撞盒的确定逻辑：
@@ -16,6 +17,18 @@ struct vulkancraft::TransformComponent;
 
 namespace vulkancraft
 {
+	// 记录其他 AABB Collider 在哪一侧发生碰撞
+	enum class CollisionSide
+	{
+		None,
+		Left,
+		Right,
+		Front,
+		Back,
+		Top,
+		Bottom
+	};
+
 	class AABBCollider
 	{
 	public:
@@ -39,7 +52,7 @@ namespace vulkancraft
 		void set_aabb_collider_transform(const bool is_default_size, const float height, const float width);
 
 		// 设置角色的 AABB Collider
-		void set_character_collider_size(const float height, const float width);
+		void set_character_collider(const glm::vec3 cur_pos, const float height, const float width);
 
 		// 基础功能：判断点是否在 AABB 内
 		bool is_point_inside_aabb(const glm::vec3 point_pos) const;
@@ -53,7 +66,11 @@ namespace vulkancraft
 		// 基础功能，判断两个 AABB 是否相切
 		bool is_two_aabb_touching(const AABBCollider& other_collider) const;
 
-		std::vector<glm::vec3> get_aabb_bottom_vertices() const; // 得到 AABB Collider 的四个落脚点
+		// 如果是游戏角色的话，会用到下面这两个函数
+		std::array<glm::vec3, 4> get_character_aabb_bottom_vertices() const; // 得到角色 AABB Collider 的四个底部顶点
+		std::array<glm::vec3, 4> get_character_aabb_top_vertices() const; // 得到角色 AABB Collider 顶部的四个顶点
+
+		glm::vec3 get_face_normal(CollisionSide side) const; // 得到 AABB Collider 每个面的法线
 
 		id_t get_id() { return id_; } // 得到 id
 		void set_id(id_t new_id) {id_ = new_id;} // 设置新 id
@@ -65,5 +82,8 @@ namespace vulkancraft
 		float default_aabb_side_length_ = 1.0f; // 默认的 AABB 碰撞盒边长
 
 		std::pair<glm::vec3, glm::vec3> aabb_range_; // 记录 aabb 碰撞盒的范围
+		std::array<glm::vec3, 4> character_bottom_aabb_pos_array_; // 记录角色 AABB 的底部四个点
+		std::array<glm::vec3, 4> character_top_aabb_pos_array_; // 记录角色 AABB 的顶部四个点
+		std::array<glm::vec3, 6> face_normals_; // 记录 aabb 碰撞盒每个面的法线
 	};
 }

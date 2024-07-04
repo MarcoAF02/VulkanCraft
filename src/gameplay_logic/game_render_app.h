@@ -25,8 +25,12 @@ namespace vulkancraft
 		void create_terrain(); // 加载游戏对象
 		void load_object_texture(); // 加载纹理贴图
 
-#pragma region 测试用函数
+#pragma region 测试用函数和变量
 
+		bool debug_light_created_ = false;
+		std::vector<id_t> player_debug_light_vector_;
+
+		void set_player_debug_light();
 		void test_load_big_point_light(); // 加载一个巨大的点光源
 		void test_load_rotate_light(); // 加载硬编码的旋转灯光
 		void test_load_viking_room();

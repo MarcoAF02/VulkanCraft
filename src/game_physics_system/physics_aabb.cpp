@@ -21,12 +21,20 @@ namespace vulkancraft
 
 		if (is_character_collider)
 		{
-			set_character_collider_size(height, width);
+			set_character_collider(transform_component.translation, height, width);
 		}
 		else
 		{
 			set_aabb_collider_transform(is_default_size, height, width);
 		}
+
+		// 初始化 AABB 的面法线
+		face_normals_[0] = glm::vec3(1, 0, 0); // 正 X 面
+		face_normals_[1] = glm::vec3(-1, 0, 0); // 负 X 面
+		face_normals_[2] = glm::vec3(0, -1, 0); // 正 Y 面（注意 Y 轴方向）
+		face_normals_[3] = glm::vec3(0, 1, 0); // 负 Y 面（注意 Y 轴方向）
+		face_normals_[4] = glm::vec3(0, 0, 1); // 正 Z 面
+		face_normals_[5] = glm::vec3(0, 0, -1); // 负 Z 面
 	}
 
 	void AABBCollider::set_aabb_collider_transform(const bool is_default_size, const float height, const float width)
@@ -43,32 +51,48 @@ namespace vulkancraft
 		}
 
 		// 更新 AABB 的最小和最大坐标
-		glm::vec3 aabb_min = collider_transform_component_.translation - half_size;
-		glm::vec3 aabb_max = collider_transform_component_.translation + half_size;
+		glm::vec3 aabb_min = collider_transform_component_.translation - glm::vec3(half_size.x, -half_size.y, half_size.z);
+		glm::vec3 aabb_max = collider_transform_component_.translation + glm::vec3(half_size.x, -half_size.y, half_size.z);
+
+		//std::cout << aabb_min.x << ", " << aabb_min.y << ", " << aabb_min.z << std::endl;
+		//std::cout << aabb_max.x << ", " << aabb_max.y << ", " << aabb_max.z << std::endl;
 
 		aabb_range_ = std::make_pair(aabb_min, aabb_max); // 确定 AABB 的范围
 	}
 
-	void AABBCollider::set_character_collider_size(const float height, const float width)
+	void AABBCollider::set_character_collider(const glm::vec3 cur_pos, const float height, const float width)
 	{
-		glm::vec3 half_size = glm::vec3(width / 2, height / 2, width / 2); // 计算半尺寸大小
+		float half_width = width / 2.0f;
 
-		glm::vec3 collider_offset = // 计算玩家坐标偏移，让 AABB Collider 底部等于玩家脚踩的地面
-		{
-			collider_transform_component_.translation.x,
-			collider_transform_component_.translation.y + height / 2,
-			collider_transform_component_.translation.z
-		};
+		glm::vec3 aabb_min = {cur_pos.x - half_width, cur_pos.y, cur_pos.z - half_width};
+		glm::vec3 aabb_max = {cur_pos.x + half_width, cur_pos.y - height, cur_pos.z + half_width};
 
-		// TODO: 头顶的位置有问题，AABB 踩在大 AABB 的范围内时无法判断相切
-		// TODO: 这个更新完以后，把之前的四轴射线检测地面判断去掉...
-		// TODO: 注意 Y 轴的上下方向是反的，回头修改
+		aabb_range_.first = aabb_min;
+		aabb_range_.second = aabb_max;
 
-		// 更新 AABB 的最小和最大坐标
-		glm::vec3 aabb_min = collider_offset - half_size;
-		glm::vec3 aabb_max = collider_offset + half_size;
+		// X 轴正着是左，Z 轴正着是前
 
-		aabb_range_ = std::make_pair(aabb_min, aabb_max);
+		// 记录底部四个坐标
+		glm::vec3 bottom_left_front = {cur_pos.x + half_width, cur_pos.y, cur_pos.z + half_width};
+		glm::vec3 bottom_right_front = {cur_pos.x - half_width, cur_pos.y, cur_pos.z + half_width};
+		glm::vec3 bottom_left_back = {cur_pos.x + half_width, cur_pos.y, cur_pos.z - half_width};
+		glm::vec3 bottom_right_back = {cur_pos.x - half_width, cur_pos.y, cur_pos.z - half_width};
+
+		// 记录顶部四个坐标
+		glm::vec3 top_left_front = {cur_pos.x + half_width, cur_pos.y - height, cur_pos.z + half_width};
+		glm::vec3 top_right_front = {cur_pos.x - half_width, cur_pos.y - height, cur_pos.z + half_width};
+		glm::vec3 top_left_back = {cur_pos.x + half_width, cur_pos.y - height, cur_pos.z - half_width};
+		glm::vec3 top_right_back = {cur_pos.x - half_width, cur_pos.y - height, cur_pos.z - half_width};
+
+		character_top_aabb_pos_array_[0] = top_left_front;
+		character_top_aabb_pos_array_[1] = top_right_front;
+		character_top_aabb_pos_array_[2] = top_left_back;
+		character_top_aabb_pos_array_[3] = top_right_back;
+
+		character_bottom_aabb_pos_array_[0] = bottom_left_front;
+		character_bottom_aabb_pos_array_[1] = bottom_right_front;
+		character_bottom_aabb_pos_array_[2] = bottom_left_back;
+		character_bottom_aabb_pos_array_[3] = bottom_right_back;
 	}
 
 	bool AABBCollider::is_point_inside_aabb(const glm::vec3 point_pos) const
@@ -144,16 +168,16 @@ namespace vulkancraft
 
 		// 分别检查 x，y，z 轴（既不满足大于也不满足小于，就是等于）
 		if (min1.x > max2.x || max1.x < min2.x) return false;
-		if (min1.y > max2.y || max1.y < min2.y) return false;
+		if (min1.y < max2.y || max1.y > min2.y) return false;
 		if (min1.z > max2.z || max1.z < min2.z) return false;
 
 		// 如果所有轴都满足条件，则两个AABB相切
 		return true;
 	}
 
-	std::vector<glm::vec3> AABBCollider::get_aabb_bottom_vertices() const
+	std::array<glm::vec3, 4> AABBCollider::get_character_aabb_bottom_vertices() const
 	{
-		std::vector<glm::vec3> bottom_vertices_vector(4);
+		std::array<glm::vec3, 4> bottom_vertices;
 
 		glm::vec3 min = aabb_range_.first;
 		glm::vec3 max = aabb_range_.second;
@@ -161,12 +185,51 @@ namespace vulkancraft
 		float bottom_y = min.y;
 
 		// 分别计算四个顶点的坐标
-		bottom_vertices_vector[0] = glm::vec3(min.x, bottom_y, min.z); // 左后角
-		bottom_vertices_vector[1] = glm::vec3(max.x, bottom_y, min.z); // 右后角
-		bottom_vertices_vector[2] = glm::vec3(min.x, bottom_y, max.z); // 左前角
-		bottom_vertices_vector[3] = glm::vec3(max.x, bottom_y, max.z); // 右前角
+		bottom_vertices[0] = glm::vec3(min.x, bottom_y, min.z); // 左后角
+		bottom_vertices[1] = glm::vec3(max.x, bottom_y, min.z); // 右后角
+		bottom_vertices[2] = glm::vec3(min.x, bottom_y, max.z); // 左前角
+		bottom_vertices[3] = glm::vec3(max.x, bottom_y, max.z); // 右前角
 
-		return bottom_vertices_vector;
+		return bottom_vertices;
+	}
+
+	std::array<glm::vec3, 4> AABBCollider::get_character_aabb_top_vertices() const
+	{
+		std::array<glm::vec3, 4> top_vertices;
+
+		glm::vec3 min = aabb_range_.first;
+		glm::vec3 max = aabb_range_.second;
+
+		float top_y = max.y;
+
+		// 分别计算四个顶点的坐标
+		top_vertices[0] = glm::vec3(min.x, top_y, min.z); // 左后角
+		top_vertices[1] = glm::vec3(max.x, top_y, min.z); // 右后角
+		top_vertices[2] = glm::vec3(min.x, top_y, max.z); // 左前角
+		top_vertices[3] = glm::vec3(max.x, top_y, max.z); // 右前角
+
+		return top_vertices;
+	}
+
+	glm::vec3 AABBCollider::get_face_normal(CollisionSide side) const
+	{
+		switch (side)
+		{
+		case CollisionSide::Left:
+			return face_normals_[1];
+		case CollisionSide::Right:
+			return face_normals_[0];
+		case CollisionSide::Top:
+			return face_normals_[3]; // Y 轴倒置，Top 对应原本的负 Y 面
+		case CollisionSide::Bottom:
+			return face_normals_[2]; // Y 轴倒置，Bottom 对应原本的正 Y 面
+		case CollisionSide::Front:
+			return face_normals_[5];
+		case CollisionSide::Back:
+			return face_normals_[4];
+		default:
+			return glm::vec3(0, 0, 0); // 没有匹配的侧面
+		}
 	}
 
 }

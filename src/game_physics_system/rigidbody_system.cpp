@@ -19,16 +19,15 @@ namespace vulkancraft
 
 	void Rigidbody::ground_check(AABBCollider& aabb_collider, float delta_time, float max_length)
 	{
-		is_ground_ = true; // HACK: 暂时关闭重力
-		return;
-
 		glm::vec3 ray_direction(0.0f, +1.0f, 0.0f); // 射线发射的方向（和长度）
 
 		// 遍历角色底部的四个点
-		for (int i = 0; i < aabb_collider.get_aabb_bottom_vertices().size(); i++)
+		for (int i = 0; i < aabb_collider.get_character_aabb_bottom_vertices().size(); i++)
 		{
+			// std::cout << aabb_collider.get_aabb_bottom_vertices()[i].x << ", " << aabb_collider.get_aabb_bottom_vertices()[i].y << ", " << aabb_collider.get_aabb_bottom_vertices()[i].z << std::endl;
+
 			// 射线发射点
-			glm::vec3 ray_origin(aabb_collider.get_aabb_bottom_vertices()[i].x, aabb_collider.get_aabb_bottom_vertices()[i].y + kEpsilon, aabb_collider.get_aabb_bottom_vertices()[i].z);
+			glm::vec3 ray_origin(aabb_collider.get_character_aabb_bottom_vertices()[i].x, aabb_collider.get_character_aabb_bottom_vertices()[i].y + kEpsilon, aabb_collider.get_character_aabb_bottom_vertices()[i].z);
 
 			// TODO: 这里先遍历所有 AABB Collider，之后再用一个队列优化性能
 			for (int j = 0; j < game_object_manager_->get_physical_obj_vector().size(); j++)
@@ -51,22 +50,22 @@ namespace vulkancraft
 
 	void Rigidbody::free_falling(float delta_time, glm::vec3& target_pos)
 	{
-		glm::vec3 gravity_velocity(0.0f, 0.0f, 0.0f);
-		float gravity_speed = 0.0f;
+		//glm::vec3 gravity_velocity(0.0f, 0.0f, 0.0f);
+		//float gravity_speed = 0.0f;
 
-		if (is_ground_) // 在地上
-		{
-			accumulator_ = 0.0f; // 时间累积归零
-			gravity_velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-			gravity_speed = 0.0f;
-		}
-		else // 在空中
-		{
-			accumulator_ += delta_time; // 累加时间
-			gravity_velocity += glm::vec3(0.0f, -1.0f, 0.0f) * kGravity * accumulator_ * delta_time; // 应用重力加速度到速度上
-			target_pos -= gravity_velocity; // 更新物体的垂直位置
+		//if (is_ground_) // 在地上
+		//{
+		//	accumulator_ = 0.0f; // 时间累积归零
+		//	gravity_velocity = glm::vec3(0.0f, 0.0f, 0.0f);
+		//	gravity_speed = 0.0f;
+		//}
+		//else // 在空中
+		//{
+		//	accumulator_ += delta_time; // 累加时间
+		//	gravity_velocity += glm::vec3(0.0f, -1.0f, 0.0f) * kGravity * accumulator_ * delta_time; // 应用重力加速度到速度上
+		//	target_pos -= gravity_velocity; // 更新物体的垂直位置
 
-			// std::cout << accumulator_ << std::endl;
-		}
+		//	// std::cout << accumulator_ << std::endl;
+		//}
 	}
 }

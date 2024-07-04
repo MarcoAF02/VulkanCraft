@@ -20,10 +20,10 @@ namespace vulkancraft
 		}
 
 		terrain_generation_ = std::make_shared<TerrainGeneration>
-		(
-			game_device_,
-			game_object_map_
-		);
+			(
+				game_device_,
+				game_object_map_
+			);
 	}
 
 	GameRenderApp::~GameRenderApp() { }
@@ -114,6 +114,7 @@ namespace vulkancraft
 
 			// HACK: 打印玩家数据
 			// game_entity_manager_->get_character_controller() -> print_player_details();
+			set_player_debug_light(); // 设置 Debug 灯
 
 			// HACK: 设置观察摄像机
 			viewer_camera_ = game_entity_manager_->get_character_controller()->get_player_camera();
@@ -175,8 +176,8 @@ namespace vulkancraft
 		int plane_length = 20, plane_width = 20;
 		int wall_height = 6, wall_width = 6;
 
-		terrain_generation_ -> create_plane(plane_length, plane_width);
-		terrain_generation_ -> create_wall(wall_height, wall_width);
+		terrain_generation_->create_plane(plane_length, plane_width);
+		terrain_generation_->create_wall(wall_height, wall_width);
 
 		test_load_big_point_light();
 	}
@@ -191,6 +192,44 @@ namespace vulkancraft
 	}
 
 #pragma region 测试用函数实现
+
+	void GameRenderApp::set_player_debug_light()
+	{
+		if (!debug_light_created_)
+		{
+			for (int i = 0; i < game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_bottom_vertices().size(); i++)
+			{
+				BaseGameObject debug_light = BaseGameObject::make_point_light(0.2f);
+				debug_light.color_ = { 0.0f, 1.0f, 0.0f };
+				debug_light.transform_.translation = game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_bottom_vertices()[i];
+				game_object_map_.emplace(debug_light.get_id(), std::move(debug_light));
+				player_debug_light_vector_.push_back(debug_light.get_id());
+			}
+
+			for (int i = 0; i < game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_top_vertices().size(); i++)
+			{
+				BaseGameObject debug_light = BaseGameObject::make_point_light(0.2f);
+				debug_light.color_ = { 0.0f, 1.0f, 0.0f };
+				debug_light.transform_.translation = game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_top_vertices()[i];
+				game_object_map_.emplace(debug_light.get_id(), std::move(debug_light));
+				player_debug_light_vector_.push_back(debug_light.get_id());
+			}
+		}
+
+		debug_light_created_ = true;
+
+		for (int i = 0; i < 4; i++)
+		{
+			game_object_map_.find(player_debug_light_vector_[i])->second.transform_.translation =
+				game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_bottom_vertices()[i];
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			game_object_map_.find(player_debug_light_vector_[i + 4])->second.transform_.translation =
+				game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_top_vertices()[i];
+		}
+	}
 
 	void GameRenderApp::test_load_viking_room_texture()
 	{
@@ -216,7 +255,7 @@ namespace vulkancraft
 	{
 		BaseGameObject point_light = BaseGameObject::make_point_light(6.0f);
 		point_light.color_ = glm::vec3(1.0f, 0.8f, 0.6f);
-		point_light.transform_.translation = {6.0f, -4.0f, 4.0f};
+		point_light.transform_.translation = { 6.0f, -4.0f, 4.0f };
 		game_object_map_.emplace(point_light.get_id(), std::move(point_light));
 	}
 

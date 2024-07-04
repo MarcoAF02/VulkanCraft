@@ -32,15 +32,15 @@ namespace vulkancraft
 		character_game_obj_.transform_.scale = { 1, 1, 1 }; // 玩家的缩放不用改变
 
 		// 初始化相机物体站位
-camera_game_obj_.transform_.translation = spawn_point_ + glm::vec3{ 0, -character_height_, 0 };
-camera_game_obj_.transform_.rotation = character_game_obj_.transform_.rotation; // 旋转和玩家角色保持一致
-camera_game_obj_.transform_.scale = { 1, 1, 1 }; // 相机的缩放不用改变
+		camera_game_obj_.transform_.translation = spawn_point_ + glm::vec3{ 0, -character_height_, 0 };
+		camera_game_obj_.transform_.rotation = character_game_obj_.transform_.rotation; // 旋转和玩家角色保持一致
+		camera_game_obj_.transform_.scale = { 1, 1, 1 }; // 相机的缩放不用改变
 
-character_collider_.set_id(character_game_obj_.get_id());
-character_collider_.collider_transform_component_.translation = character_game_obj_.transform_.translation; // 位置一样
-character_collider_.set_character_collider_size(character_height_, character_width_);
+		character_collider_.set_id(character_game_obj_.get_id());
+		character_collider_.collider_transform_component_.translation = character_game_obj_.transform_.translation; // 位置一样
+		character_collider_.set_character_collider(spawn_point_, character_height_, character_width_);
 
-print_player_details();
+		print_player_details();
 	}
 
 	void CharacterController::print_player_details() const
@@ -65,7 +65,7 @@ print_player_details();
 
 		std::cout << "玩家摄像机的坐标为："
 			<< camera_game_obj_.transform_.translation.x << ", "
-			<< -camera_game_obj_.transform_.translation.y << ", "
+			<< camera_game_obj_.transform_.translation.y << ", "
 			<< camera_game_obj_.transform_.translation.z << std::endl;
 
 		std::cout << "玩家摄像机的旋转角度为："
@@ -87,6 +87,11 @@ print_player_details();
 			<< character_collider_.get_aabb_range().second.z << std::endl;
 	}
 
+	AABBCollider& CharacterController::get_player_collider()
+	{
+		return character_collider_;
+	}
+
 	void CharacterController::move(float fixed_delta_time, GLFWwindow* glfw_window)
 	{
 		// TODO: 这里应该可以设置玩家移动速度，视角转换速度
@@ -98,7 +103,7 @@ print_player_details();
 		// 同步 AABB Collider，旋转不用同步
 		character_collider_.collider_transform_component_.translation = character_game_obj_.transform_.translation;
 		character_collider_.collider_transform_component_.scale = character_game_obj_.transform_.scale;
-		character_collider_.set_character_collider_size(character_height_, character_width_);
+		character_collider_.set_character_collider(character_collider_.collider_transform_component_.translation, character_height_, character_width_);
 
 		camera_game_obj_.transform_.scale = { 1, 1, 1 }; // 相机的缩放不用改变
 	}
@@ -139,38 +144,44 @@ print_player_details();
 
 	void CharacterController::handle_collision(AABBCollider& wall_collider)
 	{
+		// 注意：Vulkan 使用 Y 轴朝下的右手坐标系
+
+		// 初始化碰撞方向为 None
+		CollisionSide collisionSide = CollisionSide::None;
+
 		// 获取角色当前位置
 		glm::vec3 player_collider_pos = character_collider_.collider_transform_component_.translation;
 
 		// 获取墙体的最小和最大坐标
 		glm::vec3 wall_collider_min = wall_collider.get_aabb_range().first;
-		glm::vec3 wall_max = wall_collider.get_aabb_range().second;
+		glm::vec3 wall_collider_max = wall_collider.get_aabb_range().second;
 
+		// 检测碰撞并更新碰撞方向
 		if (player_collider_pos.x <= wall_collider_min.x)
 		{
 			player_collider_pos.x = wall_collider_min.x + std::numeric_limits<float>::epsilon();
-			std::cout << "玩家与某 Collider 相切了" << std::endl;
+			collisionSide = CollisionSide::Left;
+			std::cout << "玩家与某 Collider 左侧相切" << std::endl;
 		}
-		else if (player_collider_pos.x >= wall_max.x)
+		else if (player_collider_pos.x >= wall_collider_max.x)
 		{
-			player_collider_pos.x = wall_max.x - std::numeric_limits<float>::epsilon();
-			std::cout << "玩家与某 Collider 相切了" << std::endl;
+			player_collider_pos.x = wall_collider_max.x - std::numeric_limits<float>::epsilon();
+			collisionSide = CollisionSide::Right;
+			std::cout << "玩家与某 Collider 右侧相切" << std::endl;
 		}
-		else if (player_collider_pos.z <= wall_collider_min.z)
+		if (player_collider_pos.z <= wall_collider_min.z)
 		{
 			player_collider_pos.z = wall_collider_min.z + std::numeric_limits<float>::epsilon();
-			std::cout << "玩家与某 Collider 相切了" << std::endl;
+			collisionSide = CollisionSide::Front;
+			std::cout << "玩家与某 Collider 前侧相切" << std::endl;
 		}
-		else if (player_collider_pos.z >= wall_max.z)
+		else if (player_collider_pos.z >= wall_collider_max.z)
 		{
-			player_collider_pos.z = wall_max.z - std::numeric_limits<float>::epsilon();
-			std::cout << "玩家与某 Collider 相切了" << std::endl;
+			player_collider_pos.z = wall_collider_max.z - std::numeric_limits<float>::epsilon();
+			collisionSide = CollisionSide::Back;
+			std::cout << "玩家与某 Collider 后侧相切" << std::endl;
 		}
 
-		//// 更新角色位置
-		//character_collider_.collider_transform_component_.translation = player_collider_pos;
-		//character_game_obj_.transform_.translation = player_collider_pos;
-		//camera_game_obj_.transform_.translation = player_collider_pos;
 	}
 
 	void CharacterController::set_player_camera(PlayerCameraView camera_view)

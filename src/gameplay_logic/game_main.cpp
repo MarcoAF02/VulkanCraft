@@ -19,6 +19,8 @@
 void create_render_app(); // 创建渲染线程
 void create_physical_app(); // 创建物理线程
 
+// HACK: Vulkan 的 NDC 默认使用的 Y 轴向下的右手坐标系以及 Y 轴向下的 FrameBuffer
+
 // TODO: 物理线程还需要一个线程，就是对 AABB Collider 的队列优化
 
 // HACK: 全游戏的入口点
