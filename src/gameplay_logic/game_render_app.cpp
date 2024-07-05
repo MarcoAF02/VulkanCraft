@@ -124,6 +124,8 @@ namespace vulkancraft
 			player_camera_view_.near = 0.1f;
 			player_camera_view_.far = 200.0f;
 
+			// TODO: 这里依然将 GLFW 指针的所有权转移了，此处需要使用全局原子指针
+			// TODO: 用这个获取：global_glfw_window_ptr.load(std::memory_order_acquire);
 			game_entity_manager_->get_character_controller()->init_mouse_rotate(game_window_.get_glfw_window());
 			game_entity_manager_->get_character_controller()->rotate(frame_time, game_window_.get_glfw_window());
 			game_entity_manager_->get_character_controller()->set_player_camera(player_camera_view_);

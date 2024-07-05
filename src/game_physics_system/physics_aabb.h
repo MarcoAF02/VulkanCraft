@@ -29,6 +29,16 @@ namespace vulkancraft
 		Bottom
 	};
 
+	// 记录两个 AABB 的相切信息
+	struct AABBContactInfo
+	{
+		bool is_touching;
+		glm::vec3 normal;
+		glm::vec3 tangent1;
+		glm::vec3 tangent2;
+		bool tangents_are_parallel;
+	};
+
 	class AABBCollider
 	{
 	public:
@@ -65,6 +75,9 @@ namespace vulkancraft
 
 		// 基础功能，判断两个 AABB 是否相切
 		bool is_two_aabb_touching(const AABBCollider& other_collider) const;
+
+		// 基础功能，用法线判断两个 AABB 的相切情况
+		AABBContactInfo is_two_aabb_touching_check_normal(const AABBCollider& other_collider) const;
 
 		// 如果是游戏角色的话，会用到下面这两个函数
 		std::array<glm::vec3, 4> get_character_aabb_bottom_vertices() const; // 得到角色 AABB Collider 的四个底部顶点

@@ -175,6 +175,81 @@ namespace vulkancraft
 		return true;
 	}
 
+	AABBContactInfo AABBCollider::is_two_aabb_touching_check_normal(const AABBCollider& other_collider) const
+	{
+		AABBContactInfo result{ false, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), false };
+
+		const glm::vec3& min1 = aabb_range_.first;
+		const glm::vec3& max1 = aabb_range_.second;
+		const glm::vec3& min2 = other_collider.aabb_range_.first;
+		const glm::vec3& max2 = other_collider.aabb_range_.second;
+
+		bool collision_res = min1.x > max2.x || max1.x < min2.x ||
+			min1.y < max2.y || max1.y > min2.y ||
+			min1.z > max2.z || max1.z < min2.z;
+
+		// 初始检查，如果在任何一个维度上没有重叠，则直接返回
+		if (collision_res) return result;
+
+		// 如果所有轴都满足条件，则两个 AABB 相切
+		result.is_touching = true;
+
+		// 这里把 aabb 最大，最小的点位坐标归一化为 1 长度单位
+		// 已经发生了重叠碰撞，绝对坐标就失去意义了
+		glm::vec3 min1_backup = glm::vec3((min1.x > 0) ? 1 : ((min1.x < 0) ? -1 : 0), (min1.y > 0) ? 1 : ((min1.y < 0) ? -1 : 0), (min1.z > 0) ? 1 : ((min1.z < 0) ? -1 : 0));
+		glm::vec3 max1_backup = glm::vec3((max1.x > 0) ? 1 : ((max1.x < 0) ? -1 : 0), (max1.y > 0) ? 1 : ((max1.y < 0) ? -1 : 0), (max1.z > 0) ? 1 : ((max1.z < 0) ? -1 : 0));
+		glm::vec3 min2_backup = glm::vec3((min2.x > 0) ? 1 : ((min2.x < 0) ? -1 : 0), (min2.y > 0) ? 1 : ((min2.y < 0) ? -1 : 0), (min2.z > 0) ? 1 : ((min2.z < 0) ? -1 : 0));
+		glm::vec3 max2_backup = glm::vec3((max2.x > 0) ? 1 : ((max2.x < 0) ? -1 : 0), (max2.y > 0) ? 1 : ((max2.y < 0) ? -1 : 0), (max2.z > 0) ? 1 : ((max2.z < 0) ? -1 : 0));
+
+		// 确定相切的面和相应的法线
+		int face_index = -1;
+		if (min1_backup.x == max2_backup.x) face_index = 1; // 负X面
+		else if (max1_backup.x == min2_backup.x) face_index = 0; // 正X面
+		else if (min1_backup.y == max2_backup.y) face_index = 2; // 正Y面 -> 在倒置Y轴中，实际上是负Y面
+		else if (max1_backup.y == min2_backup.y) face_index = 3; // 负Y面 -> 在倒置Y轴中，实际上是正Y面
+		else if (min1_backup.z == max2_backup.z) face_index = 5; // 负Z面
+		else if (max1_backup.z == min2_backup.z) face_index = 4; // 正Z面
+
+		// std::cout << face_index << std::endl;
+
+		if (face_index != -1)
+		{
+			result.normal = face_normals_[face_index];
+		}
+		else
+		{
+			// 如果没有找到相切的面，设置 result.is_touching 为 false 并返回
+			result.is_touching = false;
+			return result;
+		}
+
+		// 确定相切面上的切线
+		glm::vec3 axis1 = glm::vec3(1.0f, 0.0f, 0.0f);
+		glm::vec3 axis2 = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 axis3 = glm::vec3(0.0f, 0.0f, 1.0f);
+
+		if (face_index == 0 || face_index == 1) // X面
+		{
+			result.tangent1 = axis2;
+			result.tangent2 = axis3;
+		}
+		else if (face_index == 2 || face_index == 3) // Y面
+		{
+			result.tangent1 = axis1;
+			result.tangent2 = axis3;
+		}
+		else if (face_index == 4 || face_index == 5) // Z面
+		{
+			result.tangent1 = axis1;
+			result.tangent2 = axis2;
+		}
+
+		// 检查切线是否平行
+		result.tangents_are_parallel = glm::dot(result.tangent1, result.tangent2) >= 0.999f;
+
+		return result;
+	}
+
 	std::array<glm::vec3, 4> AABBCollider::get_character_aabb_bottom_vertices() const
 	{
 		std::array<glm::vec3, 4> bottom_vertices;

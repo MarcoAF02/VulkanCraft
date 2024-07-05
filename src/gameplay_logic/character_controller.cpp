@@ -137,7 +137,12 @@ namespace vulkancraft
 		{
 			if (character_collider_.is_two_aabb_touching(game_object_manager_->get_physical_obj_vector()[i]->aabb_collider_))
 			{
-				handle_collision(game_object_manager_->get_physical_obj_vector()[i]->aabb_collider_);
+				bool is_tangent = character_collider_.is_two_aabb_touching_check_normal(game_object_manager_->get_physical_obj_vector()[i]->aabb_collider_).tangents_are_parallel;
+
+				if (is_tangent)
+				{
+					handle_collision(game_object_manager_->get_physical_obj_vector()[i]->aabb_collider_);
+				}
 			}
 		}
 	}
