@@ -27,14 +27,6 @@ namespace vulkancraft
 		{
 			set_aabb_collider_transform(is_default_size, height, width);
 		}
-
-		// 初始化 AABB 的面法线
-		face_normals_[0] = glm::vec3(1, 0, 0); // 正 X 面
-		face_normals_[1] = glm::vec3(-1, 0, 0); // 负 X 面
-		face_normals_[2] = glm::vec3(0, -1, 0); // 正 Y 面（注意 Y 轴方向）
-		face_normals_[3] = glm::vec3(0, 1, 0); // 负 Y 面（注意 Y 轴方向）
-		face_normals_[4] = glm::vec3(0, 0, 1); // 正 Z 面
-		face_normals_[5] = glm::vec3(0, 0, -1); // 负 Z 面
 	}
 
 	void AABBCollider::set_aabb_collider_transform(const bool is_default_size, const float height, const float width)
@@ -64,8 +56,8 @@ namespace vulkancraft
 	{
 		float half_width = width / 2.0f;
 
-		glm::vec3 aabb_min = {cur_pos.x - half_width, cur_pos.y, cur_pos.z - half_width};
-		glm::vec3 aabb_max = {cur_pos.x + half_width, cur_pos.y - height, cur_pos.z + half_width};
+		glm::vec3 aabb_min = { cur_pos.x - half_width, cur_pos.y, cur_pos.z - half_width };
+		glm::vec3 aabb_max = { cur_pos.x + half_width, cur_pos.y - height, cur_pos.z + half_width };
 
 		aabb_range_.first = aabb_min;
 		aabb_range_.second = aabb_max;
@@ -73,26 +65,26 @@ namespace vulkancraft
 		// X 轴正着是左，Z 轴正着是前
 
 		// 记录底部四个坐标
-		glm::vec3 bottom_left_front = {cur_pos.x + half_width, cur_pos.y, cur_pos.z + half_width};
-		glm::vec3 bottom_right_front = {cur_pos.x - half_width, cur_pos.y, cur_pos.z + half_width};
-		glm::vec3 bottom_left_back = {cur_pos.x + half_width, cur_pos.y, cur_pos.z - half_width};
-		glm::vec3 bottom_right_back = {cur_pos.x - half_width, cur_pos.y, cur_pos.z - half_width};
+		glm::vec3 bottom_left_front = { cur_pos.x + half_width, cur_pos.y, cur_pos.z + half_width };
+		glm::vec3 bottom_right_front = { cur_pos.x - half_width, cur_pos.y, cur_pos.z + half_width };
+		glm::vec3 bottom_left_back = { cur_pos.x + half_width, cur_pos.y, cur_pos.z - half_width };
+		glm::vec3 bottom_right_back = { cur_pos.x - half_width, cur_pos.y, cur_pos.z - half_width };
 
 		// 记录顶部四个坐标
-		glm::vec3 top_left_front = {cur_pos.x + half_width, cur_pos.y - height, cur_pos.z + half_width};
-		glm::vec3 top_right_front = {cur_pos.x - half_width, cur_pos.y - height, cur_pos.z + half_width};
-		glm::vec3 top_left_back = {cur_pos.x + half_width, cur_pos.y - height, cur_pos.z - half_width};
-		glm::vec3 top_right_back = {cur_pos.x - half_width, cur_pos.y - height, cur_pos.z - half_width};
+		glm::vec3 top_left_front = { cur_pos.x + half_width, cur_pos.y - height, cur_pos.z + half_width };
+		glm::vec3 top_right_front = { cur_pos.x - half_width, cur_pos.y - height, cur_pos.z + half_width };
+		glm::vec3 top_left_back = { cur_pos.x + half_width, cur_pos.y - height, cur_pos.z - half_width };
+		glm::vec3 top_right_back = { cur_pos.x - half_width, cur_pos.y - height, cur_pos.z - half_width };
 
-		character_top_aabb_pos_array_[0] = top_left_front;
-		character_top_aabb_pos_array_[1] = top_right_front;
-		character_top_aabb_pos_array_[2] = top_left_back;
-		character_top_aabb_pos_array_[3] = top_right_back;
+		aabb_top_pos_array_[0] = top_left_front;
+		aabb_top_pos_array_[1] = top_right_front;
+		aabb_top_pos_array_[2] = top_left_back;
+		aabb_top_pos_array_[3] = top_right_back;
 
-		character_bottom_aabb_pos_array_[0] = bottom_left_front;
-		character_bottom_aabb_pos_array_[1] = bottom_right_front;
-		character_bottom_aabb_pos_array_[2] = bottom_left_back;
-		character_bottom_aabb_pos_array_[3] = bottom_right_back;
+		aabb_bottom_pos_array_[0] = bottom_left_front;
+		aabb_bottom_pos_array_[1] = bottom_right_front;
+		aabb_bottom_pos_array_[2] = bottom_left_back;
+		aabb_bottom_pos_array_[3] = bottom_right_back;
 	}
 
 	bool AABBCollider::is_point_inside_aabb(const glm::vec3 point_pos) const
@@ -175,100 +167,7 @@ namespace vulkancraft
 		return true;
 	}
 
-	AABBContactInfo AABBCollider::is_two_aabb_touching_check_normal(const AABBCollider& other_collider) const
-	{
-		AABBContactInfo result{ false, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), false };
-
-		const glm::vec3& min1 = aabb_range_.first;
-		const glm::vec3& max1 = aabb_range_.second;
-		const glm::vec3& min2 = other_collider.aabb_range_.first;
-		const glm::vec3& max2 = other_collider.aabb_range_.second;
-
-		bool collision_res = min1.x > max2.x || max1.x < min2.x ||
-			min1.y < max2.y || max1.y > min2.y ||
-			min1.z > max2.z || max1.z < min2.z;
-
-		// 初始检查，如果在任何一个维度上没有重叠，则直接返回
-		if (collision_res) return result;
-
-		// 如果所有轴都满足条件，则两个 AABB 相切
-		result.is_touching = true;
-
-		// 这里把 aabb 最大，最小的点位坐标归一化为 1 长度单位
-		// 已经发生了重叠碰撞，绝对坐标就失去意义了
-		glm::vec3 min1_backup = glm::vec3((min1.x > 0) ? 1 : ((min1.x < 0) ? -1 : 0), (min1.y > 0) ? 1 : ((min1.y < 0) ? -1 : 0), (min1.z > 0) ? 1 : ((min1.z < 0) ? -1 : 0));
-		glm::vec3 max1_backup = glm::vec3((max1.x > 0) ? 1 : ((max1.x < 0) ? -1 : 0), (max1.y > 0) ? 1 : ((max1.y < 0) ? -1 : 0), (max1.z > 0) ? 1 : ((max1.z < 0) ? -1 : 0));
-		glm::vec3 min2_backup = glm::vec3((min2.x > 0) ? 1 : ((min2.x < 0) ? -1 : 0), (min2.y > 0) ? 1 : ((min2.y < 0) ? -1 : 0), (min2.z > 0) ? 1 : ((min2.z < 0) ? -1 : 0));
-		glm::vec3 max2_backup = glm::vec3((max2.x > 0) ? 1 : ((max2.x < 0) ? -1 : 0), (max2.y > 0) ? 1 : ((max2.y < 0) ? -1 : 0), (max2.z > 0) ? 1 : ((max2.z < 0) ? -1 : 0));
-
-		// 确定相切的面和相应的法线
-		int face_index = -1;
-		if (min1_backup.x == max2_backup.x) face_index = 1; // 负X面
-		else if (max1_backup.x == min2_backup.x) face_index = 0; // 正X面
-		else if (min1_backup.y == max2_backup.y) face_index = 2; // 正Y面 -> 在倒置Y轴中，实际上是负Y面
-		else if (max1_backup.y == min2_backup.y) face_index = 3; // 负Y面 -> 在倒置Y轴中，实际上是正Y面
-		else if (min1_backup.z == max2_backup.z) face_index = 5; // 负Z面
-		else if (max1_backup.z == min2_backup.z) face_index = 4; // 正Z面
-
-		// std::cout << face_index << std::endl;
-
-		if (face_index != -1)
-		{
-			result.normal = face_normals_[face_index];
-		}
-		else
-		{
-			// 如果没有找到相切的面，设置 result.is_touching 为 false 并返回
-			result.is_touching = false;
-			return result;
-		}
-
-		// 确定相切面上的切线
-		glm::vec3 axis1 = glm::vec3(1.0f, 0.0f, 0.0f);
-		glm::vec3 axis2 = glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 axis3 = glm::vec3(0.0f, 0.0f, 1.0f);
-
-		if (face_index == 0 || face_index == 1) // X面
-		{
-			result.tangent1 = axis2;
-			result.tangent2 = axis3;
-		}
-		else if (face_index == 2 || face_index == 3) // Y面
-		{
-			result.tangent1 = axis1;
-			result.tangent2 = axis3;
-		}
-		else if (face_index == 4 || face_index == 5) // Z面
-		{
-			result.tangent1 = axis1;
-			result.tangent2 = axis2;
-		}
-
-		// 检查切线是否平行
-		result.tangents_are_parallel = glm::dot(result.tangent1, result.tangent2) >= 0.999f;
-
-		return result;
-	}
-
-	std::array<glm::vec3, 4> AABBCollider::get_character_aabb_bottom_vertices() const
-	{
-		std::array<glm::vec3, 4> bottom_vertices;
-
-		glm::vec3 min = aabb_range_.first;
-		glm::vec3 max = aabb_range_.second;
-
-		float bottom_y = min.y;
-
-		// 分别计算四个顶点的坐标
-		bottom_vertices[0] = glm::vec3(min.x, bottom_y, min.z); // 左后角
-		bottom_vertices[1] = glm::vec3(max.x, bottom_y, min.z); // 右后角
-		bottom_vertices[2] = glm::vec3(min.x, bottom_y, max.z); // 左前角
-		bottom_vertices[3] = glm::vec3(max.x, bottom_y, max.z); // 右前角
-
-		return bottom_vertices;
-	}
-
-	std::array<glm::vec3, 4> AABBCollider::get_character_aabb_top_vertices() const
+	std::array<glm::vec3, 4> AABBCollider::get_aabb_top_vertices() const
 	{
 		std::array<glm::vec3, 4> top_vertices;
 
@@ -286,25 +185,78 @@ namespace vulkancraft
 		return top_vertices;
 	}
 
-	glm::vec3 AABBCollider::get_face_normal(CollisionSide side) const
+	std::array<glm::vec3, 4> AABBCollider::get_aabb_bottom_vertices() const
 	{
-		switch (side)
-		{
-		case CollisionSide::Left:
-			return face_normals_[1];
-		case CollisionSide::Right:
-			return face_normals_[0];
-		case CollisionSide::Top:
-			return face_normals_[3]; // Y 轴倒置，Top 对应原本的负 Y 面
-		case CollisionSide::Bottom:
-			return face_normals_[2]; // Y 轴倒置，Bottom 对应原本的正 Y 面
-		case CollisionSide::Front:
-			return face_normals_[5];
-		case CollisionSide::Back:
-			return face_normals_[4];
-		default:
-			return glm::vec3(0, 0, 0); // 没有匹配的侧面
-		}
+		std::array<glm::vec3, 4> bottom_vertices;
+
+		glm::vec3 min = aabb_range_.first;
+		glm::vec3 max = aabb_range_.second;
+
+		float bottom_y = min.y;
+
+		// 分别计算四个顶点的坐标
+		bottom_vertices[0] = glm::vec3(min.x, bottom_y, min.z); // 左后角
+		bottom_vertices[1] = glm::vec3(max.x, bottom_y, min.z); // 右后角
+		bottom_vertices[2] = glm::vec3(min.x, bottom_y, max.z); // 左前角
+		bottom_vertices[3] = glm::vec3(max.x, bottom_y, max.z); // 右前角
+
+		return bottom_vertices;
+	}
+
+	std::array<glm::vec3, 4> AABBCollider::get_aabb_front_vertices() const
+	{
+		const glm::vec3& min = aabb_range_.first;
+		const glm::vec3& max = aabb_range_.second;
+
+		return
+		{ {
+		glm::vec3(max.x, min.y, max.z), // 下右前
+		glm::vec3(min.x, min.y, max.z), // 下左前
+		glm::vec3(min.x, max.y, max.z), // 上左前
+		glm::vec3(max.x, max.y, max.z)  // 上右前
+		} };
+	}
+
+	std::array<glm::vec3, 4> AABBCollider::get_aabb_back_vertices() const
+	{
+		const glm::vec3& min = aabb_range_.first;
+		const glm::vec3& max = aabb_range_.second;
+
+		return
+		{ {
+			glm::vec3(max.x, min.y, min.z), // 下右后
+			glm::vec3(min.x, min.y, min.z), // 下左后
+			glm::vec3(min.x, max.y, min.z), // 上左后
+			glm::vec3(max.x, max.y, min.z)  // 上右后
+		} };
+	}
+
+	std::array<glm::vec3, 4> AABBCollider::get_aabb_left_vertices() const
+	{
+		const glm::vec3& min = aabb_range_.first;
+		const glm::vec3& max = aabb_range_.second;
+
+		return
+		{ {
+			glm::vec3(max.x, min.y, max.z), // 下左后
+			glm::vec3(max.x, min.y, min.z), // 下左前
+			glm::vec3(max.x, max.y, min.z), // 上左前
+			glm::vec3(max.x, max.y, max.z)  // 上左后
+		} };
+	}
+
+	std::array<glm::vec3, 4> AABBCollider::get_aabb_right_vertices() const
+	{
+		const glm::vec3& min = aabb_range_.first;
+		const glm::vec3& max = aabb_range_.second;
+
+		return
+		{ {
+			glm::vec3(min.x, min.y, max.z), // 下右后
+			glm::vec3(min.x, min.y, min.z), // 下右前
+			glm::vec3(min.x, max.y, min.z), // 上右前
+			glm::vec3(min.x, max.y, max.z)  // 上右后
+		} };
 	}
 
 }

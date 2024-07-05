@@ -13,6 +13,13 @@ namespace vulkancraft
 		{
 			std::cerr << "Character Controller 上的某个单例类创建失败：" << e.what() << std::endl;
 		}
+
+		//for (int i = 0; i < character_collider_.get_aabb_right_vertices().size(); i++)
+		//{
+		//	std::cout << character_collider_.get_aabb_right_vertices()[i].x << ", ";
+		//	std::cout << character_collider_.get_aabb_right_vertices()[i].y << ", ";
+		//	std::cout << character_collider_.get_aabb_right_vertices()[i].z << std::endl;
+		//}
 	}
 
 	CharacterController::~CharacterController() { }
@@ -32,7 +39,7 @@ namespace vulkancraft
 		character_game_obj_.transform_.scale = { 1, 1, 1 }; // 玩家的缩放不用改变
 
 		// 初始化相机物体站位
-		camera_game_obj_.transform_.translation = spawn_point_ + glm::vec3{ 0, -character_height_, 0 };
+		camera_game_obj_.transform_.translation = spawn_point_ + glm::vec3{ 0, -camera_height_, 0 };
 		camera_game_obj_.transform_.rotation = character_game_obj_.transform_.rotation; // 旋转和玩家角色保持一致
 		camera_game_obj_.transform_.scale = { 1, 1, 1 }; // 相机的缩放不用改变
 
@@ -98,7 +105,7 @@ namespace vulkancraft
 
 		// 键盘只控制移动，不控制玩家旋转
 		keyboard_move_controller_.player_move(glfw_window, fixed_delta_time, character_game_obj_);
-		camera_game_obj_.transform_.translation = character_game_obj_.transform_.translation + glm::vec3{ 0, -character_height_, 0 };
+		camera_game_obj_.transform_.translation = character_game_obj_.transform_.translation + glm::vec3{ 0, -camera_height_, 0 };
 
 		// 同步 AABB Collider，旋转不用同步
 		character_collider_.collider_transform_component_.translation = character_game_obj_.transform_.translation;
@@ -117,14 +124,15 @@ namespace vulkancraft
 	{
 		mouse_rotate_controller_.rotate_control(glfw_window, fixed_delta_time, character_game_obj_, kRotateAll);
 
-		camera_game_obj_.transform_.translation = character_game_obj_.transform_.translation + glm::vec3{ 0, -character_height_, 0 };
+		camera_game_obj_.transform_.translation = character_game_obj_.transform_.translation + glm::vec3{ 0, -camera_height_, 0 };
 		camera_game_obj_.transform_.rotation = character_game_obj_.transform_.rotation;
 		camera_game_obj_.transform_.scale = { 1, 1, 1 }; // 相机的缩放不用改变
 	}
 
 	void CharacterController::update_player_physics(float delta_time)
 	{
-		character_rigidbody_.ground_check(character_collider_, delta_time, ground_check_max_length_); // 地面检测
+		character_rigidbody_.ground_check(character_collider_, ground_check_max_length_); // 地面检测
+		character_rigidbody_.wall_checking(character_collider_, ground_check_max_length_);
 
 		// 计算重力下落
 		character_rigidbody_.free_falling(delta_time, character_game_obj_.transform_.translation);
@@ -137,12 +145,7 @@ namespace vulkancraft
 		{
 			if (character_collider_.is_two_aabb_touching(game_object_manager_->get_physical_obj_vector()[i]->aabb_collider_))
 			{
-				bool is_tangent = character_collider_.is_two_aabb_touching_check_normal(game_object_manager_->get_physical_obj_vector()[i]->aabb_collider_).tangents_are_parallel;
-
-				if (is_tangent)
-				{
-					handle_collision(game_object_manager_->get_physical_obj_vector()[i]->aabb_collider_);
-				}
+				// TODO: 检查玩家有没有撞到墙
 			}
 		}
 	}

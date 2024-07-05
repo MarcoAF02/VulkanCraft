@@ -199,20 +199,20 @@ namespace vulkancraft
 	{
 		if (!debug_light_created_)
 		{
-			for (int i = 0; i < game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_bottom_vertices().size(); i++)
+			for (int i = 0; i < game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_bottom_vertices().size(); i++)
 			{
 				BaseGameObject debug_light = BaseGameObject::make_point_light(0.2f);
 				debug_light.color_ = { 0.0f, 1.0f, 0.0f };
-				debug_light.transform_.translation = game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_bottom_vertices()[i];
+				debug_light.transform_.translation = game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_bottom_vertices()[i];
 				game_object_map_.emplace(debug_light.get_id(), std::move(debug_light));
 				player_debug_light_vector_.push_back(debug_light.get_id());
 			}
 
-			for (int i = 0; i < game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_top_vertices().size(); i++)
+			for (int i = 0; i < game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_top_vertices().size(); i++)
 			{
 				BaseGameObject debug_light = BaseGameObject::make_point_light(0.2f);
 				debug_light.color_ = { 0.0f, 1.0f, 0.0f };
-				debug_light.transform_.translation = game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_top_vertices()[i];
+				debug_light.transform_.translation = game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_top_vertices()[i];
 				game_object_map_.emplace(debug_light.get_id(), std::move(debug_light));
 				player_debug_light_vector_.push_back(debug_light.get_id());
 			}
@@ -223,13 +223,13 @@ namespace vulkancraft
 		for (int i = 0; i < 4; i++)
 		{
 			game_object_map_.find(player_debug_light_vector_[i])->second.transform_.translation =
-				game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_bottom_vertices()[i];
+				game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_bottom_vertices()[i];
 		}
 
 		for (int i = 0; i < 4; i++)
 		{
 			game_object_map_.find(player_debug_light_vector_[i + 4])->second.transform_.translation =
-				game_entity_manager_->get_character_controller()->get_player_collider().get_character_aabb_top_vertices()[i];
+				game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_top_vertices()[i];
 		}
 	}
 

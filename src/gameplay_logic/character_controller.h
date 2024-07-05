@@ -77,6 +77,9 @@ namespace vulkancraft
 		void update_player_collision();
 		void handle_collision(AABBCollider& wall_collider); // 检测玩家 Collider 和墙体的碰撞
 
+		// 根据碰撞方向停止玩家移动
+		// void stop_moving(CollisionSide side);
+
 #pragma region DEBUG 用函数
 
 		// 把玩家的身高，碰撞体等全打印出来
@@ -93,9 +96,11 @@ namespace vulkancraft
 
 		float character_height_ = 1.8f; // 人类的身高
 		float character_width_ = 0.6f; // 人类的宽度
+		float camera_height_ = 1.65f; // 摄像机的高度
 
 		// HACK: 这个别改，保持 0.1f...
 		float ground_check_max_length_ = 0.1f; // 脚底射线检测的长度
+		float wall_check_max_length_ = 5.0f; // 墙面射线检测的长度
 
 		glm::vec3 spawn_point_ = glm::vec3{ 0, 0, 0 };
 

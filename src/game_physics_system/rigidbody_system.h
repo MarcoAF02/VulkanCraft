@@ -11,14 +11,33 @@
 // 重力系统
 namespace vulkancraft
 {
+	// 记录其他 AABB Collider 在哪一侧发生碰撞
+	enum class CollisionSide
+	{
+		None,
+		Left,
+		Right,
+		Front,
+		Back,
+		Top,
+		Bottom,
+
+		// TODO: 下面四个可能不需要
+		LeftFront,
+		RightFront,
+		LeftBack,
+		RightBack
+	};
+
 	class Rigidbody
 	{
 	public:
 		Rigidbody();
 		~Rigidbody();
 
-		void ground_check(AABBCollider& aabb_collider, float delta_time, float max_length); // 因重力下落的 AABB Collider
+		void ground_check(AABBCollider& aabb_collider, float max_length); // 因重力下落的 AABB Collider
 		void free_falling(float delta_time, glm::vec3& target_pos); // 返回一个自由落体用的向量
+		void wall_checking(AABBCollider& aabb_collider, float max_length); // 检查墙面碰撞
 
 	private:
 

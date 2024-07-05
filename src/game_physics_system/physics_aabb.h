@@ -17,28 +17,6 @@ struct vulkancraft::TransformComponent;
 
 namespace vulkancraft
 {
-	// 记录其他 AABB Collider 在哪一侧发生碰撞
-	enum class CollisionSide
-	{
-		None,
-		Left,
-		Right,
-		Front,
-		Back,
-		Top,
-		Bottom
-	};
-
-	// 记录两个 AABB 的相切信息
-	struct AABBContactInfo
-	{
-		bool is_touching;
-		glm::vec3 normal;
-		glm::vec3 tangent1;
-		glm::vec3 tangent2;
-		bool tangents_are_parallel;
-	};
-
 	class AABBCollider
 	{
 	public:
@@ -76,14 +54,13 @@ namespace vulkancraft
 		// 基础功能，判断两个 AABB 是否相切
 		bool is_two_aabb_touching(const AABBCollider& other_collider) const;
 
-		// 基础功能，用法线判断两个 AABB 的相切情况
-		AABBContactInfo is_two_aabb_touching_check_normal(const AABBCollider& other_collider) const;
-
-		// 如果是游戏角色的话，会用到下面这两个函数
-		std::array<glm::vec3, 4> get_character_aabb_bottom_vertices() const; // 得到角色 AABB Collider 的四个底部顶点
-		std::array<glm::vec3, 4> get_character_aabb_top_vertices() const; // 得到角色 AABB Collider 顶部的四个顶点
-
-		glm::vec3 get_face_normal(CollisionSide side) const; // 得到 AABB Collider 每个面的法线
+		// 记录 AABB 的各个碰撞点位
+		std::array<glm::vec3, 4> get_aabb_top_vertices() const; // 得到顶部的四个顶点
+		std::array<glm::vec3, 4> get_aabb_bottom_vertices() const; // 得到底部的四个顶点
+		std::array<glm::vec3, 4> get_aabb_front_vertices() const; // 得到前面的四个顶点
+		std::array<glm::vec3, 4> get_aabb_back_vertices() const; // 得到后面的四个顶点
+		std::array<glm::vec3, 4> get_aabb_left_vertices() const; // 得到左侧的四个顶点
+		std::array<glm::vec3, 4> get_aabb_right_vertices() const; // 得到右侧的四个顶点
 
 		id_t get_id() { return id_; } // 得到 id
 		void set_id(id_t new_id) {id_ = new_id;} // 设置新 id
@@ -95,8 +72,10 @@ namespace vulkancraft
 		float default_aabb_side_length_ = 1.0f; // 默认的 AABB 碰撞盒边长
 
 		std::pair<glm::vec3, glm::vec3> aabb_range_; // 记录 aabb 碰撞盒的范围
-		std::array<glm::vec3, 4> character_bottom_aabb_pos_array_; // 记录角色 AABB 的底部四个点
-		std::array<glm::vec3, 4> character_top_aabb_pos_array_; // 记录角色 AABB 的顶部四个点
-		std::array<glm::vec3, 6> face_normals_; // 记录 aabb 碰撞盒每个面的法线
+		std::array<glm::vec3, 4> aabb_bottom_pos_array_; // 记录 AABB 底部四个点
+		std::array<glm::vec3, 4> aabb_top_pos_array_; // 记录 AABB 顶部四个点
+		std::array<glm::vec3, 4> aabb_left_pos_array_; // 记录 AABB 左侧四个点
+		std::array<glm::vec3, 4> aabb_right_pos_array_; // 记录 AABB 右侧四个点
+
 	};
 }
