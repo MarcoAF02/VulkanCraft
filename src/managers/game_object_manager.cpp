@@ -1,6 +1,8 @@
 
 #include "game_object_manager.h"
 
+struct vulkancraft::BlockGenerateData;
+
 namespace vulkancraft
 {
 
@@ -21,49 +23,45 @@ namespace vulkancraft
 	std::shared_ptr<GameObjectManager> GameObjectManager::get_instance()
 	{
 		// 确保它只被执行了一次
-		std::call_once(init_instance_flag_, GameObjectManager::init_singleton);
+		std::call_once(init_instance_flag_, &GameObjectManager::init_singleton);
 		return instance_;
 	}
 
-	void GameObjectManager::insert_sharing_game_object_data(const id_t obj_id, const GameObjectPublicData game_object_data)
+	void GameObjectManager::insert_sharing_game_object_data(id_t id_pub, GameObjectPublicData data)
 	{
-		std::lock_guard<std::mutex> lock(mutex_);
-		sharing_object_map_.emplace(obj_id, game_object_data);
+		std::lock_guard<std::mutex> lock(mutex_); // 保护数据安全
+
+		if (game_obj_public_data_map_.contains(id_pub)) // 重复添加
+		{
+			std::cerr << "ID 为 " << id_pub << " 的游戏物体被重复添加至 Game Object Manager。本次添加将忽略" << std::endl;
+			return;
+		}
+		else // 正确添加
+		{
+			game_obj_public_data_map_.emplace(id_pub, data);
+		}	
 	}
 
-	std::shared_ptr<GameObjectPublicData> GameObjectManager::get_sharing_obj_by_id(const id_t obj_id)
+	GameObjectPublicData GameObjectManager::get_public_data_by_id(id_t id_pub)
 	{
-		std::lock_guard<std::mutex> lock(mutex_); // 确保线程安全
-		auto it = sharing_object_map_.find(obj_id);
+		std::lock_guard<std::mutex> lock(mutex_); // 保护数据安全
 
-		if (it != sharing_object_map_.end()) // 对于这个游戏物体存在的情况
+		if (game_obj_public_data_map_.contains(id_pub))
 		{
-			return std::make_shared<GameObjectPublicData>(it -> second);
+			return game_obj_public_data_map_[id_pub];
 		}
 		else
 		{
-			throw std::runtime_error("无法找到对应的游戏物体，请检查代码逻辑");
+			std::cerr << "没有 ID 为 " << id_pub << " 的游戏公共数据" << std::endl;
+			throw std::runtime_error("异常已抛出\n");
 		}
-	}
-
-	void GameObjectManager::add_physical_obj_by_id(const id_t obj_id)
-	{
-		// 使用的时候，应该先将 game object 公共数据库，再将它从这里取出来用，顺序不能错。
-		std::shared_ptr<GameObjectPublicData> new_physical_data = get_sharing_obj_by_id(obj_id);
-		physical_game_obj_vector_.push_back(new_physical_data);
-	}
-
-	std::vector<std::shared_ptr<GameObjectPublicData>>& GameObjectManager::get_physical_obj_vector()
-	{
-		std::lock_guard<std::mutex> lock(mutex_); // 确保线程安全
-		return physical_game_obj_vector_;
 	}
 
 #pragma endregion
 
 #pragma region GameObjectPublicData 相关
 
-	GameObjectPublicData::GameObjectPublicData(id_t obj_id, bool is_static, TransformComponent transform_component, AABBCollider aabb_collider) : id_pub_ {obj_id}, is_static_ {is_static}, transform_pub_ {transform_component}, aabb_collider_{aabb_collider}{}
+	GameObjectPublicData::GameObjectPublicData(id_t id_pub, btScalar mass, TransformComponent transform_component, btVector3 local_inertia_pub) : id_pub_{id_pub}, mass_{mass}, transform_pub_{transform_component}, local_inertia_pub_{local_inertia_pub} { }
 
 #pragma endregion
 

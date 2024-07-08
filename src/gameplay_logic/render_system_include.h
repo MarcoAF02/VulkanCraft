@@ -3,6 +3,7 @@
 
 #include "game_window.h"
 #include "game_camera.h"
+#include "physical_simulation_app.h"
 #include "../vulkan_base/game_device.h"
 #include "../vulkan_base/game_buffer.h"
 #include "../vulkan_base/game_descriptors.h"
@@ -17,7 +18,6 @@
 #include "../managers/game_object_manager.h" // 游戏对象管理器
 #include "../managers/thread_state_manager.h" // 线程管理器
 #include "../managers/game_entity_manager.h"
-#include "../game_physics_system/physics_aabb.h"
 #include "system/terrain_generation.h" // 世界生成器
 
 // libs

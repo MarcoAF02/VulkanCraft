@@ -3,7 +3,7 @@
 
 namespace vulkancraft
 {
-	TerrainGeneration::TerrainGeneration(GameDevice& game_device, BaseGameObject::Map& game_object_map) : game_device_ {game_device}, game_object_map_ {game_object_map}
+	TerrainGeneration::TerrainGeneration(GameDevice& game_device, RenderAppObjMap& game_object_map) : game_device_{ game_device }, game_object_map_{ game_object_map }
 	{
 		try
 		{
@@ -126,5 +126,20 @@ namespace vulkancraft
 			new_data.position.y = 0;
 		}
 	}
+
+#pragma region DEBUG ÓÃº¯Êý
+
+	void TerrainGeneration::test_dynamic_block_create(BlockGenerateData block_data)
+	{
+		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, model_file_path_);
+		BaseGameObject stone_obj = BaseGameObject::create_game_object(block_data.is_static);
+
+		stone_obj.model_ = stone_model;
+		stone_obj.transform_.translation = block_data.position;
+		stone_obj.transform_.rotation = block_data.rotation;
+		stone_obj.transform_.scale = block_data.scale;
+	}
+
+#pragma endregion
 
 }

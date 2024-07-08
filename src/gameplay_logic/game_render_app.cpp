@@ -24,9 +24,22 @@ namespace vulkancraft
 				game_device_,
 				game_object_map_
 			);
+
+		create_physics_thread(); // 一切准备就绪后，创建物理线程
 	}
 
 	GameRenderApp::~GameRenderApp() { }
+
+	void GameRenderApp::create_physics_thread()
+	{
+		std::thread physical_thread(create_physical_simulation_app);
+		physical_thread.join(); // 等待物理线程完成
+	}
+
+	void GameRenderApp::create_physical_simulation_app()
+	{
+		physical_simulation_app_ = std::make_shared<PhysicalSimulationApp>();
+	}
 
 	void GameRenderApp::create_global_pool()
 	{

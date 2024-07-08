@@ -2,8 +2,6 @@
 #pragma once
 
 #include "../gameplay_logic/game_camera.h"
-#include "../game_physics_system/physics_aabb.h"
-#include "../game_physics_system/rigidbody_system.h"
 #include "../input_system/keyboard_input_controller.h"
 #include "../input_system/mouse_rotate_controller.h"
 
@@ -14,8 +12,6 @@
 #include <glm/glm.hpp>
 
 struct vulkancraft::TransformComponent;
-class vulkancraft::AABBCollider; // AABB 碰撞盒
-class vulkancraft::Rigidbody; // 物理系统
 class vulkancraft::KeyboardMovementController; // 键盘控制器
 class vulkancraft::MouseRotateController; // 鼠标旋转控制器
 
@@ -59,23 +55,12 @@ namespace vulkancraft
 		// 得到玩家观察相机
 		GameBaseCamera& get_player_camera();
 
-		// 得到玩家的 AABB Collider
-		AABBCollider& get_player_collider();
-
 		// 初始化鼠标视角控制器
 		void init_mouse_rotate(GLFWwindow* glfw_window);
 
 		// 玩家身体会左右旋转，只有摄像机会上下旋转
 		void move(float fixed_delta_time, GLFWwindow* glfw_window);
 		void rotate(float fixed_delta_time, GLFWwindow* glfw_window);
-
-		// TODO: 跳起来顶头回落，需要使用顶头四轴射线检测
-		// TODO: 两个 AABB 先检测重叠的轴，再检测相切
-		// TODO: 如果 AABB 重叠检测成功，则不需要用头顶四轴射线检测了
-		// TODO: 阅读一下自己的代码...
-		void update_player_physics(float delta_time); // 自由落体更新
-		void update_player_collision();
-		void handle_collision(AABBCollider& wall_collider); // 检测玩家 Collider 和墙体的碰撞
 
 		// 根据碰撞方向停止玩家移动
 		// void stop_moving(CollisionSide side);
@@ -88,8 +73,6 @@ namespace vulkancraft
 #pragma endregion
 
 	private:
-
-		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
 
 		// 人类的高度为 1.8 宽度为 0.6
 		// 摄像机不需要 AABB Collider，玩家角色需要
@@ -111,18 +94,5 @@ namespace vulkancraft
 
 		KeyboardMovementController keyboard_move_controller_;
 		MouseRotateController mouse_rotate_controller_;
-
-		AABBCollider character_collider_ =
-		{
-			true,
-			character_game_obj_.transform_,
-			character_game_obj_.get_id(),
-			false,
-			character_height_,
-			character_width_
-		};
-
-		// TODO: 这个东西要放在物理线程中循环
-		Rigidbody character_rigidbody_;
 	};
 }

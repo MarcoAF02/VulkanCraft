@@ -3,25 +3,7 @@
 
 namespace vulkancraft
 {
-	CharacterController::CharacterController()
-	{
-		try
-		{
-			game_object_manager_ = GameObjectManager::get_instance();
-		}
-		catch (std::exception& e)
-		{
-			std::cerr << "Character Controller 上的某个单例类创建失败：" << e.what() << std::endl;
-		}
-
-		//for (int i = 0; i < character_collider_.get_aabb_right_vertices().size(); i++)
-		//{
-		//	std::cout << character_collider_.get_aabb_right_vertices()[i].x << ", ";
-		//	std::cout << character_collider_.get_aabb_right_vertices()[i].y << ", ";
-		//	std::cout << character_collider_.get_aabb_right_vertices()[i].z << std::endl;
-		//}
-	}
-
+	CharacterController::CharacterController() { }
 	CharacterController::~CharacterController() { }
 
 	GameBaseCamera& CharacterController::get_player_camera() { return player_camera_; }
@@ -42,10 +24,6 @@ namespace vulkancraft
 		camera_game_obj_.transform_.translation = spawn_point_ + glm::vec3{ 0, -camera_height_, 0 };
 		camera_game_obj_.transform_.rotation = character_game_obj_.transform_.rotation; // 旋转和玩家角色保持一致
 		camera_game_obj_.transform_.scale = { 1, 1, 1 }; // 相机的缩放不用改变
-
-		character_collider_.set_id(character_game_obj_.get_id());
-		character_collider_.collider_transform_component_.translation = character_game_obj_.transform_.translation; // 位置一样
-		character_collider_.set_character_collider(spawn_point_, character_height_, character_width_);
 
 		print_player_details();
 	}
@@ -79,24 +57,6 @@ namespace vulkancraft
 			<< camera_game_obj_.transform_.rotation.x << ", "
 			<< camera_game_obj_.transform_.rotation.y << ", "
 			<< camera_game_obj_.transform_.rotation.z << std::endl;
-
-		std::cout << "玩家 Collider 的旋转角度为："
-			<< character_collider_.collider_transform_component_.rotation.x << ", "
-			<< character_collider_.collider_transform_component_.rotation.y << ", "
-			<< character_collider_.collider_transform_component_.rotation.z << std::endl;
-
-		std::cout << "玩家 Collider 的最小，最大顶点分别在："
-			<< character_collider_.get_aabb_range().first.x << ", "
-			<< character_collider_.get_aabb_range().first.y << ", "
-			<< character_collider_.get_aabb_range().first.z << " 和 "
-			<< character_collider_.get_aabb_range().second.x << ", "
-			<< character_collider_.get_aabb_range().second.y << ", "
-			<< character_collider_.get_aabb_range().second.z << std::endl;
-	}
-
-	AABBCollider& CharacterController::get_player_collider()
-	{
-		return character_collider_;
 	}
 
 	void CharacterController::move(float fixed_delta_time, GLFWwindow* glfw_window)
@@ -106,11 +66,6 @@ namespace vulkancraft
 		// 键盘只控制移动，不控制玩家旋转
 		keyboard_move_controller_.player_move(glfw_window, fixed_delta_time, character_game_obj_);
 		camera_game_obj_.transform_.translation = character_game_obj_.transform_.translation + glm::vec3{ 0, -camera_height_, 0 };
-
-		// 同步 AABB Collider，旋转不用同步
-		character_collider_.collider_transform_component_.translation = character_game_obj_.transform_.translation;
-		character_collider_.collider_transform_component_.scale = character_game_obj_.transform_.scale;
-		character_collider_.set_character_collider(character_collider_.collider_transform_component_.translation, character_height_, character_width_);
 
 		camera_game_obj_.transform_.scale = { 1, 1, 1 }; // 相机的缩放不用改变
 	}
@@ -127,69 +82,6 @@ namespace vulkancraft
 		camera_game_obj_.transform_.translation = character_game_obj_.transform_.translation + glm::vec3{ 0, -camera_height_, 0 };
 		camera_game_obj_.transform_.rotation = character_game_obj_.transform_.rotation;
 		camera_game_obj_.transform_.scale = { 1, 1, 1 }; // 相机的缩放不用改变
-	}
-
-	void CharacterController::update_player_physics(float delta_time)
-	{
-		character_rigidbody_.ground_check(character_collider_, ground_check_max_length_); // 地面检测
-		character_rigidbody_.wall_checking(character_collider_, ground_check_max_length_);
-
-		// 计算重力下落
-		character_rigidbody_.free_falling(delta_time, character_game_obj_.transform_.translation);
-		character_rigidbody_.free_falling(delta_time, camera_game_obj_.transform_.translation);
-	}
-
-	void CharacterController::update_player_collision()
-	{
-		for (int i = 0; i < game_object_manager_->get_physical_obj_vector().size(); i++)
-		{
-			if (character_collider_.is_two_aabb_touching(game_object_manager_->get_physical_obj_vector()[i]->aabb_collider_))
-			{
-				// TODO: 检查玩家有没有撞到墙
-			}
-		}
-	}
-
-	void CharacterController::handle_collision(AABBCollider& wall_collider)
-	{
-		// 注意：Vulkan 使用 Y 轴朝下的右手坐标系
-
-		// 初始化碰撞方向为 None
-		CollisionSide collisionSide = CollisionSide::None;
-
-		// 获取角色当前位置
-		glm::vec3 player_collider_pos = character_collider_.collider_transform_component_.translation;
-
-		// 获取墙体的最小和最大坐标
-		glm::vec3 wall_collider_min = wall_collider.get_aabb_range().first;
-		glm::vec3 wall_collider_max = wall_collider.get_aabb_range().second;
-
-		// 检测碰撞并更新碰撞方向
-		if (player_collider_pos.x <= wall_collider_min.x)
-		{
-			player_collider_pos.x = wall_collider_min.x + std::numeric_limits<float>::epsilon();
-			collisionSide = CollisionSide::Left;
-			std::cout << "玩家与某 Collider 左侧相切" << std::endl;
-		}
-		else if (player_collider_pos.x >= wall_collider_max.x)
-		{
-			player_collider_pos.x = wall_collider_max.x - std::numeric_limits<float>::epsilon();
-			collisionSide = CollisionSide::Right;
-			std::cout << "玩家与某 Collider 右侧相切" << std::endl;
-		}
-		if (player_collider_pos.z <= wall_collider_min.z)
-		{
-			player_collider_pos.z = wall_collider_min.z + std::numeric_limits<float>::epsilon();
-			collisionSide = CollisionSide::Front;
-			std::cout << "玩家与某 Collider 前侧相切" << std::endl;
-		}
-		else if (player_collider_pos.z >= wall_collider_max.z)
-		{
-			player_collider_pos.z = wall_collider_max.z - std::numeric_limits<float>::epsilon();
-			collisionSide = CollisionSide::Back;
-			std::cout << "玩家与某 Collider 后侧相切" << std::endl;
-		}
-
 	}
 
 	void CharacterController::set_player_camera(PlayerCameraView camera_view)

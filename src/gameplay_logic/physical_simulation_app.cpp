@@ -7,6 +7,16 @@ namespace vulkancraft
 	{
 		try
 		{
+			init_physics_system();
+			test_create_dynamic_rigidbody();
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << "物理系统初始化失败：" << e.what() << std::endl;
+		}
+
+		try
+		{
 			game_object_manager_ = GameObjectManager::get_instance();
 			thread_state_manager_ = ThreadStateManager::get_instance();
 			game_entity_manager_ = GameEntityManager::get_instance(); // 这里已经生成玩家了
@@ -30,7 +40,83 @@ namespace vulkancraft
 		update_physical_simulation(); // 计算物理模拟循环
 	}
 
-	PhysicalSimulationApp::~PhysicalSimulationApp() { }
+	PhysicalSimulationApp::~PhysicalSimulationApp()
+	{
+		glfw_window_ = nullptr; // 窗口指针直接设空就行，清除内容的工作在渲染线程内会由 GLFW 自主完成
+		clear_physics_system(); // 清理物理系统
+	}
+
+	void PhysicalSimulationApp::init_physics_system()
+	{
+		collision_default_config_ = new btDefaultCollisionConfiguration();
+		dispatcher_ = new btCollisionDispatcher(collision_default_config_);
+		overlapping_pair_cache_ = new btDbvtBroadphase();
+		solver_ = new btSequentialImpulseConstraintSolver();
+
+		dynamics_world_ = new btDiscreteDynamicsWorld
+		(
+			dispatcher_,
+			overlapping_pair_cache_,
+			solver_,
+			collision_default_config_
+		);
+
+		dynamics_world_->setGravity(kGravityVector);// 设置重力
+
+		int thread_nums = std::thread::hardware_concurrency();
+
+		if (thread_nums <= 0)
+		{
+			std::cout << "无法找到支持多线程运算的硬件" << std::endl;
+		}
+		else
+		{
+			dynamics_world_->setNumTasks(thread_nums);
+		}
+	}
+
+	void PhysicalSimulationApp::clear_physics_system()
+	{
+		// remove the rigidbodies from the dynamics world and delete them
+		for (int i = dynamics_world_->getNumCollisionObjects() - 1; i >= 0; i--)
+		{
+			btCollisionObject* obj = dynamics_world_->getCollisionObjectArray()[i];
+			btRigidBody* body = btRigidBody::upcast(obj);
+
+			if (body && body->getMotionState())
+			{
+				delete body->getMotionState();
+			}
+
+			dynamics_world_->removeCollisionObject(obj);
+			delete obj;
+		}
+
+		// delete collision shapes
+		for (int j = 0; j < collision_shape_array_.size(); j++)
+		{
+			btCollisionShape* shape = collision_shape_array_[j];
+			collision_shape_array_[j] = 0;
+			delete shape;
+		}
+
+		// delete dynamics world
+		delete dynamics_world_;
+
+		// delete solver
+		delete solver_;
+
+		// delete broadphase
+		delete overlapping_pair_cache_;
+
+		// delete dispatcher
+		delete dispatcher_;
+
+		delete collision_default_config_;
+
+		// next line is optional: it will be cleared by the destructor when the array goes out of scope
+		collision_shape_array_.clear();
+	}
 
 	void PhysicalSimulationApp::update_physical_simulation()
 	{
@@ -76,9 +162,11 @@ namespace vulkancraft
 
 				// calculate_aabb_collider(); // 两两检测动态物体的 Collider 是否有碰撞
 
-				game_entity_manager_->get_character_controller()->move(accumulator_delta_time, glfw_window_);
-				game_entity_manager_->get_character_controller()->update_player_physics(accumulator_delta_time);
-				game_entity_manager_->get_character_controller()->update_player_collision();
+				// 更新 Bullet 3 物理引擎创建的物理世界
+				// 如碰撞，触发器等都用这个物理引擎实现
+				update_bullet_physics_world();
+
+				// TODO: 更新玩家坐标位置
 
 				// ==================== HACK 这上面是物理循环 ==================== //
 
@@ -112,19 +200,80 @@ namespace vulkancraft
 		}
 	}
 
-	void PhysicalSimulationApp::calculate_aabb_collider()
+	void PhysicalSimulationApp::update_bullet_physics_world()
 	{
-		for (int i = 0; i < game_object_manager_->get_physical_obj_vector().size(); i++)
+		for (int i = dynamics_world_->getNumCollisionObjects() - 1; i >= 0; i--)
 		{
-			for (int j = i + 1; j < game_object_manager_->get_physical_obj_vector().size(); j++)
+			btCollisionObject* obj = dynamics_world_->getCollisionObjectArray()[i];
+			btRigidBody* body = btRigidBody::upcast(obj);
+			btTransform trans;
+
+			if (body && body->getMotionState())
 			{
-				if (game_object_manager_->get_physical_obj_vector()[i]->
-					aabb_collider_.is_two_aabb_collision(game_object_manager_->get_physical_obj_vector()[j]->aabb_collider_))
-				{
-					// std::cout << game_object_manager_->get_physical_obj_vector()[i]->get_pub_id() << " 号方块与 " << game_object_manager_->get_physical_obj_vector()[j]->get_pub_id() << " 号方块发生碰撞" << std::endl;
-				}
+				body->getMotionState()->getWorldTransform(trans);
 			}
+			else
+			{
+				trans = obj->getWorldTransform();
+			}
+
+			printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 		}
 	}
+
+#pragma region DEBUG 用函数
+
+	void PhysicalSimulationApp::test_create_dynamic_rigidbody()
+	{
+		// 创建测试用的物理物体，这个基本就是对着官方的抄一遍
+		btCollisionShape* ground_shape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
+		collision_shape_array_.push_back(ground_shape);
+
+		btTransform ground_transform;
+		ground_transform.setIdentity();
+		ground_transform.setOrigin(btVector3(0, -56, 0));
+
+		btScalar mass(0.0f); // 设置地板的质量，小于 0 那它就是静态的
+
+		// 当且仅当质量不是零，刚体是动态的，否则是静态的
+		bool is_dynamic = (mass != 0.f);
+
+		btVector3 local_inertia(0, 0, 0);
+
+		if (is_dynamic) ground_shape->calculateLocalInertia(mass, local_inertia);
+
+		// 使用 motionstate 是可选的，它提供插值功能，并且只同步 “活动” 对象
+		btDefaultMotionState* my_motion_state = new btDefaultMotionState(ground_transform);
+		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, my_motion_state, ground_shape, local_inertia);
+		btRigidBody* body = new btRigidBody(rbInfo);
+
+		// 注册刚体
+		dynamics_world_->addRigidBody(body);
+
+		// 创建动态物体
+		{
+			btCollisionShape* test_cube = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
+			collision_shape_array_.push_back(test_cube);
+
+			btTransform start_transform;
+			start_transform.setIdentity();
+
+			btScalar mass(1.f);
+			bool is_dynamic = (mass != 0.f);
+
+			btVector3 local_inertia(0, 0, 0);
+			if (is_dynamic) test_cube->calculateLocalInertia(mass, local_inertia);
+
+			start_transform.setOrigin(btVector3(2, 10, 0));
+
+			btDefaultMotionState* my_motion_state = new btDefaultMotionState(start_transform);
+			btRigidBody::btRigidBodyConstructionInfo rb_info(mass, my_motion_state, test_cube, local_inertia);
+			btRigidBody* body = new btRigidBody(rb_info);
+
+			dynamics_world_->addRigidBody(body);
+		}
+	}
+
+#pragma endregion
 
 }

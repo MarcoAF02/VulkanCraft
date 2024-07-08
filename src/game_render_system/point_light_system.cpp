@@ -108,7 +108,7 @@ namespace vulkancraft
 	void PointLightSystem::render(FrameInfo& frameInfo)
 	{
 		// sort lights
-		std::map<float, BaseGameObject::id_t> sorted;
+		std::map<float, id_t> sorted;
 
 		for (auto& kv : frameInfo.game_object_map)
 		{

@@ -9,7 +9,6 @@ namespace vulkancraft
 	class GameRenderApp
 	{
 	public:
-
 		GameRenderApp();
 		~GameRenderApp();
 
@@ -19,6 +18,9 @@ namespace vulkancraft
 		const int kWidth = 1280;
 		const int kHeight = 800;
 		const std::string kWindowName = "VulkanCraft";
+
+		void create_physical_simulation_app(); // 创建物理 APP
+		void create_physics_thread(); // 创建物理线程
 
 		void initialize_render_system(); // 初始化渲染系统
 		void update_render_window_content(); // 渲染窗口主循环
@@ -39,7 +41,7 @@ namespace vulkancraft
 #pragma endregion
 
 	private:
-
+		std::shared_ptr<PhysicalSimulationApp> physical_simulation_app_; // 物理模拟 APP（单独创建一个线程）
 		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
 		std::shared_ptr<ThreadStateManager> thread_state_manager_; // 线程监视器
 		std::shared_ptr<GameEntityManager> game_entity_manager_;
@@ -52,7 +54,7 @@ namespace vulkancraft
 
 		std::unique_ptr<VulkanBaseDescriptorPool> global_pool_{}; // 全局描述符池
 		std::unique_ptr<GameTexture> game_base_texture_{}; // 游戏贴图
-		BaseGameObject::Map game_object_map_; // 以字典储存的 game_object
+		RenderAppObjMap game_object_map_; // 以字典储存的 game_object
 
 		PlayerCameraView player_camera_view_; // 构造玩家相机观察矩阵
 		glm::vec3 player_spawn_point_ = { 0.0f, 0.0f, 0.0f }; // 玩家出生点
