@@ -36,7 +36,6 @@ namespace vulkancraft
 		void create_physical_thread(); // 创建物理线程
 		void wait_for_threads(); // 等待线程执行完成
 
-		std::shared_ptr<GameRenderApp> get_render_app_ptr() const {return game_render_app_;}
 		std::shared_ptr<PhysicalSimulationApp> get_physical_simulation_app_ptr() const {return physical_simulation_app_;}
 
 		void set_render_thread_state_to_phy(bool new_state);

@@ -28,8 +28,8 @@ namespace vulkancraft
 
 	void ThreadStateManager::create_physical_thread()
 	{
-		// 创建一个线程，执行 create_physical_app 函数
-		physical_thread_ = std::thread(&ThreadStateManager::create_physical_app, this);
+		// 创建物理模拟 App
+		physical_simulation_app_ = std::make_shared<PhysicalSimulationApp>();
 	}
 
 	void ThreadStateManager::create_render_app()
@@ -37,15 +37,9 @@ namespace vulkancraft
 		game_render_app_ = std::make_shared<GameRenderApp>();
 	}
 
-	void ThreadStateManager::create_physical_app()
-	{
-		physical_simulation_app_ = std::make_shared<PhysicalSimulationApp>();
-	}
-
 	void ThreadStateManager::wait_for_threads()
 	{
 		if (render_thread_.joinable()) render_thread_.join();
-		if (physical_thread_.joinable()) physical_thread_.join();
 	}
 
 	void ThreadStateManager::set_render_thread_state_to_phy(bool new_state)

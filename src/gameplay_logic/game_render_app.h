@@ -41,6 +41,8 @@ namespace vulkancraft
 
 		// std::shared_ptr<TerrainGeneration> terrain_generation_; // 世界生成器
 
+		GLFWwindow* glfw_window_ptr_ = nullptr; // 渲染线程内的窗口指针
+
 		GameWindow game_window_{ kWidth, kHeight, kWindowName }; // 游戏窗口
 		GameDevice game_device_{ game_window_ };
 		GameRenderer game_renderer_{ game_window_, game_device_ };

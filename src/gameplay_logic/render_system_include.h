@@ -3,7 +3,6 @@
 
 #include "game_window.h"
 #include "game_camera.h"
-#include "physical_simulation_app.h"
 #include "../vulkan_base/game_device.h"
 #include "../vulkan_base/game_buffer.h"
 #include "../vulkan_base/game_descriptors.h"

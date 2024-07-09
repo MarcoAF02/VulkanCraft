@@ -13,6 +13,11 @@
 #include <chrono>
 #include <cmath>
 #include <unordered_map>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
+class ThreadStateManager;
 
 namespace vulkancraft
 {
@@ -36,6 +41,9 @@ namespace vulkancraft
 	class PhysicalSimulationApp // 物理模拟 App 类
 	{
 	public:
+		std::thread physics_thread_; // 物理线程
+		std::atomic<bool> should_stop_{ false }; // 停止标记
+
 		// 类型别名
 		using id_t = unsigned _int64;
 
@@ -50,8 +58,11 @@ namespace vulkancraft
 		void update_bullet_physics_world(); // 循环更新由 Bullet 3 创建的物理世界
 		void update_physical_simulation(); // 循环更新物理模拟
 
+		void start_physical_thread(); // 开始物理循环线程
+
 #pragma region 游戏物理对象创建用函数
 
+		// TODO: 这个拿走
 		void create_single_physics_block(PhysicsObjectCreateData data);
 
 #pragma endregion

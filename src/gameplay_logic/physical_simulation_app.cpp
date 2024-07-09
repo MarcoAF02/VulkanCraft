@@ -31,11 +31,18 @@ namespace vulkancraft
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
 
-		update_physical_simulation(); // 计算物理模拟循环
+		start_physical_thread();
 	}
 
 	PhysicalSimulationApp::~PhysicalSimulationApp()
 	{
+		// 确保线程在析构之前结束
+		if (physics_thread_.joinable())
+		{
+			should_stop_ = true;
+			physics_thread_.join();
+		}
+
 		glfw_window_ = nullptr; // 窗口指针直接设空就行，清除内容的工作在渲染线程内会由 GLFW 自主完成
 		clear_physics_system(); // 清理物理系统
 	}
@@ -110,6 +117,12 @@ namespace vulkancraft
 
 		// next line is optional: it will be cleared by the destructor when the array goes out of scope
 		collision_shape_array_.clear();
+	}
+
+	void PhysicalSimulationApp::start_physical_thread()
+	{
+		should_stop_ = false;
+		physics_thread_ = std::thread(&PhysicalSimulationApp::update_physical_simulation, this);
 	}
 
 	void PhysicalSimulationApp::update_physical_simulation()
