@@ -10,10 +10,7 @@
 // HACK: 此处注意内存对齐
 // std - 140: alignas(16) 
 
-// 全局类型别名
-using id_t = unsigned _int64;
-using RenderAppObjMap = std::unordered_map<id_t, vulkancraft::BaseGameObject>;
-using ObjectPublicDataMap = std::unordered_map<id_t, vulkancraft::GameObjectPublicData>;
+class BaseGameObject;
 
 namespace vulkancraft
 {
@@ -43,7 +40,7 @@ namespace vulkancraft
 		alignas(8) VkCommandBuffer command_buffer;
 		GameBaseCamera& camera;
 		alignas(8) VkDescriptorSet global_descriptor_set;
-		alignas(8) RenderAppObjMap& game_object_map;
+		alignas(8) BaseGameObject::RenderAppObjMap& game_object_map;
 	};
 
 }  // namespace vulkancraft

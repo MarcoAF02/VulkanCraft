@@ -2,8 +2,8 @@
 #include "game_window.h"
 #include "game_render_app.h"
 #include "physical_simulation_app.h"
-#include "../managers/game_object_manager.h"
 #include "../managers/game_entity_manager.h"
+#include "../managers/thread_state_manager.h"
 
 // std
 #include <iostream>
@@ -13,13 +13,7 @@
 #include <thread>
 #include <unordered_map>
 
-class vulkancraft::BaseGameObject;
-struct vulkancraft::BlockGenerateData;
-
-// 全局类型别名
-using id_t = unsigned _int64;
-using RenderAppObjMap = std::unordered_map<id_t, vulkancraft::BaseGameObject>;
-using ObjectPublicDataMap = std::unordered_map<id_t, vulkancraft::GameObjectPublicData>;
+class vulkancraft::ThreadStateManager;
 
 // 函数声明
 void create_render_app(); // 创建渲染线程
@@ -30,16 +24,21 @@ void create_render_app(); // 创建渲染线程
 
 int main(void)
 {
-	try
-	{
-		std::thread render_thread(create_render_app);
-		render_thread.join(); // 等待渲染线程完成
-	}
-	catch (const std::system_error& e)
-	{
-		std::cerr << "渲染或物理线程执行失败: " << e.what() << std::endl;
-		return -1;
-	}
+	//try
+	//{
+	//	std::thread render_thread(create_render_app);
+	//	render_thread.join(); // 等待渲染线程完成
+	//}
+	//catch (const std::system_error& e)
+	//{
+	//	std::cerr << "渲染或物理线程执行失败: " << e.what() << std::endl;
+	//	return -1;
+	//}
+
+	std::shared_ptr<vulkancraft::ThreadStateManager> thread_state_manager = vulkancraft::ThreadStateManager::get_instance();
+	thread_state_manager->create_render_thread();
+	thread_state_manager->create_physical_thread();
+	thread_state_manager->wait_for_threads();
 
 	return 0;
 }

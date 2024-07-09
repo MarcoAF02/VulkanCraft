@@ -6,6 +6,8 @@
 // std
 #include <vector>
 #include <memory>
+#include <thread>
+#include <mutex>
 
 // 单例类：游戏实体管理器
 namespace vulkancraft

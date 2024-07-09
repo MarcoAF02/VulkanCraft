@@ -35,7 +35,6 @@
     <ClCompile Include="src\input_system\keyboard_input_controller.cpp" />
     <ClCompile Include="src\input_system\mouse_rotate_controller.cpp" />
     <ClCompile Include="src\managers\game_entity_manager.cpp" />
-    <ClCompile Include="src\managers\game_object_manager.cpp" />
     <ClCompile Include="src\managers\thread_state_manager.cpp" />
     <ClCompile Include="src\vulkan_base\game_buffer.cpp" />
     <ClCompile Include="src\vulkan_base\game_descriptors.cpp" />
@@ -63,7 +62,6 @@
     <ClInclude Include="src\input_system\keyboard_input_controller.h" />
     <ClInclude Include="src\input_system\mouse_rotate_controller.h" />
     <ClInclude Include="src\managers\game_entity_manager.h" />
-    <ClInclude Include="src\managers\game_object_manager.h" />
     <ClInclude Include="src\managers\thread_state_manager.h" />
     <ClInclude Include="src\vulkan_base\game_buffer.h" />
     <ClInclude Include="src\vulkan_base\game_descriptors.h" />

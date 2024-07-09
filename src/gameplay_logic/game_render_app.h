@@ -3,6 +3,8 @@
 
 #include "render_system_include.h"
 
+class ThreadStateManager;
+
 namespace vulkancraft
 {
 	// 游戏渲染全流程类（Vulkan）
@@ -19,20 +21,13 @@ namespace vulkancraft
 		const int kHeight = 800;
 		const std::string kWindowName = "VulkanCraft";
 
-		void create_physical_simulation_app(); // 创建物理 APP
-		void create_physics_thread(); // 创建物理线程
-
 		void initialize_render_system(); // 初始化渲染系统
 		void update_render_window_content(); // 渲染窗口主循环
-		void create_terrain(); // 加载游戏对象
+		void create_terrain(); // 加载游戏对象（地形）
 		void load_object_texture(); // 加载纹理贴图
 
 #pragma region 测试用函数和变量
 
-		bool debug_light_created_ = false;
-		std::vector<id_t> player_debug_light_vector_;
-
-		void set_player_debug_light();
 		void test_load_big_point_light(); // 加载一个巨大的点光源
 		void test_load_rotate_light(); // 加载硬编码的旋转灯光
 		void test_load_viking_room();
@@ -41,12 +36,10 @@ namespace vulkancraft
 #pragma endregion
 
 	private:
-		std::shared_ptr<PhysicalSimulationApp> physical_simulation_app_; // 物理模拟 APP（单独创建一个线程）
-		std::shared_ptr<GameObjectManager> game_object_manager_; // 游戏公共对象管理单例
-		std::shared_ptr<ThreadStateManager> thread_state_manager_; // 线程监视器
+		std::shared_ptr<ThreadStateManager> thread_state_manager_;
 		std::shared_ptr<GameEntityManager> game_entity_manager_;
 
-		std::shared_ptr<TerrainGeneration> terrain_generation_; // 世界生成器
+		// std::shared_ptr<TerrainGeneration> terrain_generation_; // 世界生成器
 
 		GameWindow game_window_{ kWidth, kHeight, kWindowName }; // 游戏窗口
 		GameDevice game_device_{ game_window_ };
@@ -54,7 +47,7 @@ namespace vulkancraft
 
 		std::unique_ptr<VulkanBaseDescriptorPool> global_pool_{}; // 全局描述符池
 		std::unique_ptr<GameTexture> game_base_texture_{}; // 游戏贴图
-		RenderAppObjMap game_object_map_; // 以字典储存的 game_object
+		BaseGameObject::RenderAppObjMap game_object_map_; // 以字典储存的 game_object
 
 		PlayerCameraView player_camera_view_; // 构造玩家相机观察矩阵
 		glm::vec3 player_spawn_point_ = { 0.0f, 0.0f, 0.0f }; // 玩家出生点

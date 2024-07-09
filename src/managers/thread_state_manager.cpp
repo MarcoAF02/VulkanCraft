@@ -20,6 +20,34 @@ namespace vulkancraft
 		return instance_;
 	}
 
+	void ThreadStateManager::create_render_thread()
+	{
+		// 创建一个线程，执行 create_render_app 函数
+		render_thread_ = std::thread(&ThreadStateManager::create_render_app, this);
+	}
+
+	void ThreadStateManager::create_physical_thread()
+	{
+		// 创建一个线程，执行 create_physical_app 函数
+		physical_thread_ = std::thread(&ThreadStateManager::create_physical_app, this);
+	}
+
+	void ThreadStateManager::create_render_app()
+	{
+		game_render_app_ = std::make_shared<GameRenderApp>();
+	}
+
+	void ThreadStateManager::create_physical_app()
+	{
+		physical_simulation_app_ = std::make_shared<PhysicalSimulationApp>();
+	}
+
+	void ThreadStateManager::wait_for_threads()
+	{
+		if (render_thread_.joinable()) render_thread_.join();
+		if (physical_thread_.joinable()) physical_thread_.join();
+	}
+
 	void ThreadStateManager::set_render_thread_state_to_phy(bool new_state)
 	{
 		std::lock_guard<std::mutex> lock(mutex_); // 确保线程安全

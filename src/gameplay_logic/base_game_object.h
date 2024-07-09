@@ -10,8 +10,6 @@
 #include <memory>
 #include <unordered_map>
 
-using id_t = unsigned _int64;
-
 namespace vulkancraft
 {
 	struct TransformComponent
@@ -36,6 +34,9 @@ namespace vulkancraft
 	class BaseGameObject
 	{
 	public:
+		using id_t = unsigned _int64;
+		using RenderAppObjMap = std::unordered_map<id_t, BaseGameObject>;
+
 		static BaseGameObject create_game_object(bool is_static)
 		{
 			static unsigned _int64 current_id = 0;

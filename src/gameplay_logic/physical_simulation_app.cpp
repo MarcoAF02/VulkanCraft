@@ -17,8 +17,6 @@ namespace vulkancraft
 
 		try
 		{
-			game_object_manager_ = GameObjectManager::get_instance();
-			thread_state_manager_ = ThreadStateManager::get_instance();
 			game_entity_manager_ = GameEntityManager::get_instance(); // 这里已经生成玩家了
 
 			// 得到全局原子指针，这里进行阻塞以等待渲染线程创建完成
@@ -32,10 +30,6 @@ namespace vulkancraft
 		{
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
-
-		// HACK: 延迟一小段时间后再开始物理计算，防止类未初始化完毕
-		// TODO: 后续的更新中，物理模拟改成阻塞到地形生成完成后再开始判断
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 		update_physical_simulation(); // 计算物理模拟循环
 	}
@@ -122,12 +116,6 @@ namespace vulkancraft
 	{
 		while (true)
 		{
-			if (thread_state_manager_->get_render_thread_state_to_phy())
-			{
-				std::cout << std::endl << "====== 检测到物理追赶结束，物理线程已自动结束 ======" << std::endl;
-				break;
-			}
-
 			// 计算追赶时间
 			auto current_time = Clock::now(); // 记录现在的时间
 			auto elapsed_time = current_time - previous_time_; // 自上一帧以来的经过时间
@@ -148,12 +136,6 @@ namespace vulkancraft
 			// 追赶更新
 			while (accumulator_ >= kTimePerUpdate)
 			{
-				if (thread_state_manager_->get_render_thread_state_to_phy())
-				{
-					std::cout << std::endl << "====== 检测到渲染线程结束，物理追赶已自动结束 ======" << std::endl;
-					break;
-				}
-
 				// std::cout << accumulator_step_ << std::endl;
 
 				if (accumulator_step_ <= kTimeStep) break; // CD 时间没到就不循环
@@ -217,9 +199,38 @@ namespace vulkancraft
 				trans = obj->getWorldTransform();
 			}
 
-			printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+			// printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 		}
 	}
+
+#pragma region 物理游戏对象创建用函数
+
+	void PhysicalSimulationApp::create_single_physics_block(PhysicsObjectCreateData data)
+	{
+		std::lock_guard<std::mutex> lock(this->collision_shape_array_mutex_);
+
+		// TODO: 用 map 记录这个游戏对象
+		btCollisionShape* single_block = new btBoxShape(data.obj_size); // 确定大小
+
+		// TODO: 这里访问不到
+		this->collision_shape_array_.push_back(single_block);
+
+		data.transform.setIdentity();
+		bool is_dynamic = (data.mass != 0.0f);
+
+		// 如果是动态物体，设置受力张量矩阵
+		if (is_dynamic) single_block->calculateLocalInertia(data.mass, data.local_inertia);
+
+		data.transform.setOrigin(data.obj_origin);
+
+		btDefaultMotionState* block_motion_state = new btDefaultMotionState(data.transform);
+		btRigidBody::btRigidBodyConstructionInfo rb_info(data.mass, block_motion_state, single_block, data.local_inertia);
+		btRigidBody* body = new btRigidBody(rb_info);
+
+		dynamics_world_->addRigidBody(body);
+	}
+
+#pragma endregion
 
 #pragma region DEBUG 用函数
 

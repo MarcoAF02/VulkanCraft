@@ -10,7 +10,6 @@ namespace vulkancraft
 
 		try
 		{
-			game_object_manager_ = GameObjectManager::get_instance();
 			thread_state_manager_ = ThreadStateManager::get_instance();
 			game_entity_manager_ = GameEntityManager::get_instance(); // 这里已经生成玩家了
 		}
@@ -19,27 +18,11 @@ namespace vulkancraft
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
 
-		terrain_generation_ = std::make_shared<TerrainGeneration>
-			(
-				game_device_,
-				game_object_map_
-			);
-
-		create_physics_thread(); // 一切准备就绪后，创建物理线程
+		update_render_window_content();
+		// terrain_generation_ = std::make_shared<TerrainGeneration>();
 	}
 
 	GameRenderApp::~GameRenderApp() { }
-
-	void GameRenderApp::create_physics_thread()
-	{
-		std::thread physical_thread(create_physical_simulation_app);
-		physical_thread.join(); // 等待物理线程完成
-	}
-
-	void GameRenderApp::create_physical_simulation_app()
-	{
-		physical_simulation_app_ = std::make_shared<PhysicalSimulationApp>();
-	}
 
 	void GameRenderApp::create_global_pool()
 	{
@@ -107,6 +90,9 @@ namespace vulkancraft
 
 	void GameRenderApp::update_render_window_content()
 	{
+		// std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+
+		// TODO: 无法创建地形，因为发生访问冲突
 		create_terrain();
 		std::chrono::steady_clock::time_point current_time = std::chrono::high_resolution_clock::now();
 
@@ -127,7 +113,6 @@ namespace vulkancraft
 
 			// HACK: 打印玩家数据
 			// game_entity_manager_->get_character_controller() -> print_player_details();
-			set_player_debug_light(); // 设置 Debug 灯
 
 			// HACK: 设置观察摄像机
 			viewer_camera_ = game_entity_manager_->get_character_controller()->get_player_camera();
@@ -181,18 +166,29 @@ namespace vulkancraft
 		}
 
 		vkDeviceWaitIdle(game_device_.get_vulkan_device());
-		thread_state_manager_->set_render_thread_state_to_phy(true); // 将渲染线程结束的标志设置为 true
 
 		std::cout << std::endl << "====== 渲染线程结束 ======" << std::endl;
 	}
 
 	void GameRenderApp::create_terrain()
 	{
-		int plane_length = 20, plane_width = 20;
-		int wall_height = 6, wall_width = 6;
+		//int plane_length = 20, plane_width = 20;
+		//int wall_height = 6, wall_width = 6;
 
-		terrain_generation_->create_plane(plane_length, plane_width);
-		terrain_generation_->create_wall(wall_height, wall_width);
+		//terrain_generation_->create_plane(plane_length, plane_width);
+		//terrain_generation_->create_wall(wall_height, wall_width);
+
+				// 生成方块物理数据
+		PhysicsObjectCreateData obj_data = // 不知道传什么就打花括号
+		{
+			{1, 1, 1},
+			{0, 0, 0},
+			{},
+			1,
+			{}
+		};
+
+		// physical_simulation_app_->create_single_physics_block(obj_data);
 
 		test_load_big_point_light();
 	}
@@ -207,44 +203,6 @@ namespace vulkancraft
 	}
 
 #pragma region 测试用函数实现
-
-	void GameRenderApp::set_player_debug_light()
-	{
-		if (!debug_light_created_)
-		{
-			for (int i = 0; i < game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_bottom_vertices().size(); i++)
-			{
-				BaseGameObject debug_light = BaseGameObject::make_point_light(0.2f);
-				debug_light.color_ = { 0.0f, 1.0f, 0.0f };
-				debug_light.transform_.translation = game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_bottom_vertices()[i];
-				game_object_map_.emplace(debug_light.get_id(), std::move(debug_light));
-				player_debug_light_vector_.push_back(debug_light.get_id());
-			}
-
-			for (int i = 0; i < game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_top_vertices().size(); i++)
-			{
-				BaseGameObject debug_light = BaseGameObject::make_point_light(0.2f);
-				debug_light.color_ = { 0.0f, 1.0f, 0.0f };
-				debug_light.transform_.translation = game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_top_vertices()[i];
-				game_object_map_.emplace(debug_light.get_id(), std::move(debug_light));
-				player_debug_light_vector_.push_back(debug_light.get_id());
-			}
-		}
-
-		debug_light_created_ = true;
-
-		for (int i = 0; i < 4; i++)
-		{
-			game_object_map_.find(player_debug_light_vector_[i])->second.transform_.translation =
-				game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_bottom_vertices()[i];
-		}
-
-		for (int i = 0; i < 4; i++)
-		{
-			game_object_map_.find(player_debug_light_vector_[i + 4])->second.transform_.translation =
-				game_entity_manager_->get_character_controller()->get_player_collider().get_aabb_top_vertices()[i];
-		}
-	}
 
 	void GameRenderApp::test_load_viking_room_texture()
 	{

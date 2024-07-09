@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "../managers/game_object_manager.h"
 #include "../managers/thread_state_manager.h"
 #include "../managers/game_entity_manager.h"
 
@@ -13,12 +12,33 @@
 #include <memory>
 #include <chrono>
 #include <cmath>
+#include <unordered_map>
 
 namespace vulkancraft
 {
+	// 物理游戏对象的创建数据
+	struct PhysicsObjectCreateData
+	{
+		btVector3 obj_size{}; // Box Collider 的尺寸
+		btVector3 obj_origin{}; // Box Collider 的起点
+		btTransform transform{}; // 这个需要用 setOrigin() 函数来初始化位置
+		btScalar mass{}; // 质量
+		btVector3 local_inertia{};
+	};
+
+	// 跟踪物理世界对象用的数据
+	struct PhysicsObjectSaveData
+	{
+		btCollisionShape* collision_shape;
+		btRigidBody* rigid_body;
+	};
+
 	class PhysicalSimulationApp // 物理模拟 App 类
 	{
 	public:
+		// 类型别名
+		using id_t = unsigned _int64;
+
 		PhysicalSimulationApp();
 		~PhysicalSimulationApp();
 
@@ -30,14 +50,20 @@ namespace vulkancraft
 		void update_bullet_physics_world(); // 循环更新由 Bullet 3 创建的物理世界
 		void update_physical_simulation(); // 循环更新物理模拟
 
+#pragma region 游戏物理对象创建用函数
+
+		void create_single_physics_block(PhysicsObjectCreateData data);
+
+#pragma endregion
+
 	private:
+		std::mutex collision_shape_array_mutex_; // 保护线程安全用的互斥锁
+
 		GLFWwindow* glfw_window_ = nullptr; // 渲染线程内的窗口指针
 
 		using Clock = std::chrono::high_resolution_clock; // Clock 类型名
 		using Duration = std::chrono::duration<double>;
 
-		std::shared_ptr<GameObjectManager> game_object_manager_ = nullptr; // 游戏公共对象管理单例
-		std::shared_ptr<ThreadStateManager> thread_state_manager_ = nullptr; // 线程管理单例
 		std::shared_ptr<GameEntityManager> game_entity_manager_ = nullptr; // 实体管理器单例
 
 		// Bullet Physics 物理引擎相关初始化
@@ -48,7 +74,10 @@ namespace vulkancraft
 		btSequentialImpulseConstraintSolver* solver_ = nullptr;
 		btDiscreteDynamicsWorld* dynamics_world_ = nullptr;
 
+		// 储存物理对象
+		// TODO: 后续只允许使用 unordered_map
 		btAlignedObjectArray<btCollisionShape*> collision_shape_array_;
+		std::unordered_map<id_t, PhysicsObjectSaveData> physics_obj_map_;
 
 		const btVector3 kGravityVector = { 0.0f, 10.0f, 0.0f }; // 重力
 
