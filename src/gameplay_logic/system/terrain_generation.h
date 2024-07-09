@@ -1,7 +1,10 @@
 
 #pragma once
 
-#include "../render_system_include.h"
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 // Bullet Physics
 #include "btBulletDynamicsCommon.h"
@@ -11,6 +14,8 @@
 #include <vector>
 #include <string>
 #include <memory>
+
+class GameEntityManager;
 
 namespace vulkancraft
 {
@@ -25,25 +30,25 @@ namespace vulkancraft
 		float mass = 0.0f; // 物体的质量（大于 0 表示能受到重力影响）
 	};
 
-	//// 世界生成器
-	//class TerrainGeneration
-	//{
-	//public:
-	//	TerrainGeneration();
-	//	~TerrainGeneration();
+	// 世界生成器
+	class TerrainGeneration
+	{
+	public:
+		TerrainGeneration();
+		~TerrainGeneration();
 
-	//	// 安全性操作
-	//	TerrainGeneration(const TerrainGeneration&) = delete;
-	//	TerrainGeneration& operator = (const TerrainGeneration&) = delete;
+		// 安全性操作
+		TerrainGeneration(const TerrainGeneration&) = delete;
+		TerrainGeneration& operator = (const TerrainGeneration&) = delete;
 
-	//	// 静态方块生成器
-	//	void single_block_creator(BlockGenerateData block_data);
-	//	void create_plane(int length, int width); // 直接创建一个平面
-	//	void create_wall(int height, int width); // 创建一面墙
+		// 静态方块生成器
+		void single_block_creator(BlockGenerateData block_data);
+		void create_plane(int length, int width); // 直接创建一个平面
+		void create_wall(int height, int width); // 创建一面墙
 
-	//private:
+	private:
 
-	//	// 模型文件路径
-	//	std::string model_file_path_ = "models/block.obj";
-	//};
+		// 模型文件路径
+		std::string model_file_path_ = "models/block.obj";
+	};
 }
