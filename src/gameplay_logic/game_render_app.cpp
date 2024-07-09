@@ -11,12 +11,6 @@ namespace vulkancraft
 		create_global_pool();
 		initialize_render_system();
 
-		// 得到全局原子指针，这里进行阻塞以等待渲染线程创建完成
-		while (glfw_window_ptr_ == nullptr)
-		{
-			glfw_window_ptr_ = global_glfw_window_ptr.load(std::memory_order_acquire);
-		}
-
 		std::cout << glfw_window_ptr_ << std::endl;
 
 		try
@@ -27,6 +21,12 @@ namespace vulkancraft
 		catch (const std::exception& e)
 		{
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
+		}
+
+		// 得到全局原子指针，这里进行阻塞以等待渲染线程创建完成
+		while (glfw_window_ptr_ == nullptr)
+		{
+			glfw_window_ptr_ = thread_state_manager_ -> get_physical_simulation_app_ptr() -> get_glfw_window_ptr();
 		}
 
 		update_render_window_content();
@@ -182,6 +182,8 @@ namespace vulkancraft
 			}
 
 			std::cout << glfw_window_ptr_ << std::endl;
+
+
 
 			// TODO: 这里依然将 GLFW 指针的所有权转移了，此处需要使用全局原子指针
 			// TODO: 用这个获取：global_glfw_window_ptr.load(std::memory_order_acquire);

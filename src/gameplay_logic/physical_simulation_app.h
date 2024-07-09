@@ -60,6 +60,8 @@ namespace vulkancraft
 
 		void start_physical_thread(); // 开始物理循环线程
 
+		GLFWwindow* get_glfw_window_ptr() const {return glfw_window_;}
+
 #pragma region 游戏物理对象创建用函数
 
 		// TODO: 这个拿走
