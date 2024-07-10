@@ -94,10 +94,10 @@ namespace vulkancraft
 		}
 
 		// delete collision shapes
-		for (int j = 0; j < collision_shape_array_.size(); j++)
+		for (int j = 0; j < physics_obj_map_.size(); j++)
 		{
-			btCollisionShape* shape = collision_shape_array_[j];
-			collision_shape_array_[j] = 0;
+			btCollisionShape* shape = physics_obj_map_[j].collision_shape;
+			physics_obj_map_[j].collision_shape = 0;
 			delete shape;
 		}
 
@@ -116,7 +116,7 @@ namespace vulkancraft
 		delete collision_default_config_;
 
 		// next line is optional: it will be cleared by the destructor when the array goes out of scope
-		collision_shape_array_.clear();
+		physics_obj_map_.clear();
 	}
 
 	void PhysicalSimulationApp::start_physical_thread()
@@ -214,21 +214,18 @@ namespace vulkancraft
 				trans = obj->getWorldTransform();
 			}
 
-			// printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+			printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 		}
 	}
 
 #pragma region 物理游戏对象创建用函数
 
-	void PhysicalSimulationApp::create_single_physics_block(PhysicsObjectCreateData data)
+	void PhysicalSimulationApp::create_single_physics_block(BaseGameObject::id_t obj_id, PhysicsObjectCreateData data)
 	{
 		std::lock_guard<std::mutex> lock(this->collision_shape_array_mutex_);
 
 		// TODO: 用 map 记录这个游戏对象
 		btCollisionShape* single_block = new btBoxShape(data.obj_size); // 确定大小
-
-		// TODO: 这里访问不到
-		this->collision_shape_array_.push_back(single_block);
 
 		data.transform.setIdentity();
 		bool is_dynamic = (data.mass != 0.0f);
@@ -242,6 +239,13 @@ namespace vulkancraft
 		btRigidBody::btRigidBodyConstructionInfo rb_info(data.mass, block_motion_state, single_block, data.local_inertia);
 		btRigidBody* body = new btRigidBody(rb_info);
 
+		PhysicsObjectSaveData new_data =
+		{
+			single_block,
+			body
+		};
+
+		this->physics_obj_map_.emplace(obj_id, new_data);
 		dynamics_world_->addRigidBody(body);
 	}
 
@@ -253,7 +257,6 @@ namespace vulkancraft
 	{
 		// 创建测试用的物理物体，这个基本就是对着官方的抄一遍
 		btCollisionShape* ground_shape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
-		collision_shape_array_.push_back(ground_shape);
 
 		btTransform ground_transform;
 		ground_transform.setIdentity();
@@ -273,13 +276,21 @@ namespace vulkancraft
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, my_motion_state, ground_shape, local_inertia);
 		btRigidBody* body = new btRigidBody(rbInfo);
 
+		PhysicsObjectSaveData test_ground_data = 
+		{
+			ground_shape,
+			body
+		};
+
+		// HACK: 这里用掉了一个键
+		this->physics_obj_map_.emplace(123000, test_ground_data);
+
 		// 注册刚体
 		dynamics_world_->addRigidBody(body);
 
 		// 创建动态物体
 		{
 			btCollisionShape* test_cube = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
-			collision_shape_array_.push_back(test_cube);
 
 			btTransform start_transform;
 			start_transform.setIdentity();
@@ -296,6 +307,14 @@ namespace vulkancraft
 			btRigidBody::btRigidBodyConstructionInfo rb_info(mass, my_motion_state, test_cube, local_inertia);
 			btRigidBody* body = new btRigidBody(rb_info);
 
+			PhysicsObjectSaveData test_cube_data =
+			{
+				test_cube,
+				body
+			};
+
+			// HACK: 这里用掉了一个键
+			this->physics_obj_map_.emplace(123001, test_cube_data);
 			dynamics_world_->addRigidBody(body);
 		}
 	}

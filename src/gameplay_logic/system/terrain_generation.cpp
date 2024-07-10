@@ -39,7 +39,7 @@ namespace vulkancraft
 		game_object_map_.emplace(stone_obj.get_id(), std::move(stone_obj));
 
 		// TODO: Í¨Öª PhysicsObjectGenerator Àà
-		physical_simulation_app_.create_single_physics_block(stone_obj.get_id(), obj_data);
+		// physical_simulation_app_.create_single_physics_block(stone_obj.get_id(), obj_data);
 	}
 
 	void TerrainGeneration::create_plane(int length, int width)

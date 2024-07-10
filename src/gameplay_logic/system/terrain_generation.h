@@ -26,8 +26,6 @@ class GameDevice;
 
 namespace vulkancraft
 {
-	using id_t = unsigned _int64;
-
 	// 单个方块的生成数据
 	struct BlockGenerateData
 	{

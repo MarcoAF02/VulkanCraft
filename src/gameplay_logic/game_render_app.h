@@ -4,6 +4,7 @@
 #include "render_system_include.h"
 
 class ThreadStateManager;
+class TerrainGeneration;
 
 namespace vulkancraft
 {
@@ -39,7 +40,7 @@ namespace vulkancraft
 		std::shared_ptr<ThreadStateManager> thread_state_manager_;
 		std::shared_ptr<GameEntityManager> game_entity_manager_;
 
-		// std::shared_ptr<TerrainGeneration> terrain_generation_; // 世界生成器
+		std::shared_ptr<TerrainGeneration> terrain_generation_; // 世界生成器
 
 		GameWindow game_window_{ kWidth, kHeight, kWindowName }; // 游戏窗口
 		GameDevice game_device_{ game_window_ };

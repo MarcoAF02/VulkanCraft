@@ -18,6 +18,7 @@
 #include <condition_variable>
 
 class ThreadStateManager;
+class PhysicsObjectGenerator;
 
 namespace vulkancraft
 {
@@ -44,9 +45,6 @@ namespace vulkancraft
 		std::thread physics_thread_; // 物理线程
 		std::atomic<bool> should_stop_{ false }; // 停止标记
 
-		// 类型别名
-		using id_t = unsigned _int64;
-
 		PhysicalSimulationApp();
 		~PhysicalSimulationApp();
 
@@ -65,7 +63,7 @@ namespace vulkancraft
 #pragma region 游戏物理对象创建用函数
 
 		// TODO: 这个拿走
-		void create_single_physics_block(PhysicsObjectCreateData data);
+		void create_single_physics_block(BaseGameObject::id_t obj_id, PhysicsObjectCreateData data);
 
 #pragma endregion
 
@@ -88,9 +86,8 @@ namespace vulkancraft
 		btDiscreteDynamicsWorld* dynamics_world_ = nullptr;
 
 		// 储存物理对象
-		// TODO: 后续只允许使用 unordered_map
-		btAlignedObjectArray<btCollisionShape*> collision_shape_array_;
-		std::unordered_map<id_t, PhysicsObjectSaveData> physics_obj_map_;
+		std::unordered_map<BaseGameObject::id_t, PhysicsObjectSaveData> physics_obj_map_;
+		std::shared_ptr<PhysicsObjectGenerator> physics_object_generator_ = nullptr;
 
 		const btVector3 kGravityVector = { 0.0f, 10.0f, 0.0f }; // 重力
 

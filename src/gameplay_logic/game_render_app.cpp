@@ -21,7 +21,12 @@ namespace vulkancraft
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
 
-		// terrain_generation_ = std::make_shared<TerrainGeneration>();
+		terrain_generation_ = std::make_shared<TerrainGeneration>
+		(
+			game_device_,
+			*(thread_state_manager_->get_physical_simulation_app_ptr()),
+			game_object_map_
+		);
 
 		update_render_window_content();
 	}
@@ -104,8 +109,9 @@ namespace vulkancraft
 			{}
 		};
 
+		// HACK: 这里用掉一个键
 		std::cout << thread_state_manager_ -> get_physical_simulation_app_ptr() << std::endl;
-		thread_state_manager_->get_physical_simulation_app_ptr()->create_single_physics_block(new_data);
+		thread_state_manager_->get_physical_simulation_app_ptr()->create_single_physics_block(124000, new_data);
 
 		create_terrain();
 		std::chrono::steady_clock::time_point current_time = std::chrono::high_resolution_clock::now();
