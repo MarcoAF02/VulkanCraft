@@ -11,8 +11,6 @@ namespace vulkancraft
 		create_global_pool();
 		initialize_render_system();
 
-		std::cout << glfw_window_ptr_ << std::endl;
-
 		try
 		{
 			thread_state_manager_ = ThreadStateManager::get_instance();
@@ -23,16 +21,9 @@ namespace vulkancraft
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
 
-		// 得到全局原子指针，这里进行阻塞以等待渲染线程创建完成
-		while (glfw_window_ptr_ == nullptr)
-		{
-			glfw_window_ptr_ = thread_state_manager_ -> get_physical_simulation_app_ptr() -> get_glfw_window_ptr();
-		}
-
-		update_render_window_content();
 		// terrain_generation_ = std::make_shared<TerrainGeneration>();
 
-		// start_render_thread();
+		update_render_window_content();
 	}
 
 	GameRenderApp::~GameRenderApp() { }
@@ -122,13 +113,9 @@ namespace vulkancraft
 		// HACK: 初始化玩家
 		game_entity_manager_->get_character_controller()->init_character_controller(player_spawn_point_);
 
-		// std::cout << game_window_.get_glfw_window() << std::endl;
-
 		while (!game_window_.should_close())
 		{
 			glfwPollEvents();
-
-			std::cout << game_window_.get_extent().width << std::endl;
 
 			std::chrono::steady_clock::time_point new_time = std::chrono::high_resolution_clock::now();
 			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
@@ -144,6 +131,9 @@ namespace vulkancraft
 			player_camera_view_.fovy = glm::radians(60.0f);
 			player_camera_view_.near = 0.1f;
 			player_camera_view_.far = 200.0f;
+
+			game_entity_manager_->get_character_controller()->set_player_camera(player_camera_view_);
+			game_entity_manager_->get_character_controller()->init_mouse_rotate(game_window_.get_glfw_window());
 
 			if (VkCommandBuffer_T* command_buffer = game_renderer_.begin_frame())
 			{
@@ -180,16 +170,6 @@ namespace vulkancraft
 				game_renderer_.end_swap_chain_render_pass(command_buffer);
 				game_renderer_.end_frame();
 			}
-
-			std::cout << glfw_window_ptr_ << std::endl;
-
-
-
-			// TODO: 这里依然将 GLFW 指针的所有权转移了，此处需要使用全局原子指针
-			// TODO: 用这个获取：global_glfw_window_ptr.load(std::memory_order_acquire);
-			game_entity_manager_->get_character_controller()->init_mouse_rotate(glfw_window_ptr_);
-			game_entity_manager_->get_character_controller()->rotate(frame_time, glfw_window_ptr_);
-			game_entity_manager_->get_character_controller()->set_player_camera(player_camera_view_);
 		}
 
 		vkDeviceWaitIdle(game_device_.get_vulkan_device());

@@ -141,11 +141,12 @@ namespace vulkancraft
 			auto elapsed_step = current_step - previous_step_; // 自上一次以来的间隔时间
 			previous_step_ = current_step;
 
+			float elapsed_step_float = static_cast<float>(elapsed_step.count()) / 1e9f;
+
 			accumulator_step_ += elapsed_step.count(); // 累加间隔时间
 			float accumulator_delta_time = static_cast<float>(accumulator_step_) / 1e9f; // 物理间隔高精度纳秒转换回 float 类型，单位为秒
 
 			// if (accumulator_step_ <= kTimeStep) continue; // 大锁：CD 时间没到，放弃追赶更新
-			// TODO: 玩家移动，视角转换放在这里
 
 			// 追赶更新
 			while (accumulator_ >= kTimePerUpdate)

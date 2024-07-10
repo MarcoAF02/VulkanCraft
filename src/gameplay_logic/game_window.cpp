@@ -61,6 +61,21 @@ namespace vulkancraft
 		}
 	}
 
+	VkExtent2D GameWindow::get_extent()
+	{
+		int width, height;
+		glfwGetWindowSize(glfw_window_, &width, &height);
+
+		if (width != width_ || height != height_)
+		{
+			// 尺寸变化时更新记录的尺寸
+			width_ = width;
+			height_ = height;
+		}
+
+		return { static_cast<uint32_t>(width_), static_cast<uint32_t>(height_) };
+	}
+
 	void GameWindow::frame_buffer_resize_callback(GLFWwindow* window, int width, int height)
 	{
 		GameWindow* game_window = reinterpret_cast<GameWindow*>(glfwGetWindowUserPointer(window));
