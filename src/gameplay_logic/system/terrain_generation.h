@@ -6,6 +6,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+#include "../physical_simulation_app.h"
+#include "../base_game_object.h"
+
 // Bullet Physics
 #include "btBulletDynamicsCommon.h"
 
@@ -15,10 +18,16 @@
 #include <string>
 #include <memory>
 
+class PhysicalSimulationApp;
 class GameEntityManager;
+class BlockGenerateData;
+class BaseGameObject;
+class GameDevice;
 
 namespace vulkancraft
 {
+	using id_t = unsigned _int64;
+
 	// 单个方块的生成数据
 	struct BlockGenerateData
 	{
@@ -34,7 +43,7 @@ namespace vulkancraft
 	class TerrainGeneration
 	{
 	public:
-		TerrainGeneration();
+		TerrainGeneration(GameDevice& game_device, PhysicalSimulationApp& physical_simulation_app, BaseGameObject::RenderAppObjMap& game_object_map);
 		~TerrainGeneration();
 
 		// 安全性操作
@@ -47,6 +56,9 @@ namespace vulkancraft
 		void create_wall(int height, int width); // 创建一面墙
 
 	private:
+		GameDevice& game_device_;
+		BaseGameObject::RenderAppObjMap& game_object_map_; // 渲染 map 的引用
+		PhysicalSimulationApp& physical_simulation_app_; // 物理 app 的引用
 
 		// 模型文件路径
 		std::string model_file_path_ = "models/block.obj";

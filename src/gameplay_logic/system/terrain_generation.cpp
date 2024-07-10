@@ -3,43 +3,43 @@
 
 namespace vulkancraft
 {
-	TerrainGeneration::TerrainGeneration() { }
+	TerrainGeneration::TerrainGeneration(GameDevice& game_device, PhysicalSimulationApp& physical_simulation_app, BaseGameObject::RenderAppObjMap& game_object_map) : game_device_(game_device), physical_simulation_app_(physical_simulation_app), game_object_map_(game_object_map) {}
 	TerrainGeneration::~TerrainGeneration() { }
 
 	void TerrainGeneration::single_block_creator(BlockGenerateData block_data)
 	{
-		//// TODO: 
-		//// 1. 创建渲染 game object
-		//// 2. 创建物理 game object
-		//// 3. 两个线程的 ID 要同步
-		//// 4. 物理线程 APP 数据同步回渲染线程 APP 表现变化效果
-		//std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, model_file_path_);
-		//BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
+		// TODO: 
+		// 1. 创建渲染 game object
+		// 2. 创建物理 game object
+		// 3. 两个线程的 ID 要同步
+		// 4. 物理线程 APP 数据同步回渲染线程 APP 表现变化效果
+		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, model_file_path_);
+		BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
 
-		//stone_obj.model_ = stone_model;
-		//stone_obj.transform_.translation = block_data.position;
-		//stone_obj.transform_.rotation = block_data.rotation;
-		//stone_obj.transform_.scale = block_data.scale;
+		stone_obj.model_ = stone_model;
+		stone_obj.transform_.translation = block_data.position;
+		stone_obj.transform_.rotation = block_data.rotation;
+		stone_obj.transform_.scale = block_data.scale;
 
-		//btVector3 obj_size{ block_data.scale.x, block_data.scale.y, block_data.scale.z };
-		//btVector3 obj_origin{ block_data.position.x, block_data.position.y, block_data.position.z };
-		//float obj_mass = block_data.mass;
+		btVector3 obj_size{ block_data.scale.x, block_data.scale.y, block_data.scale.z };
+		btVector3 obj_origin{ block_data.position.x, block_data.position.y, block_data.position.z };
+		float obj_mass = block_data.mass;
 
-		//// 生成方块物理数据
-		//PhysicsObjectCreateData obj_data = // 不知道传什么就打花括号
-		//{
-		//	obj_size,
-		//	obj_origin,
-		//	{},
-		//	obj_mass,
-		//	{}
-		//};
+		// 生成方块物理数据
+		PhysicsObjectCreateData obj_data = // 不知道传什么就打花括号
+		{
+			obj_size,
+			obj_origin,
+			{},
+			obj_mass,
+			{}
+		};
 
-		//// 渲染数据放入 game object map
-		//game_object_map_.emplace(stone_obj.get_id(), std::move(stone_obj));
+		// 渲染数据放入 game object map
+		game_object_map_.emplace(stone_obj.get_id(), std::move(stone_obj));
 
-		//// TODO: 通知 PhysicsObjectGenerator 类
-		//physical_simulation_app_.create_single_physics_block(obj_data);
+		// TODO: 通知 PhysicsObjectGenerator 类
+		physical_simulation_app_.create_single_physics_block(stone_obj.get_id(), obj_data);
 	}
 
 	void TerrainGeneration::create_plane(int length, int width)
