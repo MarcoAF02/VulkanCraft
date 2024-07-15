@@ -7,6 +7,8 @@
 // Bullet Physics
 #include "btBulletDynamicsCommon.h"
 
+#include <glm/glm.hpp>
+
 // std
 #include <iostream>
 #include <memory>
@@ -39,6 +41,13 @@ namespace vulkancraft
 		btRigidBody* rigid_body;
 	};
 
+	struct PhysicsObjectTransData
+	{
+		glm::vec3 position;
+		glm::vec3 rotation;
+		glm::vec3 scale;
+	};
+
 	class PhysicalSimulationApp // 物理模拟 App 类
 	{
 	public:
@@ -59,6 +68,12 @@ namespace vulkancraft
 		void start_physical_thread(); // 开始物理循环线程
 
 		GLFWwindow* get_glfw_window_ptr() const {return glfw_window_;}
+
+#pragma region 根据 ID 获得物理游戏对象
+
+		PhysicsObjectTransData get_physics_obj_by_id(BaseGameObject::id_t obj_id);
+
+#pragma endregion
 
 #pragma region 游戏物理对象创建用函数
 
