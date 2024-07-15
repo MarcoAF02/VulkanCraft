@@ -127,6 +127,9 @@ namespace vulkancraft
 
 	void PhysicalSimulationApp::update_physical_simulation()
 	{
+		// HACK: 暂时让物理线程睡两秒
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+
 		while (true)
 		{
 			// 计算追赶时间
@@ -214,42 +217,11 @@ namespace vulkancraft
 				trans = obj->getWorldTransform();
 			}
 
-			printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+			// printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 		}
+
+		std::cout << dynamics_world_->getCollisionObjectArray().size() << std::endl;
 	}
-
-#pragma region 根据 ID 得到物理游戏对象
-
-	PhysicsObjectTransData PhysicalSimulationApp::get_physics_obj_by_id(BaseGameObject::id_t obj_id)
-	{
-		if (physics_obj_map_.contains(obj_id)) // 有这个物理对象的情况
-		{
-			btTransform trans;
-
-			if (physics_obj_map_[obj_id].rigid_body && physics_obj_map_[obj_id].rigid_body->getMotionState())
-			{
-				physics_obj_map_[obj_id].rigid_body->getMotionState()->getWorldTransform(trans);
-			}
-			else
-			{
-				trans = physics_obj_map_[obj_id].rigid_body->getWorldTransform();
-			}
-
-			PhysicsObjectTransData trans_data;
-			trans_data.position = { float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()) };
-			trans_data.rotation = { float(trans.getRotation().getX()), float(trans.getRotation().getY()), float(trans.getRotation().getZ()) };
-			trans_data.scale = { 1.0f, 1.0f, 1.0f };
-
-			return trans_data;
-		}
-		else // 没有这个物理对象的情况
-		{
-			std::cerr << "没有与 " << obj_id << " 相对应的物理对象" << std::endl;
-			return {};
-		}
-	}
-
-#pragma endregion
 
 #pragma region 物理游戏对象创建用函数
 

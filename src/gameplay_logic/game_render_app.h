@@ -8,6 +8,13 @@ class TerrainGeneration;
 
 namespace vulkancraft
 {
+	struct PhysicsObjectTransData
+	{
+		glm::vec3 position;
+		glm::vec3 rotation;
+		glm::vec3 scale;
+	};
+
 	// 游戏渲染全流程类（Vulkan）
 	class GameRenderApp
 	{
@@ -26,6 +33,10 @@ namespace vulkancraft
 		void update_render_window_content(); // 渲染窗口主循环
 		void create_terrain(); // 加载游戏对象（地形）
 		void load_object_texture(); // 加载纹理贴图
+
+#pragma region 同步物理对象数据
+
+#pragma endregion
 
 #pragma region 测试用函数和变量
 
