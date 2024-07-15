@@ -21,13 +21,6 @@ namespace vulkancraft
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
 
-		terrain_generation_ = std::make_shared<TerrainGeneration>
-		(
-			game_device_,
-			*(thread_state_manager_->get_physical_simulation_app_ptr()),
-			game_object_map_
-		);
-
 		update_render_window_content();
 	}
 
@@ -141,6 +134,7 @@ namespace vulkancraft
 
 			game_entity_manager_->get_character_controller()->set_player_camera(player_camera_view_);
 			game_entity_manager_->get_character_controller()->init_mouse_rotate(game_window_.get_glfw_window());
+			game_entity_manager_->get_character_controller()->rotate(frame_time, game_window_.get_glfw_window());
 
 			sync_trans_form_phy_obj(); // 同步物理世界的运算至渲染
 
@@ -188,23 +182,11 @@ namespace vulkancraft
 
 	void GameRenderApp::create_terrain()
 	{
-		//int plane_length = 20, plane_width = 20;
-		//int wall_height = 6, wall_width = 6;
+		int plane_length = 20, plane_width = 20;
+		int wall_height = 6, wall_width = 6;
 
-		//terrain_generation_->create_plane(plane_length, plane_width);
-		//terrain_generation_->create_wall(wall_height, wall_width);
-
-				// 生成方块物理数据
-		PhysicsObjectCreateData obj_data = // 不知道传什么就打花括号
-		{
-			{1, 1, 1},
-			{0, 0, 0},
-			{},
-			1,
-			{}
-		};
-
-		// physical_simulation_app_->create_single_physics_block(obj_data);
+		create_plane(plane_length, plane_width);
+		create_wall(wall_height, wall_width);
 
 		test_load_big_point_light();
 	}
@@ -217,6 +199,114 @@ namespace vulkancraft
 		image_info_.image_view = game_base_texture_->get_image_view();
 		image_info_.image_layout = game_base_texture_->get_image_layout();
 	}
+
+#pragma region 游戏地形生成器
+
+	void GameRenderApp::single_block_creator(BlockGenerateData block_data)
+	{
+		// TODO: 
+		// 1. 创建渲染 game object
+		// 2. 创建物理 game object
+		// 3. 两个线程的 ID 要同步
+		// 4. 物理线程 APP 数据同步回渲染线程 APP 表现变化效果
+		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, model_file_path_);
+		BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
+
+		stone_obj.model_ = stone_model;
+		stone_obj.transform_.translation = block_data.position;
+		stone_obj.transform_.rotation = block_data.rotation;
+		stone_obj.transform_.scale = block_data.scale;
+
+		btVector3 obj_size{ block_data.scale.x, block_data.scale.y, block_data.scale.z };
+		btVector3 obj_origin{ block_data.position.x, block_data.position.y, block_data.position.z };
+		float obj_mass = block_data.mass;
+
+		// 生成方块物理数据
+		PhysicsObjectCreateData obj_data = // 不知道传什么就打花括号
+		{
+			obj_size,
+			obj_origin,
+			{},
+			obj_mass,
+			{}
+		};
+
+		// 渲染数据放入 game object map
+		game_object_map_.emplace(stone_obj.get_id(), std::move(stone_obj));
+
+		// TODO: 通知 PhysicsObjectGenerator 类
+		thread_state_manager_->get_physical_simulation_app_ptr()->create_single_physics_block(stone_obj.get_id(), obj_data);
+	}
+
+	void GameRenderApp::create_plane(int length, int width)
+	{
+		BlockGenerateData new_data =
+		{
+			{ 0.0f, 0.0f, 0.0f },
+			{ 0.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 1.0f }
+		};
+
+		new_data.position.x = 0;
+
+		for (int j = 0; j < width; j++) // 单独处理第一列
+		{
+			single_block_creator(new_data);
+			new_data.position.z += 1;
+		}
+
+		new_data.position.z = 0;
+
+		for (int i = 0; i < length; i++) // 对于 plane 的边长
+		{
+			single_block_creator(new_data);
+			new_data.position.x += 1;
+
+			for (int j = 0; j < width; j++)
+			{
+				single_block_creator(new_data);
+				new_data.position.z += 1;
+			}
+
+			new_data.position.z = 0;
+		}
+	}
+
+	void GameRenderApp::create_wall(int height, int width)
+	{
+		BlockGenerateData new_data =
+		{
+			{ 4.0f, 0.0f, 8.0f },
+			{ 0.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 1.0f }
+		};
+
+		new_data.position.x = 4.0f;
+
+		for (int j = 0; j < width; j++) // 单独处理第一列
+		{
+			single_block_creator(new_data);
+			new_data.position.y -= 1;
+		}
+
+		new_data.position.y = 0;
+
+		for (int i = 0; i < height; i++) // 对于 plane 的边长
+		{
+			single_block_creator(new_data);
+			new_data.position.x += 1;
+
+			for (int j = 0; j < width; j++)
+			{
+				single_block_creator(new_data);
+				new_data.position.y -= 1;
+			}
+
+			new_data.position.y = 0;
+		}
+	}
+
+#pragma endregion
 
 #pragma region 同步物理游戏对象的数据
 
@@ -250,8 +340,6 @@ namespace vulkancraft
 					// scale 值不变
 					game_object_map_[i].transform_.translation = position;
 					game_object_map_[i].transform_.rotation = rotation;
-
-					// std::cout << game_object_map_[i].transform_.translation.x << " - " << game_object_map_[i].transform_.rotation.x << std::endl;
 				}
 			}
 		}
@@ -279,6 +367,11 @@ namespace vulkancraft
 		viking_room.transform_.rotation = { 3.1415926f / 2.0f, 3.1415926f, 0.0f };
 		viking_room.transform_.scale = { 1.0f, 1.0f, 1.0f };
 		game_object_map_.emplace(viking_room.get_id(), std::move(viking_room));
+	}
+
+	void GameRenderApp::test_load_falling_cube()
+	{
+
 	}
 
 	void GameRenderApp::test_load_big_point_light()

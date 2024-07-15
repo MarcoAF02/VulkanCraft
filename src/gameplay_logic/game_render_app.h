@@ -8,6 +8,18 @@ class TerrainGeneration;
 
 namespace vulkancraft
 {
+	// 单个方块的生成数据
+	struct BlockGenerateData
+	{
+		glm::vec3 position = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 rotation = { 0.0f, 0.0f, 0.0f }; // 这个是弧度制
+		glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
+
+		// 无论方块是不是静态的，都要传递给 Bullet 物理引擎，静止不动的方块也有碰撞
+		float mass = 0.0f; // 物体的质量（大于 0 表示能受到重力影响）
+	};
+
+	// 从物理线程同步回来的数据
 	struct PhysicsObjectTransData
 	{
 		glm::vec3 position;
@@ -34,6 +46,15 @@ namespace vulkancraft
 		void create_terrain(); // 加载游戏对象（地形）
 		void load_object_texture(); // 加载纹理贴图
 
+#pragma region 游戏地形生成器
+
+		// 静态方块生成器
+		void single_block_creator(BlockGenerateData block_data);
+		void create_plane(int length, int width); // 直接创建一个平面
+		void create_wall(int height, int width); // 创建一面墙
+
+#pragma endregion
+
 #pragma region 同步物理对象数据
 
 		void sync_trans_form_phy_obj();
@@ -42,6 +63,7 @@ namespace vulkancraft
 
 #pragma region 测试用函数和变量
 
+		void test_load_falling_cube(); // 加载一个自然下落的立方体
 		void test_load_big_point_light(); // 加载一个巨大的点光源
 		void test_load_rotate_light(); // 加载硬编码的旋转灯光
 		void test_load_viking_room();
@@ -50,10 +72,11 @@ namespace vulkancraft
 #pragma endregion
 
 	private:
+		// 模型文件路径
+		std::string model_file_path_ = "models/block.obj";
+
 		std::shared_ptr<ThreadStateManager> thread_state_manager_;
 		std::shared_ptr<GameEntityManager> game_entity_manager_;
-
-		std::shared_ptr<TerrainGeneration> terrain_generation_; // 世界生成器
 
 		GameWindow game_window_{ kWidth, kHeight, kWindowName }; // 游戏窗口
 		GameDevice game_device_{ game_window_ };

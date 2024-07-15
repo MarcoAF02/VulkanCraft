@@ -17,7 +17,6 @@
 #include "../input_system/keyboard_input_controller.h"
 #include "../managers/thread_state_manager.h" // 线程管理器
 #include "../managers/game_entity_manager.h"
-#include "system/terrain_generation.h" // 世界生成器
 
 // libs
 #define GLM_FORCE_RADIANS

@@ -8,7 +8,7 @@ namespace vulkancraft
 		try
 		{
 			init_physics_system();
-			test_create_dynamic_rigidbody();
+			// test_create_dynamic_rigidbody();
 		}
 		catch (std::exception& e)
 		{
@@ -127,7 +127,7 @@ namespace vulkancraft
 
 	void PhysicalSimulationApp::update_physical_simulation()
 	{
-		// HACK: 暂时让物理线程睡两秒
+		// HACK: 暂时让物理线程睡两秒，以后要加等待其他资源初始化完成的判断
 		std::this_thread::sleep_for(std::chrono::seconds(2));
 
 		is_phy_sim_started = true;
@@ -204,6 +204,8 @@ namespace vulkancraft
 
 	void PhysicalSimulationApp::update_bullet_physics_world()
 	{
+		dynamics_world_->stepSimulation(1.f / 60.0f, 10);
+
 		for (int i = dynamics_world_->getNumCollisionObjects() - 1; i >= 0; i--)
 		{
 			btCollisionObject* obj = dynamics_world_->getCollisionObjectArray()[i];
@@ -219,7 +221,7 @@ namespace vulkancraft
 				trans = obj->getWorldTransform();
 			}
 
-			// printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+			printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 		}
 
 		// std::cout << dynamics_world_->getCollisionObjectArray().size() << std::endl;
@@ -302,7 +304,7 @@ namespace vulkancraft
 			btTransform start_transform;
 			start_transform.setIdentity();
 
-			btScalar mass(1.f);
+			btScalar mass(1.0f);
 			bool is_dynamic = (mass != 0.f);
 
 			btVector3 local_inertia(0, 0, 0);
