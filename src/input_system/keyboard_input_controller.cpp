@@ -65,9 +65,6 @@ namespace vulkancraft
 
 	void KeyboardMovementController::player_move(GLFWwindow* glfw_window, float delta_time, BaseGameObject& player_obj)
 	{
-		// TODO: 这里先处理跳跃逻辑，然后处理移动插值平滑阻尼逻辑
-		// TODO: 最后，处理撞墙重置移动速度的逻辑，参考 Unity 官方的 FPS MicroGame
-
 		float yaw = player_obj.transform_.rotation.y;
 		const glm::vec3 forwardDir{ sin(yaw), 0.f, cos(yaw) };
 		const glm::vec3 rightDir{ forwardDir.z, 0.f, -forwardDir.x };
@@ -86,6 +83,7 @@ namespace vulkancraft
 		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon())
 		{
 			player_obj.transform_.translation += move_speed_ * delta_time * glm::normalize(moveDir);
+			// TODO: 玩家物理系统用这个向量加力
 		}
 	}
 

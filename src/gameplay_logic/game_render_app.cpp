@@ -92,22 +92,25 @@ namespace vulkancraft
 
 	void GameRenderApp::update_render_window_content()
 	{
-		// 测试用的数据
-		PhysicsObjectCreateData new_data =
+		BlockGenerateData cube_data_1 =
 		{
-			{1, 1, 1},
-			{2000, 2000, 2000},
-			{},
-			0,
-			{}
+			{2.0f, -10.0f, 2.0f},
+			{0.0f, 0.0f, 0.0f},
+			{1.0f, 1.0f, 1.0f},
+			1.0f
 		};
 
-		// HACK: 这里用掉一个键
-		// TODO: 这里仅创建了物理对象，游戏对象没关联上
-		std::cout << thread_state_manager_ -> get_physical_simulation_app_ptr() << std::endl;
-		thread_state_manager_->get_physical_simulation_app_ptr()->create_single_physics_block(0, new_data);
+		BlockGenerateData cube_data_2 =
+		{
+			{2.0f, -20.0f, 2.0f},
+			{0.0f, 0.0f, 0.0f},
+			{1.0f, 1.0f, 1.0f},
+			1.0f
+		};
 
 		create_terrain();
+		test_load_falling_cube(cube_data_1);
+		test_load_falling_cube(cube_data_2);
 		std::chrono::steady_clock::time_point current_time = std::chrono::high_resolution_clock::now();
 
 		// HACK: 初始化玩家
@@ -204,11 +207,6 @@ namespace vulkancraft
 
 	void GameRenderApp::single_block_creator(BlockGenerateData block_data)
 	{
-		// TODO: 
-		// 1. 创建渲染 game object
-		// 2. 创建物理 game object
-		// 3. 两个线程的 ID 要同步
-		// 4. 物理线程 APP 数据同步回渲染线程 APP 表现变化效果
 		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, model_file_path_);
 		BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
 
@@ -217,7 +215,8 @@ namespace vulkancraft
 		stone_obj.transform_.rotation = block_data.rotation;
 		stone_obj.transform_.scale = block_data.scale;
 
-		btVector3 obj_size{ block_data.scale.x, block_data.scale.y, block_data.scale.z };
+		// 物理的尺寸刚好是渲染的一半
+		btVector3 obj_size{ block_data.scale.x / 2, block_data.scale.y / 2, block_data.scale.z / 2 };
 		btVector3 obj_origin{ block_data.position.x, block_data.position.y, block_data.position.z };
 		float obj_mass = block_data.mass;
 
@@ -233,8 +232,6 @@ namespace vulkancraft
 
 		// 渲染数据放入 game object map
 		game_object_map_.emplace(stone_obj.get_id(), std::move(stone_obj));
-
-		// TODO: 通知 PhysicsObjectGenerator 类
 		thread_state_manager_->get_physical_simulation_app_ptr()->create_single_physics_block(stone_obj.get_id(), obj_data);
 	}
 
@@ -369,9 +366,37 @@ namespace vulkancraft
 		game_object_map_.emplace(viking_room.get_id(), std::move(viking_room));
 	}
 
-	void GameRenderApp::test_load_falling_cube()
+	void GameRenderApp::test_load_falling_cube(BlockGenerateData cube_data)
 	{
+		std::shared_ptr<GameModel> stone_model = GameModel::create_model_from_file(game_device_, model_file_path_);
+		BaseGameObject stone_obj = BaseGameObject::create_game_object(false);
 
+		stone_obj.model_ = stone_model;
+		stone_obj.transform_.translation = cube_data.position;
+		stone_obj.transform_.rotation = cube_data.rotation;
+		stone_obj.transform_.scale = cube_data.scale;
+
+		// 物理的尺寸刚好是渲染的一半
+		btVector3 obj_size{ cube_data.scale.x / 2, cube_data.scale.y / 2, cube_data.scale.z / 2 };
+		btVector3 obj_origin{ cube_data.position.x, cube_data.position.y, cube_data.position.z };
+		float obj_mass = cube_data.mass;
+
+		// std::cout << obj_size.x() << ", " << obj_size.y() << ", " << obj_size.z() << std::endl;
+		// std::cout << stone_obj.transform_.scale.x << ", " << stone_obj.transform_.scale.y << ", " << stone_obj.transform_.scale.z << std::endl;
+
+		// 生成方块物理数据
+		PhysicsObjectCreateData obj_data = // 不知道传什么就打花括号
+		{
+			obj_size,
+			obj_origin,
+			{},
+			obj_mass,
+			{}
+		};
+
+		// 渲染数据放入 game object map
+		game_object_map_.emplace(stone_obj.get_id(), std::move(stone_obj));
+		thread_state_manager_->get_physical_simulation_app_ptr()->create_single_physics_block(stone_obj.get_id(), obj_data);
 	}
 
 	void GameRenderApp::test_load_big_point_light()

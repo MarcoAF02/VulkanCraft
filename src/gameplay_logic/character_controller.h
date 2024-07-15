@@ -4,6 +4,7 @@
 #include "../gameplay_logic/game_camera.h"
 #include "../input_system/keyboard_input_controller.h"
 #include "../input_system/mouse_rotate_controller.h"
+#include "../base_tools/details.h"
 
 // std
 #include <iostream>
@@ -11,19 +12,14 @@
 // glm 数学库
 #include <glm/glm.hpp>
 
+// Bullet 3 物理系统
+#include "btBulletDynamicsCommon.h"
+
 struct vulkancraft::TransformComponent;
 class vulkancraft::KeyboardMovementController; // 键盘控制器
 class vulkancraft::MouseRotateController; // 鼠标旋转控制器
-
-// TODO List:
-// 1. 玩家控制器实现地面检测（完成）
-// 2. 玩家控制器重力下落，配合 1 实现落在地上（完成）
-// 3. 玩家撞墙时停止移动，可以通过获取碰撞目标 Collider 面的法线实现
-// 4. 玩家跳跃，跳跃顶头取消向上的向量重新下落（一样要采用向上的四轴射线检测）
-// 5. 移动插值平滑阻尼和撞墙重置移动速度
-// 6. 思考怎么实现材质系统，不同的方块显示不同的纹理
-// 7. 按 esc 解锁鼠标，按左 alt 锁定鼠标。菜单操作逻辑新开一个输入系统
-// TODO: 做到 6 之前，回头优化 3
+struct BlockGenerateData;
+struct PhysicsObjectTransData;
 
 namespace vulkancraft
 {
@@ -46,8 +42,11 @@ namespace vulkancraft
 		CharacterController(const CharacterController&) = delete;
 		CharacterController& operator = (const CharacterController&) = delete;
 
+		void get_into_render_obj_map(BaseGameObject::RenderAppObjMap& game_object_map);
+
 		// 初始化 character controller
 		void init_character_controller(glm::vec3 spawn_point);
+		void init_character_physics(); // 初始化玩家物理系统
 
 		// 设置并更新玩家主相机
 		void set_player_camera(PlayerCameraView camera_view);

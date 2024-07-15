@@ -2,31 +2,15 @@
 #pragma once
 
 #include "render_system_include.h"
+#include "../base_tools/details.h"
 
 class ThreadStateManager;
 class TerrainGeneration;
+struct BlockGenerateData;
+struct PhysicsObjectTransData;
 
 namespace vulkancraft
 {
-	// 单个方块的生成数据
-	struct BlockGenerateData
-	{
-		glm::vec3 position = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 rotation = { 0.0f, 0.0f, 0.0f }; // 这个是弧度制
-		glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
-
-		// 无论方块是不是静态的，都要传递给 Bullet 物理引擎，静止不动的方块也有碰撞
-		float mass = 0.0f; // 物体的质量（大于 0 表示能受到重力影响）
-	};
-
-	// 从物理线程同步回来的数据
-	struct PhysicsObjectTransData
-	{
-		glm::vec3 position;
-		glm::vec3 rotation;
-		glm::vec3 scale;
-	};
-
 	// 游戏渲染全流程类（Vulkan）
 	class GameRenderApp
 	{
@@ -63,7 +47,7 @@ namespace vulkancraft
 
 #pragma region 测试用函数和变量
 
-		void test_load_falling_cube(); // 加载一个自然下落的立方体
+		void test_load_falling_cube(BlockGenerateData cube_data); // 加载一个自然下落的立方体
 		void test_load_big_point_light(); // 加载一个巨大的点光源
 		void test_load_rotate_light(); // 加载硬编码的旋转灯光
 		void test_load_viking_room();

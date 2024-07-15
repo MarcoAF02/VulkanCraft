@@ -221,7 +221,7 @@ namespace vulkancraft
 				trans = obj->getWorldTransform();
 			}
 
-			printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+			// printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 		}
 
 		// std::cout << dynamics_world_->getCollisionObjectArray().size() << std::endl;
@@ -256,6 +256,11 @@ namespace vulkancraft
 
 		this->physics_obj_map_.emplace(obj_id, new_data);
 		dynamics_world_->addRigidBody(body);
+	}
+
+	void PhysicalSimulationApp::create_character_physics(BaseGameObject::id_t obj_id, PhysicsObjectCreateData data)
+	{
+		// TODO: 把这个写完
 	}
 
 #pragma endregion

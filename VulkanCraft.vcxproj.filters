@@ -158,6 +158,9 @@
     <ClInclude Include="src\base_tools\math_tools.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\base_tools\details.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base_render_shader.frag" />

@@ -8,6 +8,11 @@ namespace vulkancraft
 
 	GameBaseCamera& CharacterController::get_player_camera() { return player_camera_; }
 
+	void CharacterController::get_into_render_obj_map(BaseGameObject::RenderAppObjMap& game_object_map)
+	{
+		// TODO: 完成注册
+	}
+
 	void CharacterController::init_character_controller(glm::vec3 spawn_point)
 	{
 		spawn_point_ = spawn_point;
@@ -26,6 +31,23 @@ namespace vulkancraft
 		camera_game_obj_.transform_.scale = { 1, 1, 1 }; // 相机的缩放不用改变
 
 		print_player_details();
+	}
+
+	void CharacterController::init_character_physics()
+	{
+		float half_height = character_height_ / 2;
+		float half_width = character_width_ / 2;
+
+		BlockGenerateData collider_data =
+		{
+			character_game_obj_.transform_.translation, // 位置设在出生点
+			character_game_obj_.transform_.rotation,
+			character_game_obj_.transform_.scale,
+
+			1.0f // 质量
+		};
+
+
 	}
 
 	void CharacterController::print_player_details() const

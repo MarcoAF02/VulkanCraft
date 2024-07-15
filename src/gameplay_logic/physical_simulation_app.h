@@ -66,8 +66,11 @@ namespace vulkancraft
 
 #pragma region 游戏物理对象创建用函数
 
-		// TODO: 这个拿走
+		// 创建单个物理方块
 		void create_single_physics_block(BaseGameObject::id_t obj_id, PhysicsObjectCreateData data);
+		
+		// 创建玩家物理组件
+		void create_character_physics(BaseGameObject::id_t obj_id, PhysicsObjectCreateData data);
 
 #pragma endregion
 
