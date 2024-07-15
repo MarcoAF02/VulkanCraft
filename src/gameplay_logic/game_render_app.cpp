@@ -110,8 +110,9 @@ namespace vulkancraft
 		};
 
 		// HACK: 这里用掉一个键
+		// TODO: 这里仅创建了物理对象，游戏对象没关联上
 		std::cout << thread_state_manager_ -> get_physical_simulation_app_ptr() << std::endl;
-		thread_state_manager_->get_physical_simulation_app_ptr()->create_single_physics_block(124000, new_data);
+		thread_state_manager_->get_physical_simulation_app_ptr()->create_single_physics_block(0, new_data);
 
 		create_terrain();
 		std::chrono::steady_clock::time_point current_time = std::chrono::high_resolution_clock::now();
@@ -140,6 +141,8 @@ namespace vulkancraft
 
 			game_entity_manager_->get_character_controller()->set_player_camera(player_camera_view_);
 			game_entity_manager_->get_character_controller()->init_mouse_rotate(game_window_.get_glfw_window());
+
+			sync_trans_form_phy_obj(); // 同步物理世界的运算至渲染
 
 			if (VkCommandBuffer_T* command_buffer = game_renderer_.begin_frame())
 			{
@@ -214,6 +217,47 @@ namespace vulkancraft
 		image_info_.image_view = game_base_texture_->get_image_view();
 		image_info_.image_layout = game_base_texture_->get_image_layout();
 	}
+
+#pragma region 同步物理游戏对象的数据
+
+	void GameRenderApp::sync_trans_form_phy_obj()
+	{
+		for (int i = 0; i < game_object_map_.size(); i++)
+		{
+			// std::cout << game_object_map_.size() << std::endl;
+
+			// 如果物理模拟正式开始，并且物理 map 的 ID 和渲染 map 的 ID 对得上，表示该物体纳入物理计算，需要同步数据
+			if (thread_state_manager_->get_physical_simulation_app_ptr()->is_phy_sim_started)
+			{
+				if (thread_state_manager_->get_physical_simulation_app_ptr()->get_phy_obj_map().contains(game_object_map_[i].get_id()))
+				{
+					// std::cout << thread_state_manager_->get_physical_simulation_app_ptr()->get_phy_obj_map()[game_object_map_[i].get_id()].rigid_body->getWorldTransform().getOrigin().getX();
+
+					glm::vec3 position =
+					{
+						thread_state_manager_->get_physical_simulation_app_ptr()->get_phy_obj_map()[game_object_map_[i].get_id()].rigid_body->getWorldTransform().getOrigin().getX(),
+						thread_state_manager_->get_physical_simulation_app_ptr()->get_phy_obj_map()[game_object_map_[i].get_id()].rigid_body->getWorldTransform().getOrigin().getY(),
+						thread_state_manager_->get_physical_simulation_app_ptr()->get_phy_obj_map()[game_object_map_[i].get_id()].rigid_body->getWorldTransform().getOrigin().getZ(),
+					};
+
+					glm::vec3 rotation =
+					{
+						thread_state_manager_->get_physical_simulation_app_ptr()->get_phy_obj_map()[game_object_map_[i].get_id()].rigid_body->getWorldTransform().getRotation().getX(),
+						thread_state_manager_->get_physical_simulation_app_ptr()->get_phy_obj_map()[game_object_map_[i].get_id()].rigid_body->getWorldTransform().getRotation().getY(),
+						thread_state_manager_->get_physical_simulation_app_ptr()->get_phy_obj_map()[game_object_map_[i].get_id()].rigid_body->getWorldTransform().getRotation().getZ(),
+					};
+
+					// scale 值不变
+					game_object_map_[i].transform_.translation = position;
+					game_object_map_[i].transform_.rotation = rotation;
+
+					// std::cout << game_object_map_[i].transform_.translation.x << " - " << game_object_map_[i].transform_.rotation.x << std::endl;
+				}
+			}
+		}
+	}
+
+#pragma endregion
 
 #pragma region 测试用函数实现
 

@@ -36,6 +36,8 @@ namespace vulkancraft
 
 #pragma region 同步物理对象数据
 
+		void sync_trans_form_phy_obj();
+
 #pragma endregion
 
 #pragma region 测试用函数和变量

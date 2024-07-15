@@ -46,6 +46,7 @@ namespace vulkancraft
 	public:
 		std::thread physics_thread_; // 物理线程
 		std::atomic<bool> should_stop_{ false }; // 停止标记
+		std::atomic<bool> is_phy_sim_started{ false }; // 记录物理模拟是不是真正开始了
 
 		PhysicalSimulationApp();
 		~PhysicalSimulationApp();
@@ -60,7 +61,8 @@ namespace vulkancraft
 
 		void start_physical_thread(); // 开始物理循环线程
 
-		GLFWwindow* get_glfw_window_ptr() const {return glfw_window_;}
+		GLFWwindow* get_glfw_window_ptr() const { return glfw_window_; }
+		std::unordered_map<BaseGameObject::id_t, PhysicsObjectSaveData>& get_phy_obj_map() { return physics_obj_map_; }
 
 #pragma region 游戏物理对象创建用函数
 

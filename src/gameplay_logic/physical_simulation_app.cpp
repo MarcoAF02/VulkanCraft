@@ -130,6 +130,8 @@ namespace vulkancraft
 		// HACK: 暂时让物理线程睡两秒
 		std::this_thread::sleep_for(std::chrono::seconds(2));
 
+		is_phy_sim_started = true;
+
 		while (true)
 		{
 			// 计算追赶时间
@@ -220,7 +222,7 @@ namespace vulkancraft
 			// printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 		}
 
-		std::cout << dynamics_world_->getCollisionObjectArray().size() << std::endl;
+		// std::cout << dynamics_world_->getCollisionObjectArray().size() << std::endl;
 	}
 
 #pragma region 物理游戏对象创建用函数
