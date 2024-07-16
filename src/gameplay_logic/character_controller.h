@@ -20,6 +20,7 @@ class vulkancraft::KeyboardMovementController; // 键盘控制器
 class vulkancraft::MouseRotateController; // 鼠标旋转控制器
 struct BlockGenerateData;
 struct PhysicsObjectTransData;
+struct PhysicsObjectSaveData;
 
 namespace vulkancraft
 {
@@ -42,11 +43,9 @@ namespace vulkancraft
 		CharacterController(const CharacterController&) = delete;
 		CharacterController& operator = (const CharacterController&) = delete;
 
-		void get_into_render_obj_map(BaseGameObject::RenderAppObjMap& game_object_map);
-
 		// 初始化 character controller
 		void init_character_controller(glm::vec3 spawn_point);
-		void init_character_physics(); // 初始化玩家物理系统
+		void init_character_physics(BaseGameObject::RenderAppObjMap& game_object_map, std::unordered_map<BaseGameObject::id_t, PhysicsObjectSaveData>& physics_obj_map); // 初始化玩家物理系统
 
 		// 设置并更新玩家主相机
 		void set_player_camera(PlayerCameraView camera_view);

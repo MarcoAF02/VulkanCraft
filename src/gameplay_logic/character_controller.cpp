@@ -8,11 +8,6 @@ namespace vulkancraft
 
 	GameBaseCamera& CharacterController::get_player_camera() { return player_camera_; }
 
-	void CharacterController::get_into_render_obj_map(BaseGameObject::RenderAppObjMap& game_object_map)
-	{
-		// TODO: Íê³É×¢²á
-	}
-
 	void CharacterController::init_character_controller(glm::vec3 spawn_point)
 	{
 		spawn_point_ = spawn_point;
@@ -33,7 +28,7 @@ namespace vulkancraft
 		print_player_details();
 	}
 
-	void CharacterController::init_character_physics()
+	void CharacterController::init_character_physics(BaseGameObject::RenderAppObjMap& game_object_map, std::unordered_map<BaseGameObject::id_t, PhysicsObjectSaveData>& physics_obj_map)
 	{
 		float half_height = character_height_ / 2;
 		float half_width = character_width_ / 2;

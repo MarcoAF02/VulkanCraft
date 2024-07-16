@@ -61,6 +61,5 @@ namespace vulkancraft
 		static void init_singleton();
 
 		void create_render_app(); // 创建渲染 App
-		void create_physical_app(); // 创建物理 App
 	};
 }
