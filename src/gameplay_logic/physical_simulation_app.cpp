@@ -31,6 +31,9 @@ namespace vulkancraft
 			throw std::runtime_error("某个单例类初始化失败：" + std::string(e.what()));
 		}
 
+		// HACK: 此处初始化玩家物理系统
+		game_entity_manager_->get_character_controller()->init_character_physics();
+		register_player_physics(); // 注册玩家物理系统
 		start_physical_thread();
 	}
 
@@ -130,6 +133,8 @@ namespace vulkancraft
 		// HACK: 暂时让物理线程睡两秒，以后要加等待其他资源初始化完成的判断
 		std::this_thread::sleep_for(std::chrono::seconds(2));
 
+		std::cout << "物理 map 的大小为：" << physics_obj_map_.size() << std::endl;
+
 		is_phy_sim_started = true;
 
 		while (true)
@@ -149,7 +154,7 @@ namespace vulkancraft
 			float elapsed_step_float = static_cast<float>(elapsed_step.count()) / 1e9f;
 
 			accumulator_step_ += elapsed_step.count(); // 累加间隔时间
-			float accumulator_delta_time = static_cast<float>(accumulator_step_) / 1e9f; // 物理间隔高精度纳秒转换回 float 类型，单位为秒
+			accumulator_delta_time_ = static_cast<float>(accumulator_step_) / 1e9f; // 物理间隔高精度纳秒转换回 float 类型，单位为秒
 
 			// if (accumulator_step_ <= kTimeStep) continue; // 大锁：CD 时间没到，放弃追赶更新
 
@@ -162,10 +167,7 @@ namespace vulkancraft
 
 				// ==================== HACK 这下面是物理循环 ==================== //
 
-				// calculate_aabb_collider(); // 两两检测动态物体的 Collider 是否有碰撞
-
-				// 更新 Bullet 3 物理引擎创建的物理世界
-				// 如碰撞，触发器等都用这个物理引擎实现
+				// 更新 Bullet 3 物理引擎的物理世界
 				update_bullet_physics_world();
 
 				// TODO: 更新玩家坐标位置
@@ -204,7 +206,7 @@ namespace vulkancraft
 
 	void PhysicalSimulationApp::update_bullet_physics_world()
 	{
-		dynamics_world_->stepSimulation(1.f / 60.0f, 10);
+		dynamics_world_->stepSimulation(1.0f / 2000.0f, 10);
 
 		for (int i = dynamics_world_->getNumCollisionObjects() - 1; i >= 0; i--)
 		{
@@ -221,6 +223,9 @@ namespace vulkancraft
 				trans = obj->getWorldTransform();
 			}
 
+			game_entity_manager_->get_character_controller()->move(accumulator_delta_time_, glfw_window_);
+			game_entity_manager_->get_character_controller()->sync_player_rigidbody_pos();
+
 			// printf("world pos object %d = %f,%f,%f\n", i, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
 		}
 
@@ -233,15 +238,12 @@ namespace vulkancraft
 	{
 		std::lock_guard<std::mutex> lock(this->collision_shape_array_mutex_);
 
-		// TODO: 用 map 记录这个游戏对象
 		btCollisionShape* single_block = new btBoxShape(data.obj_size); // 确定大小
-
 		data.transform.setIdentity();
 		bool is_dynamic = (data.mass != 0.0f);
 
 		// 如果是动态物体，设置受力张量矩阵
 		if (is_dynamic) single_block->calculateLocalInertia(data.mass, data.local_inertia);
-
 		data.transform.setOrigin(data.obj_origin);
 
 		btDefaultMotionState* block_motion_state = new btDefaultMotionState(data.transform);
@@ -258,9 +260,13 @@ namespace vulkancraft
 		dynamics_world_->addRigidBody(body);
 	}
 
-	void PhysicalSimulationApp::create_character_physics(BaseGameObject::id_t obj_id, PhysicsObjectCreateData data)
+	void PhysicalSimulationApp::register_player_physics()
 	{
-		// TODO: 把这个写完
+		PhysicsObjectSaveData player_data = game_entity_manager_->get_character_controller()->get_player_physics_data();
+		BaseGameObject::id_t player_id = game_entity_manager_->get_character_controller()->get_player_obj_id();
+
+		this->physics_obj_map_.emplace(player_id, player_data);
+		dynamics_world_->addRigidBody(player_data.rigid_body);
 	}
 
 #pragma endregion

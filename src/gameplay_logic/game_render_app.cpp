@@ -114,7 +114,7 @@ namespace vulkancraft
 		std::chrono::steady_clock::time_point current_time = std::chrono::high_resolution_clock::now();
 
 		// HACK: ³õÊ¼»¯Íæ¼Ò
-		game_entity_manager_->get_character_controller()->init_character_controller(player_spawn_point_);
+		game_entity_manager_->get_character_controller()->init_character_controller();
 
 		while (!game_window_.should_close())
 		{

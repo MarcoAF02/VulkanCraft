@@ -71,7 +71,6 @@ namespace vulkancraft
 		BaseGameObject::RenderAppObjMap game_object_map_; // 以字典储存的 game_object
 
 		PlayerCameraView player_camera_view_; // 构造玩家相机观察矩阵
-		glm::vec3 player_spawn_point_ = { 0.0f, 0.0f, 0.0f }; // 玩家出生点
 
 		GameBaseCamera viewer_camera_; // 观察摄像机
 

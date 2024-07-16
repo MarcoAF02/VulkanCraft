@@ -37,10 +37,16 @@ namespace vulkancraft
 		using id_t = unsigned _int64;
 		using RenderAppObjMap = std::unordered_map<id_t, BaseGameObject>;
 
+		// HACK: 玩家角色直接硬编码为 ID 2560
 		static BaseGameObject create_game_object(bool is_static)
 		{
-			static unsigned _int64 current_id = 0;
-			return BaseGameObject{ current_id++ , is_static };
+			static unsigned __int64 current_id = 0;
+
+			// 检查并跳过数字 2560
+			if (current_id == 2560) current_id = 2561; // 直接设置为2561
+			else ++current_id; // 通常情况下递增
+
+			return BaseGameObject{ current_id, is_static };
 		}
 
 		static BaseGameObject make_point_light(float intensity = 10.0f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f));
@@ -53,6 +59,9 @@ namespace vulkancraft
 
 		id_t& get_id() { return id_; }
 		bool& get_static_state() { return is_static_; }
+
+		// 直接设置新 ID
+		void directly_set_id(id_t new_id) { id_ = new_id; }
 
 		glm::vec3 color_{};
 		TransformComponent transform_{};

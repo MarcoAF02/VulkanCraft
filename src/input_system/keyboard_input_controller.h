@@ -5,6 +5,9 @@
 #include "../gameplay_logic/base_game_object.h"
 #include "../base_tools/enumeration_tools.h"
 
+// Bullet 3 物理系统
+#include "btBulletDynamicsCommon.h"
+
 // stl
 #include <chrono>
 
@@ -37,13 +40,13 @@ namespace vulkancraft
 		void move_in_plane_xz(GLFWwindow* glfw_window, float delta_time, BaseGameObject& game_object, RotateState kRotateState);
 
 		// 键盘控制玩家移动
-		void player_move(GLFWwindow* glfw_window, float delta_time, BaseGameObject& player_obj);
+		void player_move(GLFWwindow* glfw_window, float delta_time, BaseGameObject& player_obj, btRigidBody* player_rb);
 
 		// 菜单按键操作
 		void control_pause_menu(GLFWwindow* glfw_window);
 
 		KeyMappings key_map_{};
-		float move_speed_{ 1.6f };
+		float move_speed_{ 100.0f };
 		float look_speed_{ 1.2f };
 	};
 

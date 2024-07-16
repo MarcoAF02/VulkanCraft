@@ -63,7 +63,7 @@ namespace vulkancraft
 		}
 	}
 
-	void KeyboardMovementController::player_move(GLFWwindow* glfw_window, float delta_time, BaseGameObject& player_obj)
+	void KeyboardMovementController::player_move(GLFWwindow* glfw_window, float delta_time, BaseGameObject& player_obj, btRigidBody* player_rb)
 	{
 		float yaw = player_obj.transform_.rotation.y;
 		const glm::vec3 forwardDir{ sin(yaw), 0.f, cos(yaw) };
@@ -80,11 +80,27 @@ namespace vulkancraft
 		if (glfwGetKey(glfw_window, key_map_.move_up) == GLFW_PRESS) moveDir += upDir;
 		if (glfwGetKey(glfw_window, key_map_.move_down) == GLFW_PRESS) moveDir -= upDir;
 
+		btVector3 bt_move_dir{ 0.0f, 0.0f, 0.0f };
+
 		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon())
 		{
-			player_obj.transform_.translation += move_speed_ * delta_time * glm::normalize(moveDir);
-			// TODO: 玩家物理系统用这个向量加力
+			// player_obj.transform_.translation += move_speed_ * delta_time * glm::normalize(moveDir);
+
+			glm::vec3 record_move_dir = glm::normalize(moveDir);
+
+			bt_move_dir =
+			{
+				record_move_dir.x,
+				record_move_dir.y,
+				record_move_dir.z
+			};
 		}
+
+		// std::cout << bt_move_dir.x() << ", " << bt_move_dir.y() << ", " << bt_move_dir.z() << std::endl;
+
+		player_rb->applyCentralForce(bt_move_dir * move_speed_ * delta_time);
+
+		// std::cout << player_obj.transform_.translation.y << std::endl;
 	}
 
 	void KeyboardMovementController::control_pause_menu(GLFWwindow* glfw_window)

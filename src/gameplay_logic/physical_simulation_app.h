@@ -3,6 +3,7 @@
 
 #include "../managers/thread_state_manager.h"
 #include "../managers/game_entity_manager.h"
+#include "../base_tools/physics_object_save_data.h"
 
 // Bullet Physics
 #include "btBulletDynamicsCommon.h"
@@ -34,13 +35,6 @@ namespace vulkancraft
 		btVector3 local_inertia{};
 	};
 
-	// 跟踪物理世界对象用的数据
-	struct PhysicsObjectSaveData
-	{
-		btCollisionShape* collision_shape;
-		btRigidBody* rigid_body;
-	};
-
 	class PhysicalSimulationApp // 物理模拟 App 类
 	{
 	public:
@@ -58,7 +52,7 @@ namespace vulkancraft
 		void clear_physics_system(); // 清理物理系统（如内存等）
 		void update_bullet_physics_world(); // 循环更新由 Bullet 3 创建的物理世界
 		void update_physical_simulation(); // 循环更新物理模拟
-
+		void register_player_physics(); // 注册玩家物理系统
 		void start_physical_thread(); // 开始物理循环线程
 
 		GLFWwindow* get_glfw_window_ptr() const { return glfw_window_; }
@@ -69,9 +63,6 @@ namespace vulkancraft
 		// 创建单个物理方块
 		void create_single_physics_block(BaseGameObject::id_t obj_id, PhysicsObjectCreateData data);
 		
-		// 创建玩家物理组件
-		void create_character_physics(BaseGameObject::id_t obj_id, PhysicsObjectCreateData data);
-
 #pragma endregion
 
 	private:
@@ -96,7 +87,7 @@ namespace vulkancraft
 		std::unordered_map<BaseGameObject::id_t, PhysicsObjectSaveData> physics_obj_map_;
 		std::shared_ptr<PhysicsObjectGenerator> physics_object_generator_ = nullptr;
 
-		const btVector3 kGravityVector = { 0.0f, 10.0f, 0.0f }; // 重力
+		const btVector3 kGravityVector = { 0.0f, 0.1f, 0.0f }; // 重力
 
 		// 追赶模式的循环时间
 		const double kTargetFps = 60.0; // 物理更新的目标帧率
@@ -110,6 +101,8 @@ namespace vulkancraft
 		const double kTimeStep = 0.0; // 物理更新循环的间隔
 		std::chrono::steady_clock::time_point previous_step_ = std::chrono::steady_clock::now(); // 上一次更新的时间
 		double accumulator_step_ = 0.0; // 时间差累积
+
+		std::atomic<float> accumulator_delta_time_{ 0 };
 
 #pragma region DEBUG 用函数
 
