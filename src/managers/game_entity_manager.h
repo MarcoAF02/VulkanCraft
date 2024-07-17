@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../gameplay_logic/character_controller.h" // 玩家角色控制器
+#include "../gameplay_logic/gameplay_frame/finite_state_machine.h"
 
 // std
 #include <vector>
@@ -34,8 +34,7 @@ namespace vulkancraft
 
 		std::shared_ptr<CharacterController> character_controller_; // 玩家角色控制器
 
-		// 初始化单例
-		static void init_singleton();
+		static void init_singleton(); // 初始化单例
 	};
 
 }

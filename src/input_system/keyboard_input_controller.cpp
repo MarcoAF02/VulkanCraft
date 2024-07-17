@@ -17,22 +17,22 @@ namespace vulkancraft
 
 		if (kRotateState == kRotateAll)
 		{
-			if (glfwGetKey(glfw_window, key_map_.look_right) == GLFW_PRESS) rotate.y += 1.f;
-			if (glfwGetKey(glfw_window, key_map_.look_left) == GLFW_PRESS) rotate.y -= 1.f;
-			if (glfwGetKey(glfw_window, key_map_.look_up) == GLFW_PRESS) rotate.x += 1.f;
-			if (glfwGetKey(glfw_window, key_map_.look_down) == GLFW_PRESS) rotate.x -= 1.f;
+			if (glfwGetKey(glfw_window, move_key_map_.look_right) == GLFW_PRESS) rotate.y += 1.f;
+			if (glfwGetKey(glfw_window, move_key_map_.look_left) == GLFW_PRESS) rotate.y -= 1.f;
+			if (glfwGetKey(glfw_window, move_key_map_.look_up) == GLFW_PRESS) rotate.x += 1.f;
+			if (glfwGetKey(glfw_window, move_key_map_.look_down) == GLFW_PRESS) rotate.x -= 1.f;
 		}
 
 		if (kRotateState == kRotateX)
 		{
-			if (glfwGetKey(glfw_window, key_map_.look_up) == GLFW_PRESS) rotate.x += 1.f;
-			if (glfwGetKey(glfw_window, key_map_.look_down) == GLFW_PRESS) rotate.x -= 1.f;
+			if (glfwGetKey(glfw_window, move_key_map_.look_up) == GLFW_PRESS) rotate.x += 1.f;
+			if (glfwGetKey(glfw_window, move_key_map_.look_down) == GLFW_PRESS) rotate.x -= 1.f;
 		}
 
 		if (kRotateState == kRotateY)
 		{
-			if (glfwGetKey(glfw_window, key_map_.look_right) == GLFW_PRESS) rotate.y += 1.f;
-			if (glfwGetKey(glfw_window, key_map_.look_left) == GLFW_PRESS) rotate.y -= 1.f;
+			if (glfwGetKey(glfw_window, move_key_map_.look_right) == GLFW_PRESS) rotate.y += 1.f;
+			if (glfwGetKey(glfw_window, move_key_map_.look_left) == GLFW_PRESS) rotate.y -= 1.f;
 		}
 
 		if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon())
@@ -50,12 +50,12 @@ namespace vulkancraft
 		const glm::vec3 upDir{ 0.f, -1.f, 0.f };
 
 		glm::vec3 moveDir{ 0.f };
-		if (glfwGetKey(glfw_window, key_map_.move_forward) == GLFW_PRESS) moveDir += forwardDir;
-		if (glfwGetKey(glfw_window, key_map_.move_backward) == GLFW_PRESS) moveDir -= forwardDir;
-		if (glfwGetKey(glfw_window, key_map_.move_right) == GLFW_PRESS) moveDir += rightDir;
-		if (glfwGetKey(glfw_window, key_map_.move_left) == GLFW_PRESS) moveDir -= rightDir;
-		if (glfwGetKey(glfw_window, key_map_.move_up) == GLFW_PRESS) moveDir += upDir;
-		if (glfwGetKey(glfw_window, key_map_.move_down) == GLFW_PRESS) moveDir -= upDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_forward) == GLFW_PRESS) moveDir += forwardDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_backward) == GLFW_PRESS) moveDir -= forwardDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_right) == GLFW_PRESS) moveDir += rightDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_left) == GLFW_PRESS) moveDir -= rightDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_up) == GLFW_PRESS) moveDir += upDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_down) == GLFW_PRESS) moveDir -= upDir;
 
 		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon())
 		{
@@ -71,14 +71,14 @@ namespace vulkancraft
 		const glm::vec3 upDir{ 0.f, -1.f, 0.f };
 
 		glm::vec3 moveDir{ 0.f };
-		if (glfwGetKey(glfw_window, key_map_.move_forward) == GLFW_PRESS) moveDir += forwardDir;
-		if (glfwGetKey(glfw_window, key_map_.move_backward) == GLFW_PRESS) moveDir -= forwardDir;
-		if (glfwGetKey(glfw_window, key_map_.move_right) == GLFW_PRESS) moveDir += rightDir;
-		if (glfwGetKey(glfw_window, key_map_.move_left) == GLFW_PRESS) moveDir -= rightDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_forward) == GLFW_PRESS) moveDir += forwardDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_backward) == GLFW_PRESS) moveDir -= forwardDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_right) == GLFW_PRESS) moveDir += rightDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_left) == GLFW_PRESS) moveDir -= rightDir;
 
-		// TODO: 上下移动应该只存在于飞行模式
-		if (glfwGetKey(glfw_window, key_map_.move_up) == GLFW_PRESS) moveDir += upDir;
-		if (glfwGetKey(glfw_window, key_map_.move_down) == GLFW_PRESS) moveDir -= upDir;
+		// TODO: 上下移动应该只存在于飞行模式，空格和左 Shift 应该改成跳跃和潜行
+		if (glfwGetKey(glfw_window, move_key_map_.move_up) == GLFW_PRESS) moveDir += upDir;
+		if (glfwGetKey(glfw_window, move_key_map_.move_down) == GLFW_PRESS) moveDir -= upDir;
 
 		btVector3 bt_move_dir{ 0.0f, 0.0f, 0.0f };
 
@@ -118,17 +118,12 @@ namespace vulkancraft
 
 			if (horizontal_speed >= max_move_speed_)
 			{
-				// 缩放水平速度向量，使其总长度等于最大速度
 				glm::vec2 normalized_horizontal_vec = glm::normalize(horizontal_vec);
 				glm::vec2 limited_horizontal_vec = normalized_horizontal_vec * max_move_speed_;
 
-				// 将限制后的水平速度转换回btVector3格式
 				btVector3 limited_horizontal_velocity(limited_horizontal_vec.x, 0, limited_horizontal_vec.y);
-
-				// 保持y轴速度不变
 				btVector3 new_velocity = btVector3(limited_horizontal_velocity.x(), cur_velocity.y(), limited_horizontal_velocity.z());
 
-				// 将新的速度设置给刚体
 				player_rb->setLinearVelocity(new_velocity);
 			}
 			else
@@ -155,19 +150,4 @@ namespace vulkancraft
 		}
 	}
 
-	void KeyboardMovementController::control_pause_menu(GLFWwindow* glfw_window)
-	{
-		if (glfwGetKey(glfw_window, key_map_.unlock_cursor) == GLFW_PRESS)
-		{
-			// 显示鼠标指针并允许光标离开窗口
-			glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		}
-
-		if (glfwGetKey(glfw_window, key_map_.lock_cursor) == GLFW_PRESS)
-		{
-			// 隐藏鼠标指针并将其固定在窗口内
-			glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		}
-	}
-
-}  // namespace vulkancraft
+} // namespace vulkancraft

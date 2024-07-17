@@ -81,6 +81,12 @@
     <ClCompile Include="src\base_tools\math_tools.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\input_system\keyboard_menu_controller.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gameplay_logic\gameplay_frame\finite_state_machine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gameplay_logic\base_game_object.h">
@@ -162,6 +168,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\base_tools\physics_object_save_data.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input_system\keyboard_menu_controller.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameplay_logic\gameplay_frame\finite_state_machine.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,6 +3,7 @@
 
 #include "../gameplay_logic/game_camera.h"
 #include "../input_system/keyboard_input_controller.h"
+#include "../input_system/keyboard_menu_controller.h"
 #include "../input_system/mouse_rotate_controller.h"
 #include "../base_tools/details.h"
 #include "../base_tools/physics_object_save_data.h"
@@ -37,7 +38,6 @@ namespace vulkancraft
 	class CharacterController
 	{
 	public:
-
 		CharacterController();
 		~CharacterController();
 
@@ -69,8 +69,8 @@ namespace vulkancraft
 		void move(float fixed_delta_time, GLFWwindow* glfw_window);
 		void rotate(float fixed_delta_time, GLFWwindow* glfw_window);
 
-		// 根据碰撞方向停止玩家移动
-		// void stop_moving(CollisionSide side);
+		// 打开或关闭暂停菜单（当前是解锁/锁定鼠标）
+		void switch_pause_menu(GLFWwindow* glfw_window);
 
 #pragma region DEBUG 用函数
 
@@ -80,7 +80,6 @@ namespace vulkancraft
 #pragma endregion
 
 	private:
-
 		// 人类的高度为 1.8 宽度为 0.6
 		// 摄像机不需要 AABB Collider，玩家角色需要
 
@@ -101,6 +100,7 @@ namespace vulkancraft
 		GameBaseCamera player_camera_; // 玩家摄像机
 
 		KeyboardMovementController keyboard_move_controller_;
+		KeyboardMenuController keyboard_menu_controller_;
 		MouseRotateController mouse_rotate_controller_;
 
 #pragma region 玩家物理组件相关参数

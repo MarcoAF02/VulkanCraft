@@ -113,8 +113,9 @@ namespace vulkancraft
 		test_load_falling_cube(cube_data_2);
 		std::chrono::steady_clock::time_point current_time = std::chrono::high_resolution_clock::now();
 
-		// HACK: 初始化玩家
+		// HACK: 初始化玩家，初始化玩家光标（GLFWwindow 指针）
 		game_entity_manager_->get_character_controller()->init_character_controller();
+		game_entity_manager_->get_character_controller()->init_mouse_rotate(game_window_.get_glfw_window());
 
 		while (!game_window_.should_close())
 		{
@@ -136,8 +137,8 @@ namespace vulkancraft
 			player_camera_view_.far = 200.0f;
 
 			game_entity_manager_->get_character_controller()->set_player_camera(player_camera_view_);
-			game_entity_manager_->get_character_controller()->init_mouse_rotate(game_window_.get_glfw_window());
 			game_entity_manager_->get_character_controller()->rotate(frame_time, game_window_.get_glfw_window());
+			game_entity_manager_->get_character_controller()->switch_pause_menu(game_window_.get_glfw_window());
 
 			sync_trans_form_phy_obj(); // 同步物理世界的运算至渲染
 

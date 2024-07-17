@@ -53,51 +53,28 @@ namespace vulkancraft
 		// render_obj_map.emplace(player_id, std::move(character_game_obj_));
 	}
 
-	PhysicsObjectSaveData& CharacterController::get_player_physics_data()
+	void CharacterController::set_player_camera(PlayerCameraView camera_view)
 	{
-		return player_physics_data_;
+		// 关联摄像机观测对象
+		player_camera_.set_view_yxz(camera_game_obj_.transform_.translation, camera_game_obj_.transform_.rotation);
+
+		// 设置摄像机视图
+		player_camera_.set_perspective_projection
+		(
+			camera_view.fovy,
+			camera_view.aspect,
+			camera_view.near,
+			camera_view.far
+		);
 	}
 
-	BaseGameObject::id_t CharacterController::get_player_obj_id() const
+	void CharacterController::switch_pause_menu(GLFWwindow* glfw_window)
 	{
-		return player_id_;
-	}
-
-	void CharacterController::print_player_details() const
-	{
-		// TODO: 打印 Collider 和摄像机的旋转
-
-		// 玩家状态
-		std::cout << "玩家出生点为："
-			<< spawn_point_.x << ", "
-			<< spawn_point_.y << ", "
-			<< spawn_point_.z << std::endl;
-
-		std::cout << "玩家当前在的点位为："
-			<< character_game_obj_.transform_.translation.x << ", "
-			<< character_game_obj_.transform_.translation.y << ", "
-			<< character_game_obj_.transform_.translation.z << std::endl;
-
-		std::cout << "玩家当前的旋转角度为："
-			<< character_game_obj_.transform_.rotation.x << ", "
-			<< character_game_obj_.transform_.rotation.y << ", "
-			<< character_game_obj_.transform_.rotation.z << std::endl;
-
-		std::cout << "玩家摄像机的坐标为："
-			<< camera_game_obj_.transform_.translation.x << ", "
-			<< camera_game_obj_.transform_.translation.y << ", "
-			<< camera_game_obj_.transform_.translation.z << std::endl;
-
-		std::cout << "玩家摄像机的旋转角度为："
-			<< camera_game_obj_.transform_.rotation.x << ", "
-			<< camera_game_obj_.transform_.rotation.y << ", "
-			<< camera_game_obj_.transform_.rotation.z << std::endl;
+		keyboard_menu_controller_.control_pause_menu(glfw_window);
 	}
 
 	void CharacterController::move(float fixed_delta_time, GLFWwindow* glfw_window)
 	{
-		// TODO: 这里应该可以设置玩家移动速度，视角转换速度
-
 		// 键盘只控制移动，不控制玩家旋转
 		keyboard_move_controller_.player_move(glfw_window, fixed_delta_time, character_game_obj_, player_rigidbody_);
 		camera_game_obj_.transform_.translation = character_game_obj_.transform_.translation + glm::vec3{ 0, -camera_height_, 0 };
@@ -142,19 +119,47 @@ namespace vulkancraft
 		//std::cout << "Bottom Z: " << aabb_min.z() << ", Top Z: " << aabb_max.z() << std::endl;
 	}
 
-	void CharacterController::set_player_camera(PlayerCameraView camera_view)
+	PhysicsObjectSaveData& CharacterController::get_player_physics_data()
 	{
-		// 关联摄像机观测对象
-		player_camera_.set_view_yxz(camera_game_obj_.transform_.translation, camera_game_obj_.transform_.rotation);
-
-		// 设置摄像机视图
-		player_camera_.set_perspective_projection
-		(
-			camera_view.fovy,
-			camera_view.aspect,
-			camera_view.near,
-			camera_view.far
-		);
+		return player_physics_data_;
 	}
+
+	BaseGameObject::id_t CharacterController::get_player_obj_id() const
+	{
+		return player_id_;
+	}
+
+#pragma region DEBUG 用函数
+
+	void CharacterController::print_player_details() const
+	{
+		// 玩家状态
+		std::cout << "玩家出生点为："
+			<< spawn_point_.x << ", "
+			<< spawn_point_.y << ", "
+			<< spawn_point_.z << std::endl;
+
+		std::cout << "玩家 Game Object 当前在的点位为："
+			<< character_game_obj_.transform_.translation.x << ", "
+			<< character_game_obj_.transform_.translation.y << ", "
+			<< character_game_obj_.transform_.translation.z << std::endl;
+
+		std::cout << "玩家 Game Object 当前的旋转角度为："
+			<< character_game_obj_.transform_.rotation.x << ", "
+			<< character_game_obj_.transform_.rotation.y << ", "
+			<< character_game_obj_.transform_.rotation.z << std::endl;
+
+		std::cout << "玩家 Camera Object 的摄像机的坐标为："
+			<< camera_game_obj_.transform_.translation.x << ", "
+			<< camera_game_obj_.transform_.translation.y << ", "
+			<< camera_game_obj_.transform_.translation.z << std::endl;
+
+		std::cout << "玩家 Camera Object 的摄像机的旋转角度为："
+			<< camera_game_obj_.transform_.rotation.x << ", "
+			<< camera_game_obj_.transform_.rotation.y << ", "
+			<< camera_game_obj_.transform_.rotation.z << std::endl;
+	}
+
+#pragma endregion
 
 }
