@@ -59,7 +59,7 @@ namespace vulkancraft
 
 		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon())
 		{
-			game_object.transform_.translation += move_speed_ * delta_time * glm::normalize(moveDir);
+			game_object.transform_.translation += move_force_ * delta_time * glm::normalize(moveDir);
 		}
 	}
 
@@ -84,7 +84,7 @@ namespace vulkancraft
 
 		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon())
 		{
-			// player_obj.transform_.translation += move_speed_ * delta_time * glm::normalize(moveDir);
+			player_move_input_state_ = kMoveInput;
 
 			glm::vec3 record_move_dir = glm::normalize(moveDir);
 
@@ -95,12 +95,64 @@ namespace vulkancraft
 				record_move_dir.z
 			};
 		}
+		else
+		{
+			player_move_input_state_ = kStop;
+		}
 
-		// std::cout << bt_move_dir.x() << ", " << bt_move_dir.y() << ", " << bt_move_dir.z() << std::endl;
+		if (player_move_input_state_ == kMoveInput) // 玩家有移动输入时
+		{
+			btVector3 cur_velocity = player_rb->getLinearVelocity();
 
-		player_rb->applyCentralForce(bt_move_dir * move_speed_ * delta_time);
+			float cur_move_speed = cur_velocity.length();
+			float x_speed = cur_velocity.x();
+			float z_speed = cur_velocity.z();
 
-		// std::cout << player_obj.transform_.translation.y << std::endl;
+			glm::vec2 horizontal_vec =
+			{
+				x_speed,
+				z_speed
+			};
+
+			float horizontal_speed = glm::length(horizontal_vec);
+
+			if (horizontal_speed >= max_move_speed_)
+			{
+				// 缩放水平速度向量，使其总长度等于最大速度
+				glm::vec2 normalized_horizontal_vec = glm::normalize(horizontal_vec);
+				glm::vec2 limited_horizontal_vec = normalized_horizontal_vec * max_move_speed_;
+
+				// 将限制后的水平速度转换回btVector3格式
+				btVector3 limited_horizontal_velocity(limited_horizontal_vec.x, 0, limited_horizontal_vec.y);
+
+				// 保持y轴速度不变
+				btVector3 new_velocity = btVector3(limited_horizontal_velocity.x(), cur_velocity.y(), limited_horizontal_velocity.z());
+
+				// 将新的速度设置给刚体
+				player_rb->setLinearVelocity(new_velocity);
+			}
+			else
+			{
+				player_rb->applyCentralForce(bt_move_dir * move_force_ * delta_time);
+			}
+		}
+
+		if (player_move_input_state_ == kStop) // 玩家没有移动输入时
+		{
+			btVector3 cur_velocity = player_rb->getLinearVelocity();
+
+			float cur_move_speed = cur_velocity.length();
+			float x_speed = cur_velocity.x();
+			float y_speed = cur_velocity.y();
+			float z_speed = cur_velocity.z();
+
+			x_speed *= reduce_move_coefficient_;
+			z_speed *= reduce_move_coefficient_;
+
+			btVector3 stop_vec(x_speed, y_speed, z_speed);
+
+			player_rb->setLinearVelocity(stop_vec);
+		}
 	}
 
 	void KeyboardMovementController::control_pause_menu(GLFWwindow* glfw_window)

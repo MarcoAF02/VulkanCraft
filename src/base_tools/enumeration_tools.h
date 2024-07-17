@@ -12,4 +12,11 @@ namespace vulkancraft
 		kRotateY, // 仅绕 Y 轴旋转，即 yaw
 		kRotateZ // 仅绕 Z 轴旋转，即 roll
 	};
+
+	// 玩家的移动输入状态
+	enum PlayerMoveInputState
+	{
+		kStop, // 停止
+		kMoveInput // 正在移动输入
+	};
 }

@@ -33,6 +33,7 @@ namespace vulkancraft
 		btTransform transform{}; // 这个需要用 setOrigin() 函数来初始化位置
 		btScalar mass{}; // 质量
 		btVector3 local_inertia{};
+		bool disable_deactivate = false; // 创建出来的 Rigidbody 是否禁用停用
 	};
 
 	class PhysicalSimulationApp // 物理模拟 App 类
@@ -87,7 +88,7 @@ namespace vulkancraft
 		std::unordered_map<BaseGameObject::id_t, PhysicsObjectSaveData> physics_obj_map_;
 		std::shared_ptr<PhysicsObjectGenerator> physics_object_generator_ = nullptr;
 
-		const btVector3 kGravityVector = { 0.0f, 0.1f, 0.0f }; // 重力
+		const btVector3 kGravityVector = { 0.0f, 10.0f, 0.0f }; // 重力
 
 		// 追赶模式的循环时间
 		const double kTargetFps = 60.0; // 物理更新的目标帧率

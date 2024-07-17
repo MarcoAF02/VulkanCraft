@@ -250,6 +250,8 @@ namespace vulkancraft
 		btRigidBody::btRigidBodyConstructionInfo rb_info(data.mass, block_motion_state, single_block, data.local_inertia);
 		btRigidBody* body = new btRigidBody(rb_info);
 
+		if (data.disable_deactivate) body->forceActivationState(DISABLE_DEACTIVATION); //  «∑ÒΩ˚”√Õ£”√
+
 		PhysicsObjectSaveData new_data =
 		{
 			single_block,

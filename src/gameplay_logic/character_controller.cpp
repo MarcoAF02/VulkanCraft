@@ -42,6 +42,7 @@ namespace vulkancraft
 		btRigidBody::btRigidBodyConstructionInfo rb_info(player_collider_mass_, player_motion_state_, player_collision_, player_collider_local_inertia);
 		player_rigidbody_ = new btRigidBody(rb_info);
 
+		player_rigidbody_->forceActivationState(DISABLE_DEACTIVATION); // 禁用停用，强制玩家物理处于激活状态
 		player_rigidbody_->setAngularFactor(btVector3(0, 0, 0)); // 禁止所有轴向上的旋转
 
 		player_physics_data_.rigid_body = player_rigidbody_;
@@ -96,7 +97,6 @@ namespace vulkancraft
 	void CharacterController::move(float fixed_delta_time, GLFWwindow* glfw_window)
 	{
 		// TODO: 这里应该可以设置玩家移动速度，视角转换速度
-		// TODO: 需要解决的问题：窗口失焦后，移动输入就不能用了
 
 		// 键盘只控制移动，不控制玩家旋转
 		keyboard_move_controller_.player_move(glfw_window, fixed_delta_time, character_game_obj_, player_rigidbody_);
@@ -137,7 +137,7 @@ namespace vulkancraft
 
 		//player_collision_->getAabb(identity, aabb_min, aabb_max);
 
-		//// 打印 AABB 的最小和最大
+		//// 打印 AABB 的最小和最大点的坐标
 		//std::cout << "Bottom Y: " << aabb_min.y() << ", Top Y: " << aabb_max.y() << std::endl;
 		//std::cout << "Bottom Z: " << aabb_min.z() << ", Top Z: " << aabb_max.z() << std::endl;
 	}

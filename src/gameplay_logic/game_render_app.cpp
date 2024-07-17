@@ -391,7 +391,8 @@ namespace vulkancraft
 			obj_origin,
 			{},
 			obj_mass,
-			{}
+			{},
+			true
 		};
 
 		// 渲染数据放入 game object map
