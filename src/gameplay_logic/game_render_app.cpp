@@ -54,6 +54,7 @@ namespace vulkancraft
 			ubo_buffer_vector_[i]->map();
 		}
 
+		// TODO: 在每个 GameModel 中声明 GameTexture 类，模型加载完后直接读取 GameTexture，在这里设置每个 GameObject 贴图的采样参数。
 		load_object_texture();
 
 		global_set_layout_ =
@@ -87,7 +88,6 @@ namespace vulkancraft
 				game_renderer_.get_swap_chain_render_pass(),
 				global_set_layout_->get_descriptor_set_layout()
 			);
-
 	}
 
 	void GameRenderApp::update_render_window_content()
