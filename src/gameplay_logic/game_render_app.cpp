@@ -193,6 +193,7 @@ namespace vulkancraft
 		create_wall(wall_height, wall_width);
 
 		test_load_big_point_light();
+		test_load_rotate_light();
 	}
 
 	void GameRenderApp::load_object_texture()
@@ -434,7 +435,7 @@ namespace vulkancraft
 				{ 0.f, -1.f, 0.f }
 			);
 
-			point_light.transform_.translation = glm::vec3(rotate_light * glm::vec4(-1.f, -1.f, -1.f, 1.f));
+			point_light.transform_.translation = glm::vec3(rotate_light * glm::vec4(-1.f, -3.f, -1.f, 1.f));
 			game_object_map_.emplace(point_light.get_id(), std::move(point_light));
 		}
 	}
