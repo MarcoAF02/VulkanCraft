@@ -1,1 +1,7 @@
+Current progress:
+![Progress - 1](https://github.com/user-attachments/assets/313499a2-4feb-4c33-a5aa-5f9bf7a5b9c6)
+![Progress - 2](https://github.com/user-attachments/assets/94385feb-ec9c-4ded-b0df-75588c0e9362)
+![Progress - 3](https://github.com/user-attachments/assets/6365de43-101f-48f6-9d71-cce067098e78)
+![Progress - 4](https://github.com/user-attachments/assets/ff4a58fe-e2d4-4f10-9daf-8695ce111827)
+
 In the near future, pixel games with random terrain generation capabilities will be developed, please stand by...
