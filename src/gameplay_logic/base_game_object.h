@@ -38,6 +38,7 @@ namespace vulkancraft
 		using RenderAppObjMap = std::unordered_map<id_t, BaseGameObject>;
 
 		// HACK: 玩家角色直接硬编码为 ID 2560
+		// TODO: ID 改为用 String 对象计数
 		static BaseGameObject create_game_object(bool is_static)
 		{
 			static unsigned __int64 current_id = 0;
