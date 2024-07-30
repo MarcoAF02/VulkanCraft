@@ -1,4 +1,4 @@
-## Current progress:
+## Current development progress:
 
 ![Progress - 1](https://github.com/user-attachments/assets/313499a2-4feb-4c33-a5aa-5f9bf7a5b9c6)
 ![Progress - 2](https://github.com/user-attachments/assets/94385feb-ec9c-4ded-b0df-75588c0e9362)
