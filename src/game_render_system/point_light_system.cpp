@@ -105,32 +105,32 @@ namespace vulkancraft
 		ubo.num_lights = lightIndex;
 	}
 
-	void PointLightSystem::render(FrameInfo& frameInfo)
+	void PointLightSystem::render(FrameInfo& frame_info)
 	{
-		// sort lights
+		// 用 map 给渲染灯光做排序，用于显示正确的半透明灯光物体
 		std::map<float, BaseGameObject::id_t> sorted;
 
-		for (auto& kv : frameInfo.game_object_map)
+		for (auto& kv : frame_info.game_object_map)
 		{
 			auto& obj = kv.second;
 			if (obj.point_light_ == nullptr) continue;
 
-			// calculate distance
-			auto offset = frameInfo.camera.get_position() - obj.transform_.translation;
+			// 计算距离，计算好后就把这个物体的信息拿过来，传递给 frame info
+			auto offset = frame_info.camera.get_position() - obj.transform_.translation;
 			float disSquared = glm::dot(offset, offset);
 			sorted[disSquared] = obj.get_id();
 		}
 
-		vulkan_render_pipeline_ -> bind(frameInfo.command_buffer);
+		vulkan_render_pipeline_ -> bind(frame_info.command_buffer);
 
 		vkCmdBindDescriptorSets
 		(
-			frameInfo.command_buffer,
+			frame_info.command_buffer,
 			VK_PIPELINE_BIND_POINT_GRAPHICS,
 			pipeline_layout_,
 			0,
 			1,
-			&frameInfo.global_descriptor_set,
+			&frame_info.global_descriptor_set,
 			0,
 			nullptr
 		);
@@ -139,7 +139,7 @@ namespace vulkancraft
 		for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
 		{
 			// use game obj id to find light object
-			auto& obj = frameInfo.game_object_map.at(it->second);
+			auto& obj = frame_info.game_object_map.at(it->second);
 
 			PointLightPushConstants push{};
 			push.position = glm::vec4(obj.transform_.translation, 1.f);
@@ -148,7 +148,7 @@ namespace vulkancraft
 
 			vkCmdPushConstants
 			(
-				frameInfo.command_buffer,
+				frame_info.command_buffer,
 				pipeline_layout_,
 				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 				0,
@@ -156,7 +156,7 @@ namespace vulkancraft
 				&push
 			);
 
-			vkCmdDraw(frameInfo.command_buffer, 6, 1, 0, 0);
+			vkCmdDraw(frame_info.command_buffer, 6, 1, 0, 0);
 		}
 	}
 

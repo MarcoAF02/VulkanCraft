@@ -25,6 +25,8 @@ namespace vulkancraft
 		const glm::mat4& get_projection() const { return projection_matrix_; }
 		const glm::mat4& get_view() const { return view_matrix_; }
 		const glm::mat4& get_inverse_view() const { return inverse_view_matrix_; }
+
+		// 获取物体的位置，用于给渲染物体排序以显示正确的颜色（尤其是半透明物体）
 		const glm::vec3 get_position() const { return glm::vec3(inverse_view_matrix_[3]); }
 
 	private:

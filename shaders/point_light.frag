@@ -35,11 +35,11 @@ void main()
 {
 	float dis = sqrt(dot(fragOffset, fragOffset));
 
-	if (dis >= 1.0)
+	if (dis >= 1.0) // 丢弃超过点光源范围的片元
 	{
 		discard;
 	}
 
-	float cosDis = 0.5 * (cos(dis * M_PI) + 1.0); // ranges from 1 -> 0
-	outColor = vec4(push.color.xyz + 0.5 * cosDis, cosDis);
+	float cosDis = 0.5 * (cos(dis * M_PI) + 1.0); // 计算从 1 -> 0 的衰减因子，实现光源亮度逐渐减弱
+	outColor = vec4(push.color.xyz + 0.5 * cosDis, cosDis); // 输出最终颜色
 }

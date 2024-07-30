@@ -43,6 +43,7 @@ void main()
 	vec3 cameraRightWorld = {ubo.view[0][0], ubo.view[1][0], ubo.view[2][0]};
 	vec3 cameraUpWorld = {ubo.view[0][1], ubo.view[1][1], ubo.view[2][1]};
 
+	// 用光源中心位置，光源范围配合摄像机计算圆形点光源范围
 	vec3 positionWorld = push.position.xyz
 	+ push.radius * fragOffset.x * cameraRightWorld
 	+ push.radius * fragOffset.y * cameraUpWorld;
