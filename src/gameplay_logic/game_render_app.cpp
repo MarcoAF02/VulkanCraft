@@ -170,7 +170,7 @@ namespace vulkancraft
 				// 走完 render pass 的生命周期
 				game_renderer_.begin_swap_chain_render_pass(command_buffer);
 
-				// order here matters
+				// 物体渲染顺序排序于此处，不透明物体的渲染排在半透明物体的后面。
 				simple_render_system_->render_game_objects(frame_info);
 				point_light_system_->render(frame_info);
 

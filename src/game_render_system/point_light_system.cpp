@@ -113,7 +113,7 @@ namespace vulkancraft
 		for (auto& kv : frame_info.game_object_map)
 		{
 			auto& obj = kv.second;
-			if (obj.point_light_ == nullptr) continue;
+			if (obj.point_light_ == nullptr) continue; // 不计算非点光源的排序
 
 			// 计算距离，计算好后就把这个物体的信息拿过来，传递给 frame info
 			auto offset = frame_info.camera.get_position() - obj.transform_.translation;
@@ -136,9 +136,11 @@ namespace vulkancraft
 		);
 
 		// iterate through sorted lights in reverse order
+		// 对排序后的点光源游戏对象进行逆序渲染，以确保半透明物体的正确渲染顺序。
 		for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
 		{
 			// use game obj id to find light object
+			// 用 ID 找到灯光物体，并设置推送常量
 			auto& obj = frame_info.game_object_map.at(it->second);
 
 			PointLightPushConstants push{};
