@@ -12,6 +12,8 @@
 
 namespace vulkancraft
 {
+	int GameSwapChain::kMaxFramesInFlight;
+
 	GameSwapChain::GameSwapChain(GameDevice& deviceRef, VkExtent2D extent) : game_device_{ deviceRef }, window_extent_{ extent }
 	{
 		try
@@ -162,18 +164,19 @@ namespace vulkancraft
 		VkPresentModeKHR presentMode = choose_swap_present_mode(swapChainSupport.present_mode_vector);
 		VkExtent2D extent = choose_swap_extent(swapChainSupport.capabilities);
 
-		uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
+		uint32_t image_count = swapChainSupport.capabilities.maxImageCount;
+		kMaxFramesInFlight = image_count;
 
-		if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
+		if (swapChainSupport.capabilities.maxImageCount > 0 && image_count > swapChainSupport.capabilities.maxImageCount)
 		{
-			imageCount = swapChainSupport.capabilities.maxImageCount;
+			image_count = swapChainSupport.capabilities.maxImageCount;
 		}
 
 		VkSwapchainCreateInfoKHR createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		createInfo.surface = game_device_.surface();
 
-		createInfo.minImageCount = imageCount;
+		createInfo.minImageCount = image_count;
 		createInfo.imageFormat = surfaceFormat.format;
 		createInfo.imageColorSpace = surfaceFormat.colorSpace;
 		createInfo.imageExtent = extent;
@@ -213,9 +216,9 @@ namespace vulkancraft
 		// allowed to create a swap chain with more. That's why we'll first query the final number of
 		// images with vkGetSwapchainImagesKHR, then resize the container and finally call it again to
 		// retrieve the handles.
-		vkGetSwapchainImagesKHR(game_device_.get_vulkan_device(), swap_chain_, &imageCount, nullptr);
-		swap_chain_image_vector_.resize(imageCount);
-		vkGetSwapchainImagesKHR(game_device_.get_vulkan_device(), swap_chain_, &imageCount, swap_chain_image_vector_.data());
+		vkGetSwapchainImagesKHR(game_device_.get_vulkan_device(), swap_chain_, &image_count, nullptr);
+		swap_chain_image_vector_.resize(image_count);
+		vkGetSwapchainImagesKHR(game_device_.get_vulkan_device(), swap_chain_, &image_count, swap_chain_image_vector_.data());
 
 		swap_chain_image_format_ = surfaceFormat.format;
 		swap_chain_extent_ = extent;
@@ -307,9 +310,9 @@ namespace vulkancraft
 
 	void GameSwapChain::create_frame_buffers()
 	{
-		swap_chain_frame_buffer_vector_.resize(image_count());
+		swap_chain_frame_buffer_vector_.resize(get_image_count());
 
-		for (size_t i = 0; i < image_count(); i++)
+		for (size_t i = 0; i < get_image_count(); i++)
 		{
 			std::array<VkImageView, 2> attachments = { swap_chain_image_view_vector_[i], depth_image_view_vector_[i] };
 
@@ -342,9 +345,9 @@ namespace vulkancraft
 		swap_chain_depth_format_ = depthFormat;
 		VkExtent2D swapChainExtent = get_swap_chain_extent();
 
-		depth_image_vector_.resize(image_count());
-		depth_image_memory_vector_.resize(image_count());
-		depth_image_view_vector_.resize(image_count());
+		depth_image_vector_.resize(get_image_count());
+		depth_image_memory_vector_.resize(get_image_count());
+		depth_image_view_vector_.resize(get_image_count());
 
 		for (int i = 0; i < depth_image_vector_.size(); i++)
 		{
@@ -395,7 +398,7 @@ namespace vulkancraft
 		image_available_semaphore_vector_.resize(kMaxFramesInFlight);
 		render_finished_semaphore_vector_.resize(kMaxFramesInFlight);
 		in_flight_fence_vector_.resize(kMaxFramesInFlight);
-		images_in_flight_vector_.resize(image_count(), VK_NULL_HANDLE);
+		images_in_flight_vector_.resize(get_image_count(), VK_NULL_HANDLE);
 
 		VkSemaphoreCreateInfo semaphoreInfo = {};
 		semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;

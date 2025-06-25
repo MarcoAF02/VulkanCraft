@@ -17,7 +17,7 @@ namespace vulkancraft
 	{
 	public:
 
-		static constexpr int kMaxFramesInFlight = 2;
+		static int kMaxFramesInFlight;
 
 		GameSwapChain(GameDevice& game_device_ref, VkExtent2D window_extent);
 		GameSwapChain(GameDevice& game_device_ref, VkExtent2D window_extent, std::shared_ptr<GameSwapChain> previous);
@@ -30,11 +30,11 @@ namespace vulkancraft
 		VkFramebuffer get_frame_buffer(int index) { return swap_chain_frame_buffer_vector_[index]; }
 		VkRenderPass get_render_pass() { return render_pass_; }
 		VkImageView get_image_view(int index) { return swap_chain_image_view_vector_[index]; }
-		size_t image_count() { return swap_chain_image_vector_.size(); }
+		size_t get_image_count() { return swap_chain_image_vector_.size(); }
 		VkFormat get_swap_chain_image_format() { return swap_chain_image_format_; }
 		VkExtent2D get_swap_chain_extent() { return swap_chain_extent_; }
-		uint32_t width() { return swap_chain_extent_.width; }
-		uint32_t height() { return swap_chain_extent_.height; }
+		uint32_t get_width() { return swap_chain_extent_.width; }
+		uint32_t get_height() { return swap_chain_extent_.height; }
 
 		float extent_aspect_ratio()
 		{
