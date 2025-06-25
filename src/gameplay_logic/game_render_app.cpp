@@ -201,8 +201,8 @@ namespace vulkancraft
 		game_base_texture_ = std::make_unique<GameTexture>(game_device_, "textures/cobblestone.png");
 
 		image_info_.sampler = game_base_texture_->get_sampler();
-		image_info_.image_view = game_base_texture_->get_image_view();
-		image_info_.image_layout = game_base_texture_->get_image_layout();
+		image_info_.imageView = game_base_texture_->get_image_view();
+		image_info_.imageLayout = game_base_texture_->get_image_layout();
 	}
 
 #pragma region 游戏地形生成器
@@ -353,8 +353,8 @@ namespace vulkancraft
 		game_base_texture_ = std::make_unique<GameTexture>(game_device_, "textures/viking_room.png");
 
 		image_info_.sampler = game_base_texture_->get_sampler();
-		image_info_.image_view = game_base_texture_->get_image_view();
-		image_info_.image_layout = game_base_texture_->get_image_layout();
+		image_info_.imageView = game_base_texture_->get_image_view();
+		image_info_.imageLayout = game_base_texture_->get_image_layout();
 	}
 
 	void GameRenderApp::test_load_viking_room()
