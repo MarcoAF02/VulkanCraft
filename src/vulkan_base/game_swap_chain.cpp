@@ -12,7 +12,7 @@
 
 namespace vulkancraft
 {
-	int GameSwapChain::kMaxFramesInFlight;
+	int GameSwapChain::static_max_frames_in_flight_;
 
 	GameSwapChain::GameSwapChain(GameDevice& deviceRef, VkExtent2D extent) : game_device_{ deviceRef }, window_extent_{ extent }
 	{
@@ -76,7 +76,7 @@ namespace vulkancraft
 		vkDestroyRenderPass(game_device_.get_vulkan_device(), render_pass_, nullptr);
 
 		// cleanup synchronization objects
-		for (size_t i = 0; i < kMaxFramesInFlight; i++)
+		for (size_t i = 0; i < static_max_frames_in_flight_; i++)
 		{
 			vkDestroySemaphore(game_device_.get_vulkan_device(), render_finished_semaphore_vector_[i], nullptr);
 			vkDestroySemaphore(game_device_.get_vulkan_device(), image_available_semaphore_vector_[i], nullptr);
@@ -151,7 +151,7 @@ namespace vulkancraft
 
 		auto result = vkQueuePresentKHR(game_device_.present_queue(), &presentInfo);
 
-		current_frame_ = (current_frame_ + 1) % kMaxFramesInFlight;
+		current_frame_ = (current_frame_ + 1) % static_max_frames_in_flight_;
 
 		return result;
 	}
@@ -165,7 +165,7 @@ namespace vulkancraft
 		VkExtent2D extent = choose_swap_extent(swapChainSupport.capabilities);
 
 		uint32_t image_count = swapChainSupport.capabilities.maxImageCount;
-		kMaxFramesInFlight = image_count;
+		static_max_frames_in_flight_ = image_count;
 
 		if (swapChainSupport.capabilities.maxImageCount > 0 && image_count > swapChainSupport.capabilities.maxImageCount)
 		{
@@ -395,9 +395,9 @@ namespace vulkancraft
 
 	void GameSwapChain::create_sync_objects()
 	{
-		image_available_semaphore_vector_.resize(kMaxFramesInFlight);
-		render_finished_semaphore_vector_.resize(kMaxFramesInFlight);
-		in_flight_fence_vector_.resize(kMaxFramesInFlight);
+		image_available_semaphore_vector_.resize(static_max_frames_in_flight_);
+		render_finished_semaphore_vector_.resize(static_max_frames_in_flight_);
+		in_flight_fence_vector_.resize(static_max_frames_in_flight_);
 		images_in_flight_vector_.resize(get_image_count(), VK_NULL_HANDLE);
 
 		VkSemaphoreCreateInfo semaphoreInfo = {};
@@ -407,7 +407,7 @@ namespace vulkancraft
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-		for (size_t i = 0; i < kMaxFramesInFlight; i++)
+		for (size_t i = 0; i < static_max_frames_in_flight_; i++)
 		{
 			if (vkCreateSemaphore(game_device_.get_vulkan_device(), &semaphoreInfo, nullptr, &image_available_semaphore_vector_[i]) != VK_SUCCESS ||
 				vkCreateSemaphore(game_device_.get_vulkan_device(), &semaphoreInfo, nullptr, &render_finished_semaphore_vector_[i]) != VK_SUCCESS ||

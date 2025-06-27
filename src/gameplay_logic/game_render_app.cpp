@@ -30,15 +30,15 @@ namespace vulkancraft
 	{
 		global_pool_ =
 			VulkanBaseDescriptorPool::Builder(game_device_)
-			.set_max_sets(GameSwapChain::kMaxFramesInFlight)
-			.add_pool_size(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, GameSwapChain::kMaxFramesInFlight)
-			.add_pool_size(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, GameSwapChain::kMaxFramesInFlight)
+			.set_max_sets(GameSwapChain::static_max_frames_in_flight_)
+			.add_pool_size(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, GameSwapChain::static_max_frames_in_flight_)
+			.add_pool_size(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, GameSwapChain::static_max_frames_in_flight_)
 			.build();
 	}
 
 	void GameRenderApp::initialize_render_system()
 	{
-		ubo_buffer_vector_.resize((GameSwapChain::kMaxFramesInFlight));
+		ubo_buffer_vector_.resize((GameSwapChain::static_max_frames_in_flight_));
 
 		for (int i = 0; i < ubo_buffer_vector_.size(); i++)
 		{
@@ -63,7 +63,7 @@ namespace vulkancraft
 			.add_binding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
 			.build();
 
-		global_descriptor_set_vector_.resize((GameSwapChain::kMaxFramesInFlight));
+		global_descriptor_set_vector_.resize((GameSwapChain::static_max_frames_in_flight_));
 
 		for (int i = 0; i < global_descriptor_set_vector_.size(); i++)
 		{

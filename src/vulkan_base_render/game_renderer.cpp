@@ -47,7 +47,7 @@ namespace vulkancraft
 
 	void GameRenderer::create_command_buffers()
 	{
-		command_buffer_vector_.resize(GameSwapChain::kMaxFramesInFlight);
+		command_buffer_vector_.resize(GameSwapChain::static_max_frames_in_flight_);
 
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -126,7 +126,7 @@ namespace vulkancraft
 		}
 
 		is_frame_started_ = false;
-		current_frame_index_ = (current_frame_index_ + 1) % GameSwapChain::kMaxFramesInFlight;
+		current_frame_index_ = (current_frame_index_ + 1) % GameSwapChain::static_max_frames_in_flight_;
 	}
 
 	void GameRenderer::begin_swap_chain_render_pass(VkCommandBuffer commandBuffer)
