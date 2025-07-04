@@ -206,7 +206,7 @@ namespace vulkancraft
 
 	void PhysicalSimulationApp::update_bullet_physics_world()
 	{
-		dynamics_world_->stepSimulation(1.0f / 2000.0f, 10);
+		dynamics_world_->stepSimulation(1.0f / 1000.0f, 1, 1.0f / 1000.0f);
 
 		for (int i = dynamics_world_->getNumCollisionObjects() - 1; i >= 0; i--)
 		{
