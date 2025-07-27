@@ -88,6 +88,18 @@ namespace vulkancraft
 				game_renderer_.get_swap_chain_render_pass(),
 				global_set_layout_->get_descriptor_set_layout()
 			);
+
+		// TODO: 这个功能需要整理成一个函数
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+
+		ImGui::StyleColorsDark(); // Setup Dear ImGui style
+		// ImGui::StyleColorsLight();
+
+		ImGui_ImplGlfw_InitForVulkan(game_window_.get_glfw_window(), true); // Setup Platform/Renderer backends
 	}
 
 	void GameRenderApp::update_render_window_content()

@@ -4,6 +4,10 @@
 #include "render_system_include.h"
 #include "../base_tools/details.h"
 
+#include "../third_party/ImGui/imgui.h"
+#include "../third_party/ImGui/backends/imgui_impl_glfw.h"
+#include "../third_party/ImGui/backends/imgui_impl_vulkan.h"
+
 class ThreadStateManager;
 class TerrainGeneration;
 struct BlockGenerateData;
