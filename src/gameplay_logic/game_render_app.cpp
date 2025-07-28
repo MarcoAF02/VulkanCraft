@@ -105,7 +105,7 @@ namespace vulkancraft
 
 		ImGui_ImplGlfw_InitForVulkan(game_window_.get_glfw_window(), true); // Setup Platform/Renderer backends
 
-		ImGui_ImplVulkan_InitInfo init_info = {};
+		ImGui_ImplVulkan_InitInfo init_info = {}; // TODO: 这里可能缺少信息
 
 		//init_info.ApiVersion = VK_API_VERSION_1_3;              // Pass in your value of VkApplicationInfo::apiVersion, otherwise will default to header version.
 		init_info.Instance = game_device_.get_vulkan_instance();
@@ -153,6 +153,11 @@ namespace vulkancraft
 		game_entity_manager_->get_character_controller()->init_character_controller();
 		game_entity_manager_->get_character_controller()->init_mouse_rotate(game_window_.get_glfw_window());
 
+		// Our state
+		bool show_demo_window = true;
+		bool show_another_window = false;
+		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
 		while (!game_window_.should_close())
 		{
 			glfwPollEvents();
@@ -160,6 +165,37 @@ namespace vulkancraft
 			std::chrono::steady_clock::time_point new_time = std::chrono::high_resolution_clock::now();
 			float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
 			current_time = new_time;
+
+			ImGui_ImplVulkan_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+
+			if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
+
+			{
+				static float f = 0.0f;
+				static int counter = 0;
+
+				ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+				ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+				ImGui::Checkbox("Another Window", &show_another_window);
+
+				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+				ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+				if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+					counter++;
+				ImGui::SameLine();
+				ImGui::Text("counter = %d", counter);
+
+				// ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
+				ImGui::End();
+			}
+
+			ImGui::Render();
 
 			// HACK: 打印玩家数据
 			// game_entity_manager_->get_character_controller() -> print_player_details();
@@ -214,6 +250,10 @@ namespace vulkancraft
 				game_renderer_.end_frame();
 			}
 		}
+
+		ImGui_ImplVulkan_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 
 		vkDeviceWaitIdle(game_device_.get_vulkan_device());
 
