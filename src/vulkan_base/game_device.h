@@ -40,37 +40,25 @@ namespace vulkancraft
 		GameDevice(GameWindow& window);
 		~GameDevice();
 
-		// Not copyable or movable
-		GameDevice(const GameDevice&) = delete;
+		GameDevice(const GameDevice&) = delete; // Not copyable or movable
 		GameDevice& operator=(const GameDevice&) = delete;
 		GameDevice(GameDevice&&) = delete;
 		GameDevice& operator=(GameDevice&&) = delete;
 
 		VkCommandPool get_command_pool() const { return command_pool_; }
-
-		// 得到 Vulkan 单例
-		VkInstance get_vulkan_instance() const { return instance_; }
-
-		// 得到 Vulkan 逻辑设备
-		VkDevice get_vulkan_device() const { return vulkan_device_; }
-
-		// 得到 Vulkan 物理设备
-		VkPhysicalDevice get_physical_device() const { return physical_device_; }
-
-		// 得到 Graphics Queue
-		VkQueue get_graphics_queue() const { return graphics_queue_; }
-
+		VkInstance get_vulkan_instance() const { return instance_; } // 得到 Vulkan 单例
+		VkDevice get_vulkan_device() const { return vulkan_device_; } // 得到 Vulkan 逻辑设备
+		VkPhysicalDevice get_physical_device() const { return physical_device_; } // 得到 Vulkan 物理设备
+		VkQueue get_graphics_queue() const { return graphics_queue_; } // 得到 Graphics Queue
 		VkSurfaceKHR surface() const { return surface_; }
 		VkQueue graphics_queue() const { return graphics_queue_; }
 		VkQueue present_queue() const { return present_queue_; }
-
 		SwapChainSupportDetails get_swap_chain_support() { return query_swap_chain_support(physical_device_); }
 		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 		QueueFamilyIndices find_physical_queue_families() { return find_queue_families(physical_device_); }
 		VkFormat find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
-		// Buffer Helper Functions
-		void create_buffer
+		void create_buffer // Buffer Helper Functions
 		(
 			VkDeviceSize size,
 			VkBufferUsageFlags usage,
