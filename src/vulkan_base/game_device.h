@@ -25,7 +25,7 @@ namespace vulkancraft
 		uint32_t present_family = 0;
 		bool graphics_family_has_value = false;
 		bool present_family_has_value = false;
-		bool isComplete() { return graphics_family_has_value && present_family_has_value; }
+		bool isComplete() const { return graphics_family_has_value && present_family_has_value; }
 	};
 
 	class GameDevice
@@ -46,17 +46,23 @@ namespace vulkancraft
 		GameDevice(GameDevice&&) = delete;
 		GameDevice& operator=(GameDevice&&) = delete;
 
-		VkCommandPool get_command_pool() { return command_pool_; }
+		VkCommandPool get_command_pool() const { return command_pool_; }
+
+		// 得到 Vulkan 单例
+		VkInstance get_vulkan_instance() const { return instance_; }
 
 		// 得到 Vulkan 逻辑设备
-		VkDevice get_vulkan_device() { return vulkan_device_; }
+		VkDevice get_vulkan_device() const { return vulkan_device_; }
 
 		// 得到 Vulkan 物理设备
-		VkPhysicalDevice get_physical_device() { return physical_device_; }
+		VkPhysicalDevice get_physical_device() const { return physical_device_; }
 
-		VkSurfaceKHR surface() { return surface_; }
-		VkQueue graphics_queue() { return graphics_queue_; }
-		VkQueue present_queue() { return present_queue_; }
+		// 得到 Graphics Queue
+		VkQueue get_graphics_queue() const { return graphics_queue_; }
+
+		VkSurfaceKHR surface() const { return surface_; }
+		VkQueue graphics_queue() const { return graphics_queue_; }
+		VkQueue present_queue() const { return present_queue_; }
 
 		SwapChainSupportDetails get_swap_chain_support() { return query_swap_chain_support(physical_device_); }
 		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);

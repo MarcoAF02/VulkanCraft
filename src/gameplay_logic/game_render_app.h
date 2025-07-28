@@ -30,6 +30,7 @@ namespace vulkancraft
 		const std::string kWindowName = "VulkanCraft";
 
 		void initialize_render_system(); // 初始化渲染系统
+		void initialize_imgui(); // 初始化 ImGui
 		void update_render_window_content(); // 渲染窗口主循环
 		void create_terrain(); // 加载游戏对象（地形）
 		void load_object_texture(); // 加载纹理贴图

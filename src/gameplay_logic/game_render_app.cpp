@@ -89,7 +89,11 @@ namespace vulkancraft
 				global_set_layout_->get_descriptor_set_layout()
 			);
 
-		// TODO: 这个功能需要整理成一个函数
+		initialize_imgui();
+	}
+
+	void GameRenderApp::initialize_imgui()
+	{
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -100,6 +104,10 @@ namespace vulkancraft
 		// ImGui::StyleColorsLight();
 
 		ImGui_ImplGlfw_InitForVulkan(game_window_.get_glfw_window(), true); // Setup Platform/Renderer backends
+
+		ImGui_ImplVulkan_InitInfo init_info = {};
+
+		// TODO: 下面填写 ImGui_ImplVulkan_InitInfo 结构体信息，填完后在渲染循环中创建 ImGui 上下文。
 	}
 
 	void GameRenderApp::update_render_window_content()
