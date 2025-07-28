@@ -83,6 +83,8 @@ namespace vulkancraft
 		VulkanBaseDescriptorPool(const VulkanBaseDescriptorPool&) = delete;
 		VulkanBaseDescriptorPool& operator = (const VulkanBaseDescriptorPool&) = delete;
 
+		VkDescriptorPool get_descriptor_pool() const { return descriptor_pool_; }
+
 		bool allocate_descriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;
 
 		void free_descriptors(std::vector<VkDescriptorSet>& descriptors) const;

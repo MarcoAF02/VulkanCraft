@@ -29,6 +29,8 @@ namespace vulkancraft
 		const int kHeight = 800;
 		const std::string kWindowName = "VulkanCraft";
 
+		std::unique_ptr<VulkanBaseDescriptorPool> global_pool_{}; // 全局描述符池
+
 		void initialize_render_system(); // 初始化渲染系统
 		void initialize_imgui(); // 初始化 ImGui
 		void update_render_window_content(); // 渲染窗口主循环
@@ -71,7 +73,6 @@ namespace vulkancraft
 		GameDevice game_device_{ game_window_ };
 		GameRenderer game_renderer_{ game_window_, game_device_ };
 
-		std::unique_ptr<VulkanBaseDescriptorPool> global_pool_{}; // 全局描述符池
 		std::unique_ptr<GameTexture> game_base_texture_{}; // 游戏贴图
 		BaseGameObject::RenderAppObjMap game_object_map_; // 以字典储存的 game_object
 

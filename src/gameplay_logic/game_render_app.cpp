@@ -107,7 +107,23 @@ namespace vulkancraft
 
 		ImGui_ImplVulkan_InitInfo init_info = {};
 
-		// TODO: 下面填写 ImGui_ImplVulkan_InitInfo 结构体信息，填完后在渲染循环中创建 ImGui 上下文。
+		//init_info.ApiVersion = VK_API_VERSION_1_3;              // Pass in your value of VkApplicationInfo::apiVersion, otherwise will default to header version.
+		init_info.Instance = game_device_.get_vulkan_instance();
+		init_info.PhysicalDevice = game_device_.get_physical_device();
+		init_info.Device = game_device_.get_vulkan_device();
+		init_info.QueueFamily = game_device_.find_physical_queue_families().graphics_family;
+		init_info.Queue = game_device_.get_graphics_queue();
+		init_info.PipelineCache = VK_NULL_HANDLE;
+		init_info.DescriptorPool = global_pool_->get_descriptor_pool();
+		init_info.RenderPass = game_renderer_.get_swap_chain_render_pass();
+		init_info.Subpass = 0;
+		init_info.MinImageCount = GameSwapChain::static_max_frames_in_flight_;
+		init_info.ImageCount = GameSwapChain::static_max_frames_in_flight_;
+		init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+		init_info.Allocator = VK_NULL_HANDLE;
+		init_info.CheckVkResultFn = VK_NULL_HANDLE;
+
+		ImGui_ImplVulkan_Init(&init_info);
 	}
 
 	void GameRenderApp::update_render_window_content()
