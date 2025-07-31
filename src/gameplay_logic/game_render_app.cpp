@@ -94,6 +94,8 @@ namespace vulkancraft
 
 	void GameRenderApp::initialize_imgui()
 	{
+		// TODO: 此处需要创建 ImGui 自己的描述符集
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
