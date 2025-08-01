@@ -94,7 +94,31 @@ namespace vulkancraft
 
 	void GameRenderApp::initialize_imgui()
 	{
-		// TODO: 此处需要创建 ImGui 自己的描述符集
+		// HACK: 此处需要创建 ImGui 自己的描述符集
+		VkDescriptorPoolSize pool_sizes[] =
+		{
+			{ VK_DESCRIPTOR_TYPE_SAMPLER, 1024 },
+			{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1024 },
+			{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1024 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1024 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1024 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1024 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1024 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1024 },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1024 },
+			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1024 },
+			{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1024 }
+		};
+
+		VkDescriptorPoolCreateInfo pool_info = {};
+		pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+		pool_info.maxSets = 1024;
+		pool_info.poolSizeCount = std::size(pool_sizes);
+		pool_info.pPoolSizes = pool_sizes;
+
+		VkDescriptorPool imgui_pool;
+		vkCreateDescriptorPool(game_device_.get_vulkan_device(), &pool_info, nullptr, &imgui_pool);
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -116,7 +140,7 @@ namespace vulkancraft
 		init_info.QueueFamily = game_device_.find_physical_queue_families().graphics_family;
 		init_info.Queue = game_device_.get_graphics_queue();
 		init_info.PipelineCache = VK_NULL_HANDLE;
-		init_info.DescriptorPool = global_pool_->get_descriptor_pool();
+		init_info.DescriptorPool = imgui_pool;
 		init_info.RenderPass = game_renderer_.get_swap_chain_render_pass();
 		init_info.Subpass = 0;
 		init_info.MinImageCount = GameSwapChain::static_max_frames_in_flight_;
